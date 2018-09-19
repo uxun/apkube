@@ -1,0 +1,4 @@
+# 在deploy节点生成CA相关证书
+- hosts: deploy
+  roles:
+  - deploy
