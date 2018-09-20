@@ -17,8 +17,8 @@
 
 - name: backup default repo
   copy:
-	src: /etc/yum.repos.d/CentOS-Base.repo
-	dest: /etc/yum.repos.d/CentOS-Base.repo.backup
+    src: /etc/yum.repos.d/CentOS-Base.repo
+    dest: /etc/yum.repos.d/CentOS-Base.repo.backup
 
 - name: get aliyun base-repo
   get_url:
