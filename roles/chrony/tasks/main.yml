@@ -1,0 +1,23 @@
+- name: install chrony
+  package: name=chrony state=latest
+
+- block:
+  - name: Configuration chrony server
+    template: src=server-centos.conf.j2 dest=/etc/chrony.conf
+    when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+  - name: start chrony server
+    service: name=chronyd state=restarted enabled=yes
+    when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+  when: 'inventory_hostname == groups.deploy[0]'
+
+- block:
+  - name: Configuration chrony client
+    template: src=client-centos.conf.j2 dest=/etc/chrony.conf
+    when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+  - name: start chrony client
+    service: name=chronyd state=restarted enabled=yes
+    when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+  when: 'inventory_hostname != groups.deploy[0]'
+
