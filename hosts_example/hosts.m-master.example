@@ -74,7 +74,8 @@ BASIC_AUTH_PASS="test1234"
 
 # ---------附加参数--------------------
 #默认二进制文件目录
-bin_dir="/opt/kube/bin"
+#bin_dir="/opt/kube/bin"
+bin_dir="/usr/local/bin"
 
 #证书目录
 ca_dir="/etc/kubernetes/ssl"
