@@ -1,9 +1,9 @@
 - name: Disable friewall
   yum: name={{ item }} state=absent
   with_items:
-    - firewalld
-    - python-firewall
-    - firewalld-filesystem
+  - firewalld
+  - python-firewall
+  - firewalld-filesystem
 
 - name: Disable SElinux
   lineinfile:
