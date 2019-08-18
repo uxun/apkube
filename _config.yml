@@ -1,0 +1,38 @@
+# Document:
+# http://simiki.org/docs/configuration.html
+url: http://uxun.github.io/wiki
+title: Uxun's WIKI
+keywords: 
+description: 
+author: Uxun 
+theme: yasimple_x2
+#theme: simple2
+
+root: /wiki
+source: content
+destination: output
+themes_dir: themes
+
+##### Parser #####
+markdown:
+  - fenced_code
+  - extra
+  - codehilite(css_class=hlcode, linenums=False)
+  - toc(title=Table of Contents)
+
+default_ext: md
+pygments: true
+debug: false
+
+#category:
+#  - name: linux  # 目录名
+#    label: Linux/运维  # 目录的别名, 生成首页时可以使用
+#  - name: database
+#    label: 数据库
+#
+
+##### Deploy #####
+deploy:
+  - type: git
+    remote: origin
+    branch: gh-pages

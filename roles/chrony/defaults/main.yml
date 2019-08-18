@@ -1,5 +1,0 @@
-# Set up the time source server
-ntp_server: "ntp1.aliyun.com"
-
-# Network segment that allows synchronization example:"10.0.0.0/8"，default: allow all
-local_network: "0.0.0.0/0"

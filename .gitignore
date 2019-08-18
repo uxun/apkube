@@ -1,0 +1,14 @@
+*.swp
+*.bak
+output*
+*.py[cd]
+.DS_Store
+*.o
+*.proj
+*.iml
+.idea/
+*.gz
+*.data
+logs/
+tmp/
+*.out
