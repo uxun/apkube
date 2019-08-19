@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Parted - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#storage">storage</a>
+    &nbsp;&#187;&nbsp;Parted
+    <span class="updated">Page Updated&nbsp;
+    None
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="parted">Parted</h2>
+<p>大于2t 磁盘分区命令</p>
+<p>二种模式</p>
+<blockquote>
+<p>1.交互式 2.命令行</p>
+</blockquote>
+<h3 id="1">1.交互式</h3>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">parted</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdf</span>
+<span class="n">GNU</span> <span class="n">Parted</span> <span class="mf">3.1</span>
+<span class="n">Using</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdf</span>
+<span class="n">Welcome</span> <span class="n">to</span> <span class="n">GNU</span> <span class="n">Parted</span><span class="o">!</span> <span class="n">Type</span> <span class="err">&#39;</span><span class="n">help</span><span class="err">&#39;</span> <span class="n">to</span> <span class="n">view</span> <span class="n">a</span> <span class="n">list</span> <span class="n">of</span> <span class="n">commands</span><span class="p">.</span>
+<span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">mklabel</span> <span class="n">gpt</span>                <span class="err">#</span> <span class="err">定义分区表格式</span>                                                  
+<span class="nl">Warning:</span> <span class="n">The</span> <span class="n">existing</span> <span class="n">disk</span> <span class="n">label</span> <span class="n">on</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdf</span> <span class="n">will</span> <span class="n">be</span> <span class="n">destroyed</span> <span class="n">and</span> <span class="n">all</span> <span class="n">data</span> <span class="n">on</span> <span class="n">this</span> <span class="n">disk</span> <span class="n">will</span> <span class="n">be</span> <span class="n">lost</span><span class="p">.</span> <span class="n">Do</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="k">continue</span><span class="o">?</span>
+<span class="n">Yes</span><span class="o">/</span><span class="n">No</span><span class="o">?</span> <span class="n">yes</span>                                                               
+<span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">print</span>                      <span class="err">#</span> <span class="err">查看当前分区情况</span>
+<span class="nl">Model:</span> <span class="n">SEAGATE</span> <span class="n">ST4000NM0025</span> <span class="p">(</span><span class="n">scsi</span><span class="p">)</span>
+<span class="n">Disk</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdf</span><span class="o">:</span> <span class="mi">4001</span><span class="n">GB</span>
+<span class="n">Sector</span> <span class="n">size</span> <span class="p">(</span><span class="n">logical</span><span class="o">/</span><span class="n">physical</span><span class="p">)</span><span class="o">:</span> <span class="mi">512</span><span class="n">B</span><span class="o">/</span><span class="mi">512</span><span class="n">B</span>
+<span class="n">Partition</span> <span class="n">Table</span><span class="o">:</span> <span class="n">gpt</span>
+<span class="n">Disk</span> <span class="n">Flags</span><span class="o">:</span> 
+
+<span class="n">Number</span>  <span class="n">Start</span>  <span class="n">End</span>  <span class="n">Size</span>  <span class="n">File</span> <span class="n">system</span>  <span class="n">Name</span>  <span class="n">Flags</span>
+
+<span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">mk</span>
+<span class="n">mklabel</span>  <span class="n">mkpart</span>   <span class="n">mktable</span>  
+<span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">mkpart</span> <span class="n">sdf1</span>                <span class="err">#</span> <span class="err">磁盘</span>
+<span class="n">File</span> <span class="n">system</span> <span class="n">type</span><span class="o">?</span>  <span class="p">[</span><span class="n">ext2</span><span class="p">]</span><span class="o">?</span> <span class="n">xfs</span>      <span class="err">#</span> <span class="err">文件系统</span>
+<span class="n">Start</span><span class="o">?</span> <span class="mi">1</span>                                                                  
+<span class="n">End</span><span class="o">?</span> <span class="mi">4001</span><span class="n">GB</span>                         <span class="err">#</span> <span class="err">大小</span>                                            
+<span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">quit</span>
+
+<span class="cp"># 格式化</span>
+<span class="err">$</span> <span class="n">mkfs</span><span class="p">.</span><span class="n">xfs</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdf1</span>
+
+<span class="cp"># uuid查看</span>
+<span class="err">$</span> <span class="n">ls</span> <span class="o">-</span><span class="n">l</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">disk</span><span class="o">/</span><span class="n">by</span><span class="o">-</span><span class="n">uuid</span><span class="o">/</span>
+<span class="err">$</span> <span class="n">blkid</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdf1</span>
+</pre></div>
+
+
+<h3 id="2">2.命令行</h3>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">parted</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span> <span class="n">mklabel</span> <span class="n">gpt</span>                <span class="err">#</span> <span class="err">定义分区表格式</span>
+<span class="err">$</span> <span class="n">parted</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span> <span class="n">mkpart</span> <span class="n">primary</span> <span class="n">ext4</span> <span class="mi">1</span> <span class="mi">10</span><span class="n">G</span>  <span class="err">#</span> <span class="err">划分主分区</span>
+<span class="err">$</span> <span class="n">parted</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span> <span class="n">mkpart</span> <span class="n">logic</span> <span class="mi">10</span><span class="n">G</span> <span class="mi">20</span><span class="n">G</span>       <span class="err">#</span> <span class="err">划分逻辑分区</span>
+<span class="err">$</span> <span class="n">parted</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span> <span class="n">mkpart</span> <span class="n">logic</span> <span class="n">ext3</span> <span class="mi">20</span><span class="n">G</span> <span class="mi">40</span><span class="n">G</span>
+<span class="err">$</span> <span class="n">parted</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span> <span class="n">mkpart</span> <span class="n">entended</span> <span class="mi">40</span><span class="n">G</span> <span class="mi">100</span><span class="o">%</span>   <span class="err">#</span> <span class="err">划分扩展分区，</span><span class="mi">100</span><span class="o">%</span><span class="err">表示使用剩余所有空间</span>
+<span class="err">$</span> <span class="n">parted</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span> <span class="n">p</span>                          <span class="err">#</span> <span class="err">查看分区详情</span>
+<span class="nl">Model:</span> <span class="n">Virtio</span> <span class="n">Block</span> <span class="n">Device</span> <span class="p">(</span><span class="n">virtblk</span><span class="p">)</span>
+<span class="n">Disk</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span><span class="o">:</span> <span class="mi">107</span><span class="n">GB</span>
+<span class="n">Sector</span> <span class="n">size</span> <span class="p">(</span><span class="n">logical</span><span class="o">/</span><span class="n">physical</span><span class="p">)</span><span class="o">:</span> <span class="mi">512</span><span class="n">B</span><span class="o">/</span><span class="mi">512</span><span class="n">B</span>
+<span class="n">Partition</span> <span class="n">Table</span><span class="o">:</span> <span class="n">gpt</span>
+<span class="n">Number</span>  <span class="n">Start</span>   <span class="n">End</span>     <span class="n">Size</span>    <span class="n">File</span> <span class="n">system</span>  <span class="n">Name</span>     <span class="n">Flags</span>
+ <span class="mi">1</span>      <span class="mi">1049</span><span class="n">kB</span>  <span class="mf">10.0</span><span class="n">GB</span>  <span class="mi">9999</span><span class="n">MB</span>  <span class="n">ext4</span>         <span class="n">primary</span>
+ <span class="mi">2</span>      <span class="mf">10.0</span><span class="n">GB</span>  <span class="mf">20.0</span><span class="n">GB</span>  <span class="mi">9999</span><span class="n">MB</span>  <span class="n">xfs</span>          <span class="n">logic</span>
+ <span class="mi">3</span>      <span class="mf">20.0</span><span class="n">GB</span>  <span class="mf">40.0</span><span class="n">GB</span>  <span class="mf">20.0</span><span class="n">GB</span>  <span class="n">ext3</span>         <span class="n">logic</span>
+ <span class="mi">4</span>      <span class="mf">40.0</span><span class="n">GB</span>  <span class="mi">107</span><span class="n">GB</span>   <span class="mf">67.4</span><span class="n">GB</span>               <span class="n">entended</span>
+
+<span class="err">$</span> <span class="n">lsblk</span>  <span class="err">#查看分区情况</span>
+</pre></div>
+
+
+<h3 id="3">3.删除</h3>
+<div class="hlcode"><pre><span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">rm</span> <span class="mi">2</span>  <span class="err">#直接删除</span><span class="n">vdb</span> 
+<span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">print</span>
+<span class="nl">Model:</span> <span class="n">Virtio</span> <span class="n">Block</span> <span class="n">Device</span> <span class="p">(</span><span class="n">virtblk</span><span class="p">)</span>
+<span class="n">Disk</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vdb</span><span class="o">:</span> <span class="mi">107</span><span class="n">GB</span>
+<span class="n">Sector</span> <span class="n">size</span> <span class="p">(</span><span class="n">logical</span><span class="o">/</span><span class="n">physical</span><span class="p">)</span><span class="o">:</span> <span class="mi">512</span><span class="n">B</span><span class="o">/</span><span class="mi">512</span><span class="n">B</span>
+<span class="n">Partition</span> <span class="n">Table</span><span class="o">:</span> <span class="n">gpt</span>
+<span class="n">Number</span>  <span class="n">Start</span>   <span class="n">End</span>     <span class="n">Size</span>    <span class="n">File</span> <span class="n">system</span>  <span class="n">Name</span>  <span class="n">Flags</span>
+ <span class="mi">1</span>      <span class="mi">1049</span><span class="n">kB</span>  <span class="mf">10.0</span><span class="n">GB</span>  <span class="mi">9999</span><span class="n">MB</span>  <span class="n">ext4</span>         <span class="n">p1</span>
+</pre></div>
+
+
+<h3 id="4">4.概念</h3>
+<h4 id="mbrgpt">MBR和GPT</h4>
+<blockquote>
+<p>MBR：MBR分区表(即主引导记录)大家都很熟悉。所支持的最大卷：2T，而且对分区有限制：最多4个主分区或3个主分区加一个扩展分区（包含随意数目的逻辑分区）。</p>
+<p>GPT：GPT（即GUID分区表）。是源自EFI标准的一种较新的磁盘分区表结构的标准，是未来磁盘分区的主要形式。GPT的分区信息是在分区中，而MBR在主引导扇区。</p>
+<p>与MBR分区方式相比，具有如下优点：</p>
+<ul>
+<li>突破MBR 4个主分区限制，每个磁盘最多支持128个主分区。</li>
+<li>支持大于2T的分区，最大卷可达18EB。</li>
+</ul>
+</blockquote>
+<h4 id="_1">主分区、扩展分区、逻辑分区</h4>
+<blockquote>
+<ul>
+<li><strong>主分区</strong>又叫主磁盘分区，和扩展分区、逻辑分区一样，是一种分区类型。主分区中不能再划分其他类型的分区，因此每个主分区都相当于一个逻辑磁盘。一个硬盘的主分区也就是包含操作系统启动所必需的文件和数据的硬盘分区，要在硬盘上安装操作系统，则该硬盘必须得有一个主分区。</li>
+<li><strong>扩展分区</strong>不能直接使用，必须分成若干逻辑分区。所有的逻辑分区都是扩展分区的一部分。</li>
+<li><strong>逻辑分区</strong>也相当于一个逻辑磁盘，但主分区是直接在硬盘上划分的，逻辑分区则必须建立于扩展分区中。</li>
+</ul>
+<p>MBR模式分区只能划分四个分区，现在GPT分区至少可以划分128个主分区，未来很有可能将不存在扩展分区和逻辑分区的概念。</p>
+</blockquote>
+<h4 id="partedfdisk">parted和fdisk</h4>
+<blockquote>
+<p>parted命令可以划分单个分区大于2T的GPT格式的分区，也可以划分普通的MBR分区，并且允许调整分区的大小。</p>
+<p>fdisk命令对于大于2T的分区无法划分，所以用fdisk无法看到parted划分的GPT格式的分区。</p>
+<p>parted是一个可以分区并进行分区调整的工具，他可以创建，破坏，移动，复制，调整ext2 linux-swap fat fat32 reiserfs类型的分区，可以创建，调整，移动Macintosh的HFS分区，检测jfs，ntfs，ufs，xfs分区。</p>
+</blockquote>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-18 22:13:44</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
