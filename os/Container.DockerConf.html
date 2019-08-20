@@ -1,0 +1,295 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>DockerConf - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/os">../../../Dropbox/wiki/os</a>
+    &nbsp;&#187;&nbsp;DockerConf
+    <span class="updated">Page Updated&nbsp;
+    2019-08-18 00:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="docker-configuration">Docker Configuration</h2>
+<h3 id="daemon-configuration-file-link"><strong>Daemon configuration file <a href="https://docs.docker.com/engine/reference/commandline/dockerd/">Link</a></strong></h3>
+<p>DefaultPath:/etc/docker/daemon.json<br />
+The <code>--config-file</code> flag 指定目录</p>
+<div class="hlcode"><pre><span class="p">{</span>
+    <span class="nt">&quot;authorization-plugins&quot;</span><span class="p">:</span> <span class="p">[],</span>    
+    <span class="nt">&quot;data-root&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="err">#</span> <span class="err">Docker</span> <span class="err">持久化数据的根路径(default:/var/lib/docker)</span>
+    <span class="nt">&quot;dns&quot;</span><span class="p">:</span> <span class="p">[],</span>                      <span class="err">#</span> <span class="err">容器DNS的地址，在容器的</span> <span class="err">/etc/resolv.conf文件中可查看</span>
+    <span class="nt">&quot;dns-opts&quot;</span><span class="p">:</span> <span class="p">[],</span>                 <span class="err">#</span> <span class="err">容器</span> <span class="err">/etc/resolv.conf</span> <span class="err">其他设置</span>
+    <span class="nt">&quot;dns-search&quot;</span><span class="p">:</span> <span class="p">[],</span>               <span class="err">#</span> <span class="err">容器的搜索域</span> <span class="err">(e.g:host.example.com)</span>
+    <span class="nt">&quot;exec-opts&quot;</span><span class="p">:</span> <span class="p">[],</span>                <span class="err">#</span> <span class="err">(default:cgroupfs)</span> <span class="err">[</span><span class="nt">&quot;native.cgroupdriver=systemd&quot;</span><span class="err">]</span>
+    <span class="s2">&quot;exec-root&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="err">#</span> <span class="err">执行状态文件的根目录（default:/var/run/docker”）</span>
+    <span class="nt">&quot;experimental&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>          <span class="err">#</span> <span class="err">实验功能</span>
+    <span class="nt">&quot;features&quot;</span><span class="p">:</span> <span class="p">{},</span>                 <span class="err">#</span> <span class="err">它明确启用或禁用特定实验功能</span>
+    <span class="nt">&quot;storage-driver&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>           <span class="err">#</span> <span class="err">存储驱动程序</span>
+    <span class="nt">&quot;storage-opts&quot;</span><span class="p">:</span> <span class="p">[],</span>             <span class="err">#</span> <span class="err">存储驱动程序的选项</span>
+    <span class="nt">&quot;labels&quot;</span><span class="p">:</span> <span class="p">[],</span>                   <span class="err">#</span> <span class="err">为守护进程设置key</span> <span class="err">=</span> <span class="err">value标签（默认为[]）</span>
+    <span class="nt">&quot;live-restore&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>           <span class="err">#</span> <span class="err">Docker守护进程down情况，容器保持运行</span>
+    <span class="nt">&quot;log-driver&quot;</span><span class="p">:</span> <span class="s2">&quot;json-file&quot;</span><span class="p">,</span>      <span class="err">#</span> <span class="err">容器日志默认驱动程序</span>
+    <span class="nt">&quot;log-opts&quot;</span><span class="p">:</span> <span class="p">{</span>                   <span class="err">#</span> <span class="err">容器日志默认驱动选项</span>
+        <span class="nt">&quot;max-size&quot;</span><span class="p">:</span> <span class="s2">&quot;10m&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;max-file&quot;</span><span class="p">:</span><span class="s2">&quot;5&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;somelabel&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;env&quot;</span><span class="p">:</span> <span class="s2">&quot;os,customer&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;mtu&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nt">&quot;pidfile&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                  <span class="err">#</span> <span class="err">(default</span> <span class="nt">&quot;/var/run/docker.pid&quot;</span><span class="err">)</span>
+    <span class="s2">&quot;cluster-store&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            <span class="err">#</span> <span class="err">分布式储存后端URL</span>
+    <span class="nt">&quot;cluster-store-opts&quot;</span><span class="p">:</span> <span class="p">{},</span>       <span class="err">#</span> <span class="err">分布式集群存储选项</span>
+    <span class="nt">&quot;cluster-advertise&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>        <span class="err">#</span> <span class="err">提供对外的接口</span> <span class="err">(host:port</span> <span class="err">or</span> <span class="err">interface:port)</span>
+    <span class="nt">&quot;max-concurrent-downloads&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>  <span class="err">#</span> <span class="err">设置每次拉取的最大并发下载量（default:3）</span>
+    <span class="nt">&quot;max-concurrent-uploads&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>    <span class="err">#</span> <span class="err">推送上传并发次数(default:5)</span>
+    <span class="nt">&quot;default-shm-size&quot;</span><span class="p">:</span> <span class="s2">&quot;64M&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;shutdown-timeout&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>         <span class="err">#</span> <span class="err">设置值后，关闭所有容器</span>
+    <span class="nt">&quot;debug&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;hosts&quot;</span><span class="p">:</span> <span class="p">[],</span>                    <span class="err">#</span> <span class="err">UNIX套接字和IP地址</span>
+    <span class="nt">&quot;log-level&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="err">#</span> <span class="err">(</span><span class="nt">&quot;debug&quot;</span><span class="p">,</span><span class="err">default:</span><span class="nt">&quot;info&quot;</span><span class="p">,</span><span class="nt">&quot;warn&quot;</span><span class="p">,</span><span class="nt">&quot;error&quot;</span><span class="p">,</span><span class="nt">&quot;fatal&quot;</span><span class="err">)</span> 
+    <span class="s2">&quot;tls&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>                    <span class="err">#</span> <span class="err">(default:false)启动TLS认证开关</span>
+    <span class="nt">&quot;tlsverify&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&quot;tlscacert&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;tlscert&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;tlskey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;swarm-default-advertise-addr&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;api-cors-header&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;selinux-enabled&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nt">&quot;userns-remap&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="err">#</span> <span class="err">用户名称空间的</span> <span class="err">User/Group</span> <span class="err">设置</span>
+    <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                    <span class="err">#</span> <span class="err">(default</span> <span class="nt">&quot;docker&quot;</span><span class="err">)</span> <span class="err">unix</span> <span class="err">socket</span>
+    <span class="s2">&quot;cgroup-parent&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            <span class="err">#</span> <span class="err">设置所有容器的父cgroup</span>
+    <span class="nt">&quot;default-ulimits&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;nofile&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;nofile&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;Hard&quot;</span><span class="p">:</span> <span class="mi">64000</span><span class="p">,</span>
+            <span class="nt">&quot;Soft&quot;</span><span class="p">:</span> <span class="mi">64000</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;init&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>                  <span class="err">#</span> <span class="err">容器运行init以转发信号并获取进程</span>
+    <span class="nt">&quot;init-path&quot;</span><span class="p">:</span> <span class="s2">&quot;/usr/libexec/docker-init&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;ipv6&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nt">&quot;iptables&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>              <span class="err">#</span> <span class="err">(default</span> <span class="err">true)</span>
+    <span class="nt">&quot;ip-forward&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>            <span class="err">#</span> <span class="err">(default</span> <span class="err">true)</span>
+    <span class="nt">&quot;ip-masq&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>               <span class="err">#</span> <span class="err">ip伪装</span> <span class="err">(default</span> <span class="err">true)</span>
+    <span class="nt">&quot;userland-proxy&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>        <span class="err">#</span> <span class="err">(default</span> <span class="err">true)</span> <span class="err">使用userland代理进行环回流量</span>
+    <span class="nt">&quot;userland-proxy-path&quot;</span><span class="p">:</span> <span class="s2">&quot;/usr/libexec/docker-proxy&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;ip&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span>                <span class="err">#</span> <span class="err">绑定容器端口时，使用的ip，默认</span><span class="nt">&quot;0.0.0.0&quot;</span>
+    <span class="s2">&quot;bridge&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                   <span class="err">#</span> <span class="err">将容器连接到网桥</span>
+    <span class="nt">&quot;bip&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                      <span class="err">#</span> <span class="err">指定网桥IP</span>
+    <span class="nt">&quot;fixed-cidr&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>               <span class="err">#</span> <span class="err">指定IPv4</span> <span class="err">子网</span>
+    <span class="nt">&quot;fixed-cidr-v6&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>            
+    <span class="nt">&quot;default-gateway&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;default-gateway-v6&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;icc&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>                   <span class="err">#</span> <span class="err">容器间通信</span> <span class="err">(default</span> <span class="err">true)</span>
+    <span class="nt">&quot;raw-logs&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>              <span class="err">#</span> <span class="err">没有ANSI着色的完整时间戳</span>
+    <span class="nt">&quot;allow-nondistributable-artifacts&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="nt">&quot;registry-mirrors&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="nt">&quot;seccomp-profile&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>          <span class="err">#</span> <span class="err">安全计算模式的配置路径</span>
+    <span class="nt">&quot;insecure-registries&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="nt">&quot;no-new-privileges&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>     <span class="err">#</span> <span class="err">默认情况容器进程无法获得额外权限</span>
+    <span class="nt">&quot;default-runtime&quot;</span><span class="p">:</span> <span class="s2">&quot;runc&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;oom-score-adjust&quot;</span><span class="p">:</span> <span class="mi">-500</span><span class="p">,</span>
+    <span class="nt">&quot;node-generic-resources&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;NVIDIA-GPU=UUID1&quot;</span><span class="p">,</span> <span class="s2">&quot;NVIDIA-GPU=UUID2&quot;</span><span class="p">],</span>
+    <span class="nt">&quot;runtimes&quot;</span><span class="p">:</span> <span class="p">{</span>                   <span class="err">#</span> <span class="err">它会更新可用于运行容器的可用OCI运行时列表。</span>
+        <span class="nt">&quot;cc-runtime&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/usr/bin/cc-runtime&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;custom&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/usr/local/bin/my-runc-replacement&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;runtimeArgs&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;--debug&quot;</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;default-address-pools&quot;</span><span class="p">:[{</span><span class="nt">&quot;base&quot;</span><span class="p">:</span><span class="s2">&quot;172.80.0.0/16&quot;</span><span class="p">,</span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="mi">24</span><span class="p">},</span>
+    <span class="p">{</span><span class="nt">&quot;base&quot;</span><span class="p">:</span><span class="s2">&quot;172.90.0.0/16&quot;</span><span class="p">,</span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="mi">24</span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3 id="explain-in-detail">Explain in detail</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>authorization-plugins</td>
+<td>访问授权插件 https://docs.docker.com/engine/extend/plugins_authorization</td>
+</tr>
+<tr>
+<td>tlsverify</td>
+<td>安全网络访问Docker https://docs.docker.com/engine/security/https/</td>
+</tr>
+<tr>
+<td>features</td>
+<td _features_:_buildkit_:="&quot;features&quot;:{&quot;buildkit&quot;:" true="true"></td>
+</tr>
+<tr>
+<td>storage-driver</td>
+<td><code>aufs</code>, <code>devicemapper</code>, <code>btrfs</code>, <code>zfs</code>, <code>overlay</code> and <code>overlay2</code></td>
+</tr>
+<tr>
+<td>storage-opts</td>
+<td _="]" _devicemapper_="&quot;devicemapper&quot;," _dm.thinpooldev="/dev/mapper/thin-pool&quot;," _dm.use_deferred_deletion="true&quot;," _dm.use_deferred_removal="true&quot;" _storage-driver_:="&quot;storage-driver&quot;:" _storage-opts_:="&quot;storage-opts&quot;:"></td>
+</tr>
+<tr>
+<td>live-restore</td>
+<td>守护程序不可用时保持容器处于活动状态https://docs.docker.com/config/containers/live-restore/</td>
+</tr>
+<tr>
+<td>cluster-store</td>
+<td><a href="https://docs.docker.com/engine/reference/commandline/dockerd/#/linux-configuration-file">The keyword</a>：Node discovery</td>
+</tr>
+<tr>
+<td>api-cors-header</td>
+<td>跨域资源共享https://en.wikipedia.org/wiki/Cross-origin_resource_sharing</td>
+</tr>
+<tr>
+<td>cgroup-parent</td>
+<td><a href="https://docs.docker.com/engine/reference/commandline/dockerd/#/linux-configuration-file">The keyword</a>：DEFAULT CGROUP PARENT</td>
+</tr>
+<tr>
+<td>allow-nondistributable-artifacts</td>
+<td><a href="https://docs.docker.com/engine/reference/commandline/dockerd/#/linux-configuration-file">The keyword</a>：Allow push of nondistributable artifacts</td>
+</tr>
+<tr>
+<td>seccomp-profile</td>
+<td>安全地运行不受信任的计算绑定程序 https://en.wikipedia.org/wiki/Seccomp</td>
+</tr>
+<tr>
+<td>runtimes</td>
+<td><a href="https://docs.docker.com/engine/reference/commandline/dockerd/#/linux-configuration-file">The keyword</a>：Docker runtime execution options</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2command">2.Command</h3>
+<p>基础容器创建：</p>
+<div class="hlcode"><pre><span class="n">docker</span> <span class="n">run</span> <span class="o">--</span><span class="n">name</span> <span class="n">baseimage</span> <span class="o">-</span><span class="n">it</span> <span class="o">-</span><span class="n">v</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">baseimage</span><span class="o">/:/</span><span class="n">data</span><span class="o">/</span><span class="n">web</span><span class="o">/</span><span class="n">html</span> <span class="n">busybox</span>
+</pre></div>
+
+
+<p>创建 nginx 容器使用 baseimage 容器网络 和 volumes 目录</p>
+<div class="hlcode"><pre><span class="n">docker</span> <span class="n">run</span> <span class="o">--</span><span class="n">name</span> <span class="n">nginx</span> <span class="o">--</span><span class="n">network</span> <span class="n">container</span><span class="o">:</span><span class="n">baseimage</span> <span class="o">--</span><span class="n">volumes</span><span class="o">-</span><span class="n">from</span> <span class="n">baseimage</span> <span class="o">-</span><span class="n">it</span> <span class="n">busybox</span>
+</pre></div>
+
+
+<h3 id="3resources">3.Resources</h3>
+<blockquote>
+<p>OOME(Out Of Memory Exception)<br />
+oom-odj 优先级调低</p>
+</blockquote>
+<h4 id="limit-a-containers-access-to-memory"><a href="https://docs.docker.com/config/containers/resource_constraints/#limit-a-containers-access-to-memory">Limit a container's access to memory</a></h4>
+<blockquote>
+<p>e.g: docker run —name stress -it --rm --cpus 2 lore/docker-stress-ng:latest stress --cpu 8</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-m or —memory=</td>
+<td></td>
+</tr>
+<tr>
+<td>--memory-swap *</td>
+<td>依赖--memory 设置时才可用</td>
+</tr>
+<tr>
+<td>--memory="300m" --memory-swap="1g"</td>
+<td>容器可使用的内存为(1g-300m)</td>
+</tr>
+<tr>
+<td>memory="300m" —memory-swap="0"</td>
+<td>视为未设置 swap=2*300m</td>
+</tr>
+<tr>
+<td>memory="300m" --memory-swap="300m"</td>
+<td>值相同正整数，容器无权访问swap</td>
+</tr>
+<tr>
+<td>--memory="300m"</td>
+<td>--memory-swap未设，容器使用300m，2*300m swap</td>
+</tr>
+<tr>
+<td>--memory="300m" --memory-swap="-1"</td>
+<td>容器swap可使用宿主机上限</td>
+</tr>
+</tbody>
+</table>
+<h4 id="configure-the-default-cfs-scheduler"><a href="https://docs.docker.com/config/containers/resource_constraints/#cpu">Configure the default CFS scheduler</a></h4>
+<blockquote>
+<p>scheduler(CFS:完全公平调度器)<br />
+0-9 实时优先级内核级别调度<br />
+100-139 非实时优先级普通进程调度 通过nice值 [-20,19] 调整优先级<br />
+两类：1.cpu密集型。2.io密集型</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>--cpus=<value></td>
+<td>限制使用cpu数量：docker &gt;1.13: —cpus="1.5" 容器最多使用1.5个cpu</td>
+</tr>
+<tr>
+<td>--cpuset-cpus</td>
+<td>限制使用哪个指定cpu编号：0-3</td>
+</tr>
+<tr>
+<td>--cpu-quota=<value></td>
+<td>限制使用时间。docker &gt; 1.13  使用--cpus</td>
+</tr>
+</tbody>
+</table>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-20 14:04:18</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
