@@ -13,3 +13,4 @@ logs/
 tmp/
 *.out
 content
+*.conf
