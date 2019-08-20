@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>DockerInstall - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/os">../../../Dropbox/wiki/os</a>
+    &nbsp;&#187;&nbsp;DockerInstall
+    <span class="updated">Page Updated&nbsp;
+    2019-08-02 00:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="docker-install">Docker install</h1>
+<h3 id="1quick-install-test-use">1.Quick install (test use)</h3>
+<div class="hlcode"><pre><span class="n">curl</span> <span class="o">-</span><span class="n">fsSL</span> <span class="n">https</span><span class="o">:</span><span class="c1">//get.docker.com -o get-docker.sh</span>
+<span class="n">sh</span> <span class="n">get</span><span class="o">-</span><span class="n">docker</span><span class="p">.</span><span class="n">sh</span>
+</pre></div>
+
+
+<h3 id="2install-docker-ce-stable-refernece">2.Install Docker CE (stable) <a href="https://docs.docker.com/install/">REFERNECE</a></h3>
+<div class="hlcode"><pre><span class="nx">yum</span> <span class="nb">install</span> <span class="na">-y</span> <span class="nx">yum</span><span class="na">-utils</span> <span class="o">\</span>
+  <span class="nx">device</span><span class="na">-mapper-persistent-data</span> <span class="o">\</span>
+  <span class="nx">lvm2</span>
+
+<span class="nx">yum</span><span class="na">-config-manager</span> <span class="o">\</span>
+    <span class="o">--</span><span class="nb">add</span><span class="na">-repo</span> <span class="o">\</span>
+    <span class="nx">https</span><span class="p">:</span><span class="c1">//download.docker.com/linux/centos/docker-ce.repo</span>
+
+<span class="err">#</span> <span class="nb">Install</span> <span class="nx">the</span> <span class="nx">latest</span> <span class="nb">version</span>
+<span class="nx">yum</span> <span class="nb">install</span> <span class="nx">docker</span><span class="na">-ce</span> <span class="nx">docker</span><span class="na">-ce-cli</span> <span class="nx">containerd.io</span>
+
+<span class="err">#</span> <span class="k">To</span> <span class="nb">install</span> <span class="nx">a</span> <span class="nx">specific</span> <span class="nb">version</span> <span class="nx">of</span> <span class="nx">Docker</span> <span class="nx">CE</span>
+<span class="err">$</span> <span class="nx">yum</span> <span class="nb">list</span> <span class="nx">docker</span><span class="na">-ce</span> <span class="o">--</span><span class="nx">showduplicates</span> <span class="o">|</span> <span class="nb">sort</span> <span class="na">-r</span>
+<span class="nx">docker</span><span class="na">-ce.x86_64</span>            <span class="mi">3</span><span class="p">:</span><span class="mf">18.09.0</span><span class="o">-</span><span class="mi">3</span><span class="bp">.</span><span class="nx">el7</span>                    <span class="nx">docker</span><span class="na">-ce-stable</span>
+<span class="nx">docker</span><span class="na">-ce.x86_64</span>            <span class="mf">18.06.3</span><span class="bp">.</span><span class="nx">ce</span><span class="o">-</span><span class="mi">3</span><span class="bp">.</span><span class="nx">el7</span>                   <span class="nx">docker</span><span class="na">-ce-stable</span>
+<span class="nx">docker</span><span class="na">-ce.x86_64</span>            <span class="mf">18.06.2</span><span class="bp">.</span><span class="nx">ce</span><span class="o">-</span><span class="mi">3</span><span class="bp">.</span><span class="nx">el7</span>                   <span class="nx">docker</span><span class="na">-ce-stable</span>
+
+<span class="err">$</span> <span class="nx">yum</span> <span class="nb">install</span> <span class="nx">docker</span><span class="na">-ce</span><span class="o">-&lt;</span><span class="nx">VERSION_STRING</span><span class="o">&gt;</span> <span class="nx">docker</span><span class="na">-ce-cli</span><span class="o">-&lt;</span><span class="nx">VERSION_STRING</span><span class="o">&gt;</span> <span class="nx">containerd.io</span>
+
+<span class="err">#</span> <span class="nx">example</span> 
+<span class="err">#</span> <span class="nx">yum</span> <span class="nb">install</span> <span class="nx">docker</span><span class="na">-ce</span><span class="o">-</span><span class="mf">18.06.3</span><span class="bp">.</span><span class="nx">ce</span> <span class="nx">docker</span><span class="na">-ce-cli</span><span class="o">-</span><span class="mf">18.06.3</span><span class="bp">.</span><span class="nx">ce</span> <span class="nx">containerd.io</span>
+</pre></div>
+
+
+<h3 id="4bash-completion">4.Bash-completion</h3>
+<div class="hlcode"><pre><span class="n">yum</span> <span class="n">install</span> <span class="n">epel</span><span class="o">-</span><span class="n">release</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">bash</span><span class="o">-</span><span class="n">completion</span> <span class="o">--</span><span class="n">enablerepo</span><span class="o">=</span><span class="n">epel</span>
+<span class="p">.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">bash_completion</span>
+</pre></div>
+
+
+<h3 id="5daemonjson">5.Daemon.json</h3>
+<div class="hlcode"><pre><span class="p">{</span>
+  <span class="nt">&quot;registry-mirrors&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;https://docker.mirrors.ustc.edu.cn&quot;</span><span class="p">],</span>
+  <span class="nt">&quot;max-concurrent-downloads&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="nt">&quot;log-driver&quot;</span><span class="p">:</span> <span class="s2">&quot;json-file&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;log-level&quot;</span><span class="p">:</span> <span class="s2">&quot;warn&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;log-opts&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;max-size&quot;</span><span class="p">:</span> <span class="s2">&quot;10m&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;max-file&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span>
+    <span class="p">},</span>
+  <span class="nt">&quot;data-root&quot;</span><span class="p">:</span> <span class="s2">&quot;/var/lib/docker&quot;</span>
+  <span class="err">#</span><span class="p">,</span><span class="nt">&quot;hosts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;tcp://0.0.0.0:2376&quot;</span><span class="p">,</span> <span class="s2">&quot;unix:///var/run/docker.sock&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h2 id="install-docker-compose">Install Docker-compose</h2>
+<blockquote>
+<p>URL https://docs.docker.com/compose/install/<br />
+Github https://github.com/docker/compose/releases<br />
+安装不同版本的Compose，请替换<code>1.24.0</code> 为要使用的Compose版本</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># download</span>
+<span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="s">&quot;https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)&quot;</span> <span class="o">-</span><span class="n">o</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+
+<span class="cp"># start</span>
+<span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+
+<span class="cp"># update</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">migrate</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">labels</span>
+
+<span class="cp"># remove</span>
+<span class="n">rm</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+<span class="cp"># or</span>
+<span class="n">pip</span> <span class="n">uninstall</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+</pre></div>
+
+
+<h2 id="uninstall-docker-ce">Uninstall Docker CE</h2>
+<div class="hlcode"><pre><span class="n">yum</span> <span class="n">remove</span> <span class="n">docker</span><span class="o">-</span><span class="n">ce</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">docker</span>
+<span class="n">yum</span> <span class="n">remove</span> <span class="n">docker</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">client</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">client</span><span class="o">-</span><span class="n">latest</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">common</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">latest</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">latest</span><span class="o">-</span><span class="n">logrotate</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">logrotate</span> \
+                  <span class="n">docker</span><span class="o">-</span><span class="n">engine</span>
+</pre></div>
+
+
+<h3 id="error">Error</h3>
+<div class="hlcode"><pre><span class="cp"># Transaction check error:</span>
+<span class="err">$</span> <span class="n">rpm</span> <span class="o">-</span><span class="n">qa</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">docker</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">ce</span><span class="o">-</span><span class="n">cli</span><span class="o">-</span><span class="mf">18.09.3</span><span class="o">-</span><span class="mf">3.</span><span class="n">el7</span><span class="p">.</span><span class="n">x86_64</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">remove</span> <span class="n">docker</span><span class="o">-</span><span class="n">ce</span><span class="o">-</span><span class="n">cli</span><span class="o">-</span><span class="mf">18.09.3</span><span class="o">-</span><span class="mf">3.</span><span class="n">el7</span><span class="p">.</span><span class="n">x86_64</span>
+</pre></div>
+
+
+<h3 id="delete-dokcer0">Delete dokcer0</h3>
+<div class="hlcode"><pre><span class="cp"># 移除网卡</span>
+<span class="n">yum</span> <span class="o">-</span><span class="n">y</span> <span class="n">install</span> <span class="n">bridge</span><span class="o">-</span><span class="n">utils</span>
+<span class="n">ifconfig</span> <span class="n">docker0</span> <span class="n">down</span>
+<span class="n">brctl</span> <span class="n">delbr</span> <span class="n">docker0</span>
+
+<span class="cp"># 移除docker目录</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">docker</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">docker</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-20 18:09:54</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

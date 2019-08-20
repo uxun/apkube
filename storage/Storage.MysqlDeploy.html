@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>MysqlDeploy - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;MysqlDeploy
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="mysql-deploy">Mysql Deploy</h2>
+<h4 id="1adding-the-mysql-yum-repository">1.Adding the MySQL Yum Repository</h4>
+<p><a href="https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/#repo-qg-yum-installing">Refernece</a></p>
+<p>Download  MySQL Yum <a href="https://dev.mysql.com/downloads/repo/yum/">Repo</a></p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">rpm</span> <span class="o">-</span><span class="n">Uvh</span> <span class="n">mysql80</span><span class="o">-</span><span class="n">community</span><span class="o">-</span><span class="n">release</span><span class="o">-</span><span class="n">el7</span><span class="o">-</span><span class="mf">3.</span><span class="n">noarch</span><span class="p">.</span><span class="n">rpm</span>
+<span class="cp"># Search Repository</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">repolist</span> <span class="n">all</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">mysql</span>
+<span class="p">...</span>
+<span class="n">mysql80</span><span class="o">-</span><span class="n">community</span><span class="o">/</span><span class="n">x86_64</span>           <span class="n">MySQL</span> <span class="mf">8.0</span> <span class="n">Community</span> <span class="n">Server</span>    <span class="n">enabled</span><span class="o">:</span>    <span class="mi">113</span>
+<span class="n">mysql80</span><span class="o">-</span><span class="n">community</span><span class="o">-</span><span class="n">source</span>           <span class="n">MySQL</span> <span class="mf">8.0</span> <span class="n">Community</span> <span class="n">Server</span> <span class="o">-</span>  <span class="n">disabled</span>
+<span class="p">...</span>
+<span class="cp"># Selecting a Release Series </span>
+<span class="cp"># yum install yum-utils 默认启用mysql80</span>
+<span class="n">shell</span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">yum</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">manager</span> <span class="o">--</span><span class="n">disable</span> <span class="n">mysql80</span><span class="o">-</span><span class="n">community</span>
+<span class="n">shell</span><span class="o">&gt;</span> <span class="n">sudo</span> <span class="n">yum</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">manager</span> <span class="o">--</span><span class="n">enable</span> <span class="n">mysql57</span><span class="o">-</span><span class="n">community</span>
+</pre></div>
+
+
+<h4 id="2add-repo-link">2.add repo <a href="https://dev.mysql.com/doc/mysql-yum-repo-quick-guide/en/#repo-qg-yum-installing">link</a></h4>
+<p><code>$ vim /etc/yum.repos.d/mysql.repo &amp;&amp; yum repolist</code></p>
+<p><strong>mysql 5.7</strong></p>
+<div class="hlcode"><pre><span class="k">[mysql57-community]</span>
+<span class="na">name</span><span class="o">=</span><span class="s">MySQL 5.7 Community Server</span>
+<span class="na">baseurl</span><span class="o">=</span><span class="s">http://repo.mysql.com/yum/mysql-5.7-community/el/6/$basearch/</span>
+<span class="na">enabled</span><span class="o">=</span><span class="s">1</span>
+<span class="na">gpgcheck</span><span class="o">=</span><span class="s">1</span>
+<span class="na">gpgkey</span><span class="o">=</span><span class="s">file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql</span>
+</pre></div>
+
+
+<p>or</p>
+<p><strong>mysql 8.0</strong></p>
+<div class="hlcode"><pre><span class="k">[mysql80-community]</span>
+<span class="na">name</span><span class="o">=</span><span class="s">MySQL 8.0 Community Server</span>
+<span class="na">baseurl</span><span class="o">=</span><span class="s">http://repo.mysql.com/yum/mysql-8.0-community/el/6/$basearch/</span>
+<span class="na">enabled</span><span class="o">=</span><span class="s">1</span>
+<span class="na">gpgcheck</span><span class="o">=</span><span class="s">1</span>
+<span class="na">gpgkey</span><span class="o">=</span><span class="s">file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql</span>
+</pre></div>
+
+
+<p><code>$ yum repolist enabled | grep mysql</code></p>
+<h3 id="3install-mysql">3.install mysql</h3>
+<div class="hlcode"><pre><span class="cp"># Install</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">mysql</span><span class="o">-</span><span class="n">community</span><span class="o">-</span><span class="n">server</span>
+<span class="cp"># Start</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">mysqld</span><span class="p">.</span><span class="n">service</span>
+</pre></div>
+
+
+<h3 id="4init">4.Init</h3>
+<div class="hlcode"><pre><span class="cp"># 查看密码</span>
+<span class="err">$</span> <span class="n">grep</span> <span class="err">&#39;</span><span class="n">temporary</span> <span class="n">password</span><span class="err">&#39;</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">mysqld</span><span class="p">.</span><span class="n">log</span>
+<span class="cp"># modify</span>
+<span class="err">$</span> <span class="n">mysql</span> <span class="o">-</span><span class="n">uroot</span> <span class="o">-</span><span class="n">p</span>
+<span class="err">$</span> <span class="n">ALTER</span> <span class="n">USER</span> <span class="err">&#39;</span><span class="n">root</span><span class="sc">&#39;@&#39;</span><span class="n">localhost</span><span class="err">&#39;</span> <span class="n">IDENTIFIED</span> <span class="n">BY</span> <span class="err">&#39;</span><span class="n">Adm</span><span class="err">@</span><span class="mi">123456</span><span class="err">&#39;</span><span class="p">;</span>
+<span class="cp"># Remote login </span>
+<span class="cp"># update user set host = ‘%’ where user = ‘root’;</span>
+<span class="n">mysql</span><span class="o">&gt;</span> <span class="n">grant</span> <span class="n">all</span> <span class="n">privileges</span> <span class="n">on</span> <span class="o">*</span><span class="p">.</span><span class="o">*</span> <span class="n">to</span> <span class="n">root</span><span class="err">@</span><span class="sc">&#39;%&#39;</span> <span class="n">identified</span> <span class="n">by</span> <span class="err">&#39;</span><span class="n">Adm</span><span class="err">@</span><span class="mi">123456</span><span class="err">&#39;</span><span class="p">;</span>
+<span class="n">mysql</span><span class="o">&gt;</span> <span class="n">flush</span> <span class="n">privileges</span><span class="p">;</span>
+</pre></div>
+
+
+<h3 id="5other">5.other</h3>
+<p><strong>mysql 5.6</strong></p>
+<div class="hlcode"><pre><span class="cp"># download repo</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//repo.mysql.com/mysql-community-release-el7-5.noarch.rpm</span>
+<span class="n">rpm</span> <span class="o">-</span><span class="n">ivh</span> <span class="n">mysql</span><span class="o">-</span><span class="n">community</span><span class="o">-</span><span class="n">release</span><span class="o">-</span><span class="n">el7</span><span class="o">-</span><span class="mf">5.</span><span class="n">noarch</span><span class="p">.</span><span class="n">rpm</span>
+
+<span class="cp"># check</span>
+<span class="n">ls</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="p">.</span><span class="n">repos</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">mysql</span><span class="o">-</span><span class="n">community</span><span class="o">*</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="p">.</span><span class="n">repos</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">mysql</span><span class="o">-</span><span class="n">community</span><span class="p">.</span><span class="n">repo</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="p">.</span><span class="n">repos</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">mysql</span><span class="o">-</span><span class="n">community</span><span class="o">-</span><span class="n">source</span><span class="p">.</span><span class="n">repo</span>
+
+<span class="cp"># install</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">mysql</span><span class="o">-</span><span class="n">server</span>
+<span class="n">systemctl</span> <span class="n">start</span> <span class="n">mysqld</span>
+<span class="n">mysql_secure_installation</span>
+
+<span class="cp"># set your mysql passwd</span>
+<span class="n">mysql</span> <span class="o">-</span><span class="n">u</span> <span class="n">root</span>
+<span class="n">mysql</span><span class="o">&gt;</span> <span class="n">use</span> <span class="n">mysql</span><span class="p">;</span>
+<span class="n">mysql</span><span class="o">&gt;</span> <span class="n">update</span> <span class="n">user</span> <span class="n">set</span> <span class="n">password</span><span class="o">=</span><span class="n">PASSWORD</span><span class="p">(</span><span class="s">&quot;GIVE-NEW-ROOT-PASSWORD&quot;</span><span class="p">)</span> <span class="n">where</span> <span class="n">User</span><span class="o">=</span><span class="err">&#39;</span><span class="n">root</span><span class="err">&#39;</span><span class="p">;</span>
+<span class="n">mysql</span><span class="o">&gt;</span> <span class="n">flush</span> <span class="n">privileges</span><span class="p">;</span>
+<span class="n">mysql</span><span class="o">&gt;</span> <span class="n">quit</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-20 18:09:54</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
