@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Chrony - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#os">os</a>
+    &nbsp;&#187;&nbsp;Chrony
+    <span class="updated">Page Updated&nbsp;
+    2019-08-12 00:12
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="chrony">Chrony 时间同步</h2>
+<p>RHEL/CentOS7.x 默认同步工具，与ntp可能会有冲突，建议使用其一。</p>
+<blockquote>
+<p>chronyd：daemon守护进程<br />
+chronyc：命令行工具</p>
+</blockquote>
+<h3 id="1deploy">1.Deploy</h3>
+<div class="hlcode"><pre><span class="cp"># install</span>
+<span class="n">yum</span> <span class="o">-</span><span class="n">y</span> <span class="n">install</span> <span class="n">chrony</span>
+
+<span class="cp"># conf</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">chrony</span><span class="p">.</span><span class="n">conf</span>
+<span class="o">-</span> <span class="n">server</span> <span class="mf">0.</span><span class="n">centos</span><span class="p">.</span><span class="n">pool</span><span class="p">.</span><span class="n">ntp</span><span class="p">.</span><span class="n">org</span> <span class="n">iburst</span> <span class="err">#</span><span class="n">ntp</span><span class="err">服务器</span>
+<span class="o">-</span> <span class="n">allow</span> <span class="mf">192.168</span><span class="o">/</span><span class="mi">16</span> <span class="err">#允许同步的主机</span>
+
+<span class="cp"># start</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">chronyd</span> <span class="o">&amp;&amp;</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">chronyd</span>
+</pre></div>
+
+
+<h3 id="2command">2.Command</h3>
+<div class="hlcode"><pre><span class="cp">#查看同步服务器信息</span>
+<span class="err">$</span> <span class="n">chronyc</span> <span class="n">tracking</span> <span class="o">-</span><span class="n">v</span>
+
+<span class="cp">#查看是否在线</span>
+<span class="err">$</span> <span class="n">chronyc</span> <span class="n">activity</span> <span class="o">-</span><span class="n">v</span>
+
+<span class="cp">#查看同步状态</span>
+<span class="err">$</span> <span class="n">chronyc</span> <span class="n">sourcestats</span> <span class="o">-</span><span class="n">v</span>
+
+<span class="cp">#查看同步服务器状态</span>
+<span class="err">$</span> <span class="n">chronyc</span> <span class="n">source</span> <span class="o">-</span><span class="n">v</span>
+
+<span class="cp">#开启同步</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">set</span><span class="o">-</span><span class="n">ntp</span> <span class="nb">true</span>
+</pre></div>
+
+
+<h3 id="3other">3.Other</h3>
+<p><code>timedatectl</code> command</p>
+<div class="hlcode"><pre><span class="cp">#查看当前时区</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">Time</span>
+
+<span class="cp">#查看可用时区</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">list</span><span class="o">-</span><span class="n">timezones</span>
+
+<span class="cp">#设置时区</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">set</span><span class="o">-</span><span class="n">timezone</span> <span class="s">&quot;Asia/Shanghai&quot;</span>
+
+<span class="cp">#设置时间</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">set</span><span class="o">-</span><span class="n">timezone</span> <span class="n">CST</span>
+
+<span class="cp">#设置时间日期</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">set</span><span class="o">-</span><span class="n">time</span> <span class="mi">20181212</span> <span class="o">|</span> <span class="mi">18</span><span class="o">:</span><span class="mi">18</span><span class="o">:</span><span class="mi">18</span> <span class="o">|</span> <span class="mi">16</span><span class="o">:</span><span class="mi">30</span><span class="o">:</span><span class="mi">30</span> <span class="mi">2018</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">12</span>
+
+<span class="cp">#查看时间是否是硬件时钟</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">local</span>
+
+<span class="cp">#将硬件时钟设置为本地时区 （1为本地时区，0为UTC）</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">set</span><span class="o">-</span><span class="n">local</span><span class="o">-</span><span class="n">rtc</span> <span class="mi">1</span>
+
+<span class="cp">#查看同步时间状态</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">status</span>
+
+<span class="cp">#开启同步 （false 为禁用）</span>
+<span class="err">$</span> <span class="n">timedatectl</span> <span class="n">set</span><span class="o">-</span><span class="n">ntp</span> <span class="nb">true</span>
+</pre></div>
+
+
+<h3 id="4date">4.date</h3>
+<p>阿里云时间同步服务器 ntp{1-7}.aliyun.com</p>
+<blockquote>
+<p>Unix类系统：time1-7.aliyun.com<br />
+Windows： time.pool.aliyun.com</p>
+</blockquote>
+<div class="hlcode"><pre><span class="n">date</span> <span class="o">-</span><span class="n">s</span> <span class="mo">06</span><span class="o">/</span><span class="mi">22</span><span class="o">/</span><span class="mi">96</span>
+<span class="n">date</span> <span class="o">-</span><span class="n">s</span> <span class="mi">13</span><span class="o">:</span><span class="mi">52</span><span class="o">:</span><span class="mo">00</span>
+<span class="n">date</span> <span class="o">-</span><span class="n">s</span> <span class="s">&quot;20181212 12:12:12&quot;</span> 
+
+<span class="cp">#当前时间和日期写入BIOS，避免重启后失效</span>
+<span class="n">hwclock</span> <span class="o">-</span><span class="n">w</span>
+
+<span class="cp">#替换系统时区文件</span>
+<span class="n">cp</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">zoneinfo</span><span class="o">/</span><span class="err">$主时区</span><span class="o">/</span><span class="err">$次时区</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">localtime</span>
+<span class="nl">example:</span>
+<span class="n">cp</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">zoneinfo</span><span class="o">/</span><span class="n">Asia</span><span class="o">/</span><span class="n">Shanghai</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">localtime</span>
+</pre></div>
+
+
+<h3 id="_1">科普世界时间</h3>
+<blockquote>
+<p>CET：欧洲中部时间（Central European Time，CET）是比世界标准时间（UTC）早一个小时的时区名称之一。它被大部分欧洲国家和部分北非国家采用。冬季时间为UTC+1，夏季欧洲夏令时为UTC+2</p>
+<p>UTC：协调世界时，又称世界标准时间或世界协调时间，简称UTC，“Coordinated Universal Time”／法文“Temps Universel Cordonné”而来。台湾采用CNS 7648的《资料元及交换格式–资讯交换–日期及时间的表示法》（与ISO 8601类似）称之为世界统一时间。中国大陆采用ISO 8601-1988的国标《数据元和交换格式信息交换日期和时间表示法》（GB/T 7408）中称之为国际协调时间。协调世界时是以原子时秒长为基础，在时刻上尽量接近于世界时的一种时间计量系统。</p>
+<p>GMT：(Greenwich Mean Time)格林尼治标准时间（旧译格林尼治平均时间或格林威治标准时间）是指位于英国伦敦郊区的皇家格林尼治天文台的标准时间，因为本初子午线被定义在通过那里的经线。</p>
+<p>CST：(China Standard Time)，中国标准时间，是中国的标准时间。在时区划分上，属东八区，比协调世界时早8小时，记为UTC+8，与中华民国国家标准时间（旧称“中原标准时间”）、香港时间和澳门时间和相同。當格林威治時間為凌晨0:00時，中國標準時間剛好為上午8:00。<br />
+</p>
+</blockquote>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-20 15:22:20</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

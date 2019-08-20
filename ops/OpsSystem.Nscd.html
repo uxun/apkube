@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Nscd - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#ops">ops</a>
+    &nbsp;&#187;&nbsp;Nscd
+    <span class="updated">Page Updated&nbsp;
+    2019-08-19 00:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="nscd-name-service-cache-daemon">NSCD (Name Service Cache Daemon)</h1>
+<h4 id="1info">1.<a href="https://linux.die.net/man/8/nscd">INFO</a></h4>
+<blockquote>
+<p>常用于内网频繁调用接口，加快 DNS 解析速度。</p>
+<p>开启 nscd 的 hosts 缓存服务后，每次内部接口请求不会都发起 dns 解析请求，而是直接命中 nscd 缓存散列表，从而获取对应服务器 ip 地址，这样可以在大量内部接口请求时减少接口的响应时间。</p>
+</blockquote>
+<h4 id="2use">2.Use</h4>
+<div class="hlcode"><pre><span class="cp"># Install</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">nscd</span> <span class="o">-</span><span class="n">y</span>
+
+<span class="cp"># cache path</span>
+<span class="err">$</span> <span class="n">ls</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">db</span><span class="o">/</span><span class="n">nscd</span><span class="o">/</span>
+
+<span class="cp"># configuration</span>
+<span class="err">$</span> <span class="n">ls</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nscd</span><span class="p">.</span><span class="n">conf</span>
+
+<span class="cp"># start</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">nscd</span>
+<span class="cp"># COMMAND</span>
+<span class="cp"># stat</span>
+<span class="err">$</span> <span class="n">nscd</span> <span class="o">-</span><span class="n">g</span>
+<span class="cp"># clean cache</span>
+<span class="err">$</span> <span class="n">nscd</span> <span class="o">-</span><span class="n">i</span> <span class="n">hosts</span>
+<span class="cp"># Close the service</span>
+<span class="err">$</span> <span class="n">nscd</span> <span class="o">-</span><span class="n">K</span>
+</pre></div>
+
+
+<h4 id="3configuration">3.Configuration</h4>
+<div class="hlcode"><pre><span class="cp"># 日志文件</span>
+<span class="cp">#logfile        /var/log/nscd.log</span>
+<span class="cp"># 调试级别</span>
+<span class="n">debug</span><span class="o">-</span><span class="n">level</span>     <span class="mi">5</span>
+<span class="cp"># 等待请求的线程数</span>
+<span class="n">threads</span>         <span class="mi">6</span>
+<span class="cp"># 最大线程数</span>
+<span class="n">max</span><span class="o">-</span><span class="n">threads</span>     <span class="mi">128</span>
+<span class="cp"># 运行用户</span>
+<span class="n">server</span><span class="o">-</span><span class="n">user</span>     <span class="n">nscd</span>
+<span class="n">paranoia</span>        <span class="n">no</span>
+<span class="cp"># 禁用passwd缓存</span>
+<span class="n">enable</span><span class="o">-</span><span class="n">cache</span>    <span class="n">passwd</span>      <span class="n">no</span>
+<span class="cp"># 禁用group缓存</span>
+<span class="n">enable</span><span class="o">-</span><span class="n">cache</span>    <span class="n">group</span>       <span class="n">no</span>
+<span class="cp"># 启用hosts缓存</span>
+<span class="n">enable</span><span class="o">-</span><span class="n">cache</span>    <span class="n">hosts</span>       <span class="n">yes</span>
+<span class="cp"># 指定缓存命中项的TTL，单位为s</span>
+<span class="n">positive</span><span class="o">-</span><span class="n">time</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">live</span>   <span class="n">hosts</span>   <span class="mi">5</span>
+<span class="cp"># 指定缓存未命中项的TTL，单位为s</span>
+<span class="n">negative</span><span class="o">-</span><span class="n">time</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">live</span>   <span class="n">hosts</span>       <span class="mi">20</span>
+<span class="cp"># 散列表大小</span>
+<span class="n">suggested</span><span class="o">-</span><span class="n">size</span>  <span class="n">hosts</span>       <span class="mi">211</span>
+<span class="cp"># 启用hosts文件的修改情况检查</span>
+<span class="n">check</span><span class="o">-</span><span class="n">files</span>     <span class="n">hosts</span>       <span class="n">yes</span>
+<span class="n">persistent</span>      <span class="n">hosts</span>       <span class="n">yes</span>
+<span class="n">shared</span>          <span class="n">hosts</span>       <span class="n">yes</span>
+<span class="cp"># 最大缓存库大小</span>
+<span class="n">max</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">size</span>     <span class="n">hosts</span>       <span class="mi">33554432</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-20 14:43:55</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
