@@ -84,6 +84,7 @@
 <span class="err">$</span> <span class="n">mkfs</span><span class="p">.</span><span class="n">ext4</span> <span class="o">-</span><span class="n">m0</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">rbd</span><span class="o">/</span><span class="n">rbd</span><span class="o">/</span><span class="n">rbd1</span>
 <span class="cp"># ceph-client节点挂载文件系统</span>
 <span class="err">$</span> <span class="n">mkdir</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">device</span>
+<span class="cp"># mount /dev/rbd/{pool-name}/foo /mnt/ceph-block-device</span>
 <span class="err">$</span> <span class="n">mount</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">rbd</span><span class="o">/</span><span class="n">rbd</span><span class="o">/</span><span class="n">rbd1</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">device</span>
 <span class="err">$</span> <span class="n">cd</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">block</span><span class="o">-</span><span class="n">device</span>
 
@@ -102,7 +103,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-08-21 23:42:15</p>
+        <p>Page Updated 2019-08-22 21:42:39</p>
       </div> <!-- end footer-right -->
     </div>
 

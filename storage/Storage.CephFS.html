@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>CephFS - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;CephFS
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 14:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="cephfs">CephFS</h2>
+<h3 id="1env-prepare">1.ENV Prepare</h3>
+<ol>
+<li>ceph存储集群</li>
+<li>Kernel Version &gt; 4.x (需要使用旧的内核，应该使用fuse客户端，不使用内核客户端)</li>
+<li>CephFS BEST <a href="https://docs.ceph.com/docs/master/cephfs/best-practices/#cephfs-best-practices">PRACTICES</a></li>
+</ol>
+<h3 id="2deploy">2.Deploy</h3>
+<p><strong>CephFS 需要配置metadata server</strong></p>
+<blockquote>
+<p>至少需一个元数据服务器</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># create a metadata server</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mds</span> <span class="n">create</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span>
+</pre></div>
+
+
+<h3 id="_1"></h3>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-22 21:42:39</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
