@@ -1,0 +1,424 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>CephCluster - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;CephCluster
+    <span class="updated">Page Updated&nbsp;
+    2019-08-20 00:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="intro-to-ceph">Intro to Ceph</h2>
+<p><strong>简单来说块存储读写快，不利于共享，文件存储读写慢，利于共享。能否弄一个读写快，利于共享的出来呢。于是就有了对象存储。</strong></p>
+<blockquote>
+<p>Ceph Version &gt; Jewel（v10.2.0）<br />
+从Ceph 10.x（Jewel）开始，你应该使用至少一个4.x内核。如果您必须使用较旧的内核，则应使用fuse客户端而不是内核客户端。</p>
+<p>对于RBD，如果您选择跟踪长期内核，我们目前推荐基于4.x的“长期维护”内核系列：<br />
+- 4.19.z<br />
+- 4.14.z</p>
+<p><a href="https://docs.ceph.com/docs/master/cephfs/best-practices/#cephfs-best-practices">系统版本</a></p>
+<p><a href="https://docs.ceph.com/docs/master/cephfs/best-practices/#cephfs-best-practices">CEPHFS BEST PRACTICES</a></p>
+</blockquote>
+<h3 id="archiecture"><a href="https://docs.ceph.com/docs/master/architecture/#architecture">Archiecture</a></h3>
+<ol>
+<li>提供对象，块和文件存储。</li>
+<li>集群至少需要一个：<ul>
+<li>Monitors (ceph-mon): 监视集群状态，维护集群状态映射。HA ceph-mon &gt; 3</li>
+<li>Manager (ceph-mgr): 负责跟踪运行时指标和Ceph集群的当前状态，API。HA ceph-mgr &gt; 2</li>
+<li>OSDs (ceph-osd): 存储数据，处理数据复制，恢复，获取心跳信息。HA ceph-osd &gt; 3</li>
+<li>MDS (ceph-mds): 代表<a href="https://docs.ceph.com/docs/master/glossary/#term-ceph-filesystem">Ceph文件系统</a>存储元数据，(对象，块不使用)</li>
+</ul>
+</li>
+<li>存储集群两类守护进程组成：OSDs and Monitors</li>
+<li>4.Flow: obj() —&gt; File() —&gt; Disk()<br />
+        obj(数据存储为对象) —&gt; File(对象应用于文件系统中的文件) —&gt; Disk(该文件存储在对象存储设备上)</li>
+<li>使用 <a href="https://docs.ceph.com/docs/master/glossary/#term-crush">CRUSH</a>算法，Ceph计算应该包含对象的放置组，并进一步计算哪个Ceph OSD守护进程应该存储放置组。CRUSH算法使Ceph存储集群能够动态扩展，重新平衡和恢复。</li>
+</ol>
+<blockquote>
+<p>OSDs: Ceph的OSD守护进程（OSD）存储数据，处理数据复制，恢复，回填，重新调整。<br />
+Ceph OSD守护程序作为一个心跳向Ceph的监视器报告一些检测信息。Ceph的存储集群需要至少2个OSD守护进程来保持一个 active + clean状态。（Ceph默认制作2个备份，但你可以调整它）</p>
+<p>Monitors:Ceph的监控保持集群状态映射，包括OSD(守护进程)映射,分组(PG)映射，和CRUSH映射。 Ceph 保持一个在Ceph监视器, Ceph OSD 守护进程和 PG的每个状态改变的历史（称之为“epoch”）<br />
+MDS: MDS是Ceph的元数据服务器，代表存储元数据的Ceph文件系统（即Ceph的块设备和Ceph的对象存储不使用MDS）。Ceph的元数据服务器使用POSIX文件系统，用户可以执行基本命令如 ls, find,等，并且不需要在Ceph的存储集群上造成巨大的负载。</p>
+<p>Ceph把客户端的数据以对象的形式存储到了存储池里。利用CRUSH算法，Ceph可以计算出安置组所包含的对象，并能进一步计算出Ceph OSD集合所存储的安置组。CRUSH算法能够使Ceph存储集群拥有动态改变大小、再平衡和数据恢复的能力。</p>
+</blockquote>
+<h3 id="ceph-api">Ceph API</h3>
+<p>Object：有原生的API，而且也兼容Swift和S3的API <br />
+Block：支持精简配置、快照、克隆 <br />
+File：Posix接口，支持快照 </p>
+<p><strong>Ceph也是分布式存储系统，它的特点是：</strong></p>
+<p>高扩展性：使用普通x86服务器，支持10~1000台服务器，支持TB到PB级的扩展。 <br />
+高可靠性：没有单点故障，多数据副本，自动管理，自动修复。 <br />
+高性能：数据分布均衡，并行化度高。对于objects storage和block storage,不需要元数据服务器。</p>
+<p><strong>一个Ceph存储集群要求至少有一个Ceph监视器和两个Ceph OSD守护进程。当运行Ceph文件系统客户端时，必须要有Ceph元数据服务器。</strong></p>
+<h2 id="ceph-cluster-deploy">Ceph Cluster Deploy</h2>
+<h3 id="env-prepare">ENV Prepare</h3>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>服务</th>
+<th>public network</th>
+<th>cluster network （OSD 通信）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hostname1</td>
+<td>osd0,mon,ceph-deploy</td>
+<td>em2:192.168.1.0/24</td>
+<td>em3:10.1.3.0/24</td>
+</tr>
+<tr>
+<td>Hostname2</td>
+<td>osd1,mon,ceph-node1</td>
+<td>em2:192.168.1.0/24</td>
+<td>em3:10.1.3.0/24</td>
+</tr>
+<tr>
+<td>Hostname3</td>
+<td>osd2,mon,ceph-node2</td>
+<td>em2:192.168.1.0/24</td>
+<td>em3:10.1.3.0/24</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1node-init-all">1.Node init (ALL)</h3>
+<div class="hlcode"><pre><span class="cp"># Stop firewalld or selinux</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">stop</span> <span class="n">firewalld</span> <span class="o">&amp;&amp;</span> <span class="n">systemctl</span> <span class="n">disable</span> <span class="n">firewalld</span>
+<span class="err">$</span> <span class="n">setenforce</span> <span class="mi">0</span>
+<span class="err">$</span> <span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="err">&#39;</span><span class="o">/</span><span class="n">SELINUX</span><span class="o">/</span><span class="n">s</span><span class="o">/</span><span class="n">enforcing</span><span class="o">/</span><span class="n">disabled</span><span class="o">/</span><span class="err">&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">selinux</span><span class="o">/</span><span class="n">config</span>
+
+<span class="cp"># 公共域开放Ceph Monitors使用的6789端口和OSD使用的6800:7300端口范围。</span>
+<span class="err">$</span> <span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">zone</span><span class="o">=</span><span class="n">public</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">port</span><span class="o">=</span><span class="mi">6789</span><span class="o">/</span><span class="n">tcp</span> <span class="o">--</span><span class="n">permanent</span>
+<span class="n">or</span>
+<span class="err">$</span> <span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">zone</span><span class="o">=</span><span class="n">public</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">service</span><span class="o">=</span><span class="n">ceph</span><span class="o">-</span><span class="n">mon</span> <span class="o">--</span><span class="n">permanent</span>
+<span class="cp"># OSD 和 MDS</span>
+<span class="err">$</span> <span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">zone</span><span class="o">=</span><span class="n">public</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">service</span><span class="o">=</span><span class="n">ceph</span> <span class="o">--</span><span class="n">permanent</span>
+<span class="cp"># firewall-cmd --reload</span>
+
+<span class="cp"># 若使用iptables，要开放Ceph Monitors使用的6789端口和OSD使用的6800:7300端口范围。</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">iptables</span> <span class="o">-</span><span class="n">A</span> <span class="n">INPUT</span> <span class="o">-</span><span class="n">i</span> <span class="p">{</span><span class="n">iface</span><span class="p">}</span> <span class="o">-</span><span class="n">p</span> <span class="n">tcp</span> <span class="o">-</span><span class="n">s</span> <span class="p">{</span><span class="n">ip</span><span class="o">-</span><span class="n">address</span><span class="p">}</span><span class="o">/</span><span class="p">{</span><span class="n">netmask</span><span class="p">}</span> <span class="o">--</span><span class="n">dport</span> <span class="mi">6789</span> <span class="o">-</span><span class="n">j</span> <span class="n">ACCEPT</span>
+<span class="cp"># iptables save</span>
+
+<span class="cp"># 在每个节点上配置好iptables。</span>
+<span class="err">$</span> <span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">service</span> <span class="n">iptables</span> <span class="n">save</span>
+
+<span class="cp"># 主机名解析</span>
+<span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hosts</span>
+<span class="mf">192.168.1.235</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span> 
+<span class="mf">192.168.1.236</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span>
+<span class="mf">192.168.1.237</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span>
+
+<span class="cp"># Install Depended</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">epel</span><span class="o">*</span> <span class="n">ntp</span> <span class="n">ntpdate</span> <span class="n">ntp</span><span class="o">-</span><span class="n">doc</span> <span class="n">openssh</span><span class="o">-</span><span class="n">server</span> <span class="n">yum</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">priorities</span> <span class="n">leveldb</span> <span class="o">-</span><span class="n">y</span>
+</pre></div>
+
+
+<h3 id="2add-repo-s">2.Add Repo (S)</h3>
+<p><strong>el7</strong></p>
+<div class="hlcode"><pre><span class="n">wget</span> <span class="o">-</span><span class="n">O</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="p">.</span><span class="n">repos</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">Base</span><span class="p">.</span><span class="n">repo</span> <span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.163.com/.help/CentOS7-Base-163.repo &amp;&amp; yum clean all &amp;&amp; yum makecache</span>
+
+<span class="n">cat</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="p">.</span><span class="n">repos</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">ceph</span><span class="p">.</span><span class="n">repo</span> <span class="o">&lt;&lt;</span> <span class="n">EOF</span>
+<span class="p">[</span><span class="n">Ceph</span><span class="p">]</span>
+<span class="n">name</span><span class="o">=</span><span class="n">Ceph</span> <span class="n">packages</span> <span class="k">for</span> <span class="err">$</span><span class="n">basearch</span>
+<span class="n">baseurl</span><span class="o">=</span><span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.aliyun.com/ceph/rpm-jewel/el7/\$basearch</span>
+<span class="n">enabled</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">gpgcheck</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">type</span><span class="o">=</span><span class="n">rpm</span><span class="o">-</span><span class="n">md</span>
+<span class="n">gpgkey</span><span class="o">=</span><span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.aliyun.com/ceph/keys/release.asc</span>
+<span class="n">priority</span><span class="o">=</span><span class="mi">1</span>
+
+<span class="p">[</span><span class="n">Ceph</span><span class="o">-</span><span class="n">noarch</span><span class="p">]</span>
+<span class="n">name</span><span class="o">=</span><span class="n">Ceph</span> <span class="n">noarch</span> <span class="n">packages</span>
+<span class="n">baseurl</span><span class="o">=</span><span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.aliyun.com/ceph/rpm-jewel/el7/noarch</span>
+<span class="n">enabled</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">gpgcheck</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">type</span><span class="o">=</span><span class="n">rpm</span><span class="o">-</span><span class="n">md</span>
+<span class="n">gpgkey</span><span class="o">=</span><span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.aliyun.com/ceph/keys/release.asc</span>
+<span class="n">priority</span><span class="o">=</span><span class="mi">1</span>
+
+<span class="p">[</span><span class="n">ceph</span><span class="o">-</span><span class="n">source</span><span class="p">]</span>
+<span class="n">name</span><span class="o">=</span><span class="n">Ceph</span> <span class="n">source</span> <span class="n">packages</span>
+<span class="n">baseurl</span><span class="o">=</span><span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.aliyun.com/ceph/rpm-jewel/el7/SRPMS</span>
+<span class="n">enabled</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">gpgcheck</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">type</span><span class="o">=</span><span class="n">rpm</span><span class="o">-</span><span class="n">md</span>
+<span class="n">gpgkey</span><span class="o">=</span><span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.aliyun.com/ceph/keys/release.asc</span>
+<span class="n">priority</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">EOF</span>
+</pre></div>
+
+
+<p><strong>el6</strong></p>
+<div class="hlcode"><pre><span class="k">[ceph]</span>
+<span class="na">name</span><span class="o">=</span><span class="s">ceph</span>
+<span class="na">baseurl</span><span class="o">=</span><span class="s">http://download.ceph.com/rpm-hammer/el6/x86_64/</span>
+<span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+<span class="k">[ceph-noarch]</span>
+<span class="na">name</span><span class="o">=</span><span class="s">cephnoarch</span>
+<span class="na">baseurl</span><span class="o">=</span><span class="s">http://download.ceph.com/rpm-hammer/el6/noarch/</span>
+<span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+</pre></div>
+
+
+<h3 id="3install-ceph-deploy-s">3.Install ceph-deploy (S)</h3>
+<div class="hlcode"><pre><span class="cp"># new 安装管理端</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">update</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">python</span><span class="o">-</span><span class="n">pip</span>
+</pre></div>
+
+
+<h3 id="4ceph-init-all">4.Ceph init (ALL)</h3>
+<div class="hlcode"><pre><span class="cp"># 创建ceph特定用户(从Infernalis版起，用户名“ceph”保留给了Ceph守护进程。如果Ceph节点上已经有了 “ceph” 用户，升级前必须先删掉这个用户)</span>
+<span class="err">$</span> <span class="n">useradd</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">cephd</span> <span class="o">-</span><span class="n">m</span> <span class="n">cephd</span> 
+<span class="err">$</span> <span class="n">passwd</span> <span class="n">cephd</span> 
+<span class="cp"># 添加 sudo 权限 </span>
+<span class="err">$</span> <span class="n">echo</span> <span class="s">&quot;cephd ALL = (root) NOPASSWD:ALL&quot;</span> <span class="o">|</span> <span class="n">sudo</span> <span class="n">tee</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">cephd</span> 
+<span class="err">$</span> <span class="n">chmod</span> <span class="mo">0440</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">cephd</span>
+
+<span class="cp"># TTY</span>
+<span class="cp"># 配置Ceph节点的用户具用sudo权限，找到 Defaults requiretty 选项，把它改为 Defaults:ceph !requiretty ，这样 ceph-deploy 就能用 ceph 用户登录并使用 sudo 了</span>
+<span class="err">$</span> <span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="err">&#39;</span><span class="n">s</span><span class="err">@</span><span class="n">Defaults</span>    <span class="n">requiretty</span><span class="err">@</span><span class="n">Defaults</span><span class="o">:</span><span class="n">cephd</span>    <span class="o">!</span><span class="n">requiretty</span><span class="err">@&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sudoers</span>
+
+<span class="cp"># Deploy node 切换cephd用户配置密钥</span>
+<span class="err">$</span> <span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span> 
+<span class="err">$</span> <span class="n">ssh</span><span class="o">-</span><span class="n">copy</span><span class="o">-</span><span class="n">id</span> <span class="n">cephd</span><span class="err">@</span><span class="p">{</span><span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span><span class="p">,</span><span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span><span class="p">,</span><span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span><span class="p">}</span>
+
+<span class="cp"># 修改ceph-deploy管理节点上的~/.ssh/config文件，这样ceph-deploy就能用你所建的用户名登录Ceph节点了，而无需每次执行ceph-deploy都要指定--username{username}。主机名应该解析为网络IP地址，而不是环回IP地址。</span>
+<span class="n">cat</span> <span class="o">&gt;</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">config</span> <span class="o">&lt;&lt;</span> <span class="n">EOF</span>
+<span class="n">Host</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span>
+  <span class="n">Hostname</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span>
+  <span class="n">User</span> <span class="n">cephd</span>
+<span class="n">Host</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span>
+  <span class="n">Hostname</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span>
+  <span class="n">User</span> <span class="n">cephd</span>
+<span class="n">Host</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span>
+  <span class="n">Hostname</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span>
+  <span class="n">User</span> <span class="n">cephd</span>
+<span class="n">EOF</span>
+
+<span class="err">$</span> <span class="n">chmod</span> <span class="mi">600</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">config</span>
+</pre></div>
+
+
+<h3 id="6create-a-cluster-s">6.Create a Cluster (S)</h3>
+<p>清理环境(prepare环境无旧ceph)</p>
+<div class="hlcode"><pre><span class="o">-----</span><span class="nx">old</span>
+<span class="err">#</span> <span class="nb">Reset</span>
+<span class="nx">ceph</span><span class="na">-deploy</span> <span class="nx">purge</span> <span class="p">{</span><span class="nx">ceph</span><span class="na">-node</span><span class="p">}</span> <span class="err">[</span><span class="p">{</span><span class="nx">ceph</span><span class="na">-node</span><span class="p">}</span><span class="cp">]</span>
+ceph-deploy purgedata {ceph-node} <span class="cp">[</span><span class="p">{</span><span class="nx">ceph</span><span class="na">-node</span><span class="p">}</span><span class="cp">]</span>
+ceph-deploy forgetkeys
+
+# 安装期间由本地ceph-deploy写出的所有文件
+rm ceph.*
+
+-----new
+# 管理节点上创建一个目录，用于保存 ceph-deploy 生成的配置文件和密钥对<span class="nt">&lt;br&gt;</span>
+$ mkdir -pv /data5/ceph-cluster <span class="err">&amp;&amp;</span> cd /data5/ceph-cluster
+
+# 创建监视器 (创建1个monitor监视器)，当前目录输出
+# $ ceph-deploy new $hostname
+# ImportError: No module named ceph_deploy.cli ----&gt; python env #!/usr/bin/python2.7
+# 多个监视器 (ceph-deploy new ceph-node1 ceph-node2 ceph-node3）
+$ ceph-deploy new hadoop-s02-235 hadoop-s03-236 hadoop-s04-237
+
+$ ls /data5/ceph-cluster
+ceph.conf  ceph-deploy-ceph.log ceph.mon.keyring
+</pre></div>
+
+
+<h3 id="7cephconf-s">7.Ceph.conf (S)</h3>
+<blockquote>
+<p>网络设置参考：https://docs.ceph.com/docs/master/rados/configuration/network-config-ref/</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># ceph.conf配置</span>
+<span class="p">[</span><span class="n">global</span><span class="p">]</span>
+<span class="n">fsid</span> <span class="o">=</span> <span class="mi">2</span><span class="n">a49ef14</span><span class="o">-</span><span class="mi">7883</span><span class="o">-</span><span class="mi">4</span><span class="n">abf</span><span class="o">-</span><span class="n">a307</span><span class="o">-</span><span class="n">d2b1018b3d2b</span>
+<span class="n">mon_initial_members</span> <span class="o">=</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span><span class="p">,</span><span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span><span class="p">,</span><span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span>
+<span class="n">mon_host</span> <span class="o">=</span> <span class="mf">192.168.1.235</span><span class="p">,</span><span class="mf">192.168.1.236</span><span class="p">,</span><span class="mf">192.168.1.237</span>
+
+<span class="cp"># （= none 不认证，加快集群访问速度）|（= cephx ：开启认证）</span>
+<span class="n">auth_cluster_required</span> <span class="o">=</span> <span class="n">cephx</span>
+<span class="n">auth_service_required</span> <span class="o">=</span> <span class="n">cephx</span>
+<span class="n">auth_client_required</span> <span class="o">=</span> <span class="n">cephx</span>
+
+<span class="cp"># monitor与osd，client与monitor，client与osd通信的网络</span>
+<span class="n">public</span> <span class="n">network</span> <span class="o">=</span> <span class="mf">192.168.1.0</span><span class="o">/</span><span class="mi">24</span>
+
+<span class="cp"># OSD之间通信的网络</span>
+<span class="n">cluster</span> <span class="n">network</span> <span class="o">=</span> <span class="mf">10.1.3.0</span><span class="o">/</span><span class="mi">24</span>
+
+<span class="cp"># 日志大小：MB最少(1G，应该是期望的驱动器速度和filestore max sync interval的乘积）</span>
+<span class="n">osd</span> <span class="n">journal</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">1024</span>
+
+<span class="cp"># osd 副本 </span>
+<span class="n">osd</span> <span class="n">pool</span> <span class="k">default</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">3</span> 
+<span class="n">rbd</span> <span class="k">default</span> <span class="n">features</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="cp"># Ensure you have a realistic number of placement groups. We recommend</span>
+<span class="cp"># approximately 100 per OSD. E.g., total number of OSDs multiplied by 100 </span>
+<span class="cp"># divided by the number of replicas (i.e., osd pool default size). So for</span>
+<span class="cp"># 10 OSDs and osd pool default size = 4, we&#39;d recommend approximately</span>
+<span class="cp"># (100 * 10) / 4 = 250.</span>
+<span class="n">osd</span> <span class="n">pool</span> <span class="k">default</span> <span class="n">pg</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">250</span>
+<span class="n">osd</span> <span class="n">pool</span> <span class="k">default</span> <span class="n">pgp</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">250</span>
+
+<span class="p">[</span><span class="n">osd</span><span class="p">]</span>
+<span class="n">osd</span> <span class="n">max</span> <span class="n">object</span> <span class="n">name</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">osd</span> <span class="n">max</span> <span class="n">object</span> <span class="n">namespace</span> <span class="n">len</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">rbd</span> <span class="k">default</span> <span class="n">features</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+
+
+<h3 id="8install-ceph-package-s">8.Install ceph package (S)</h3>
+<div class="hlcode"><pre><span class="cp"># ceph-deploy 将在每个节点安装Ceph</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">install</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">install</span> <span class="o">--</span><span class="n">release</span> <span class="n">jewel</span> <span class="o">--</span><span class="n">repo</span><span class="o">-</span><span class="n">url</span> <span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.163.com/ceph/rpm-jewel/el7 --gpg-url http://mirrors.163.com/ceph/keys/release.asc hadoop-s02-235 hadoop-s03-236 hadoop-s04-237</span>
+
+<span class="cp"># 初始化monitor(s)并收集所有密钥，这是Ceph组件间进行安全访问时所需要的，如果此步失败并输出类似于如下信息 “Unable to find /etc/ceph/ceph.client.admin.keyring”，请确认ceph.conf中为monitor指定的IP是 Public IP，而不是Private IP。</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mon</span> <span class="n">create</span><span class="o">-</span><span class="n">initial</span>
+<span class="err">$</span> <span class="n">ls</span> <span class="o">*</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">admin</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">mgr</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">osd</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">mds</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">rgw</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">rbd</span><span class="p">.</span><span class="n">keyring</span>
+<span class="n">ceph</span><span class="p">.</span><span class="n">bootstrap</span><span class="o">-</span><span class="n">rbd</span><span class="o">-</span><span class="n">mirror</span><span class="p">.</span><span class="n">keyring</span>
+
+<span class="cp"># 用ceph-deploy把配置文件和admin密钥拷贝到管理节点和 Ceph 节点，这样你每次执行 Ceph 命令行时就无需指定 monitor 地址和 ceph.client.admin.keyring 了</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">admin</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span> 
+
+<span class="cp"># 部署 ceph-mgr ceph version &gt; Luminous</span>
+<span class="cp"># ceph-deploy mgr create node1  *Required only for luminous+ builds, i.e &gt;= 12.x builds*</span>
+
+<span class="cp"># 配置OSD.每个节点中都有一个未使用的磁盘/dev/vdb</span>
+<span class="cp"># tip: 如果要在LVM卷上创建OSD，则参数 --data 必须是volume_group/lv_name，而不是卷的块设备的路径。</span>
+<span class="cp"># ceph-deploy osd create --data /dev/vdb node1</span>
+<span class="cp"># ceph-deploy osd create --data /dev/vdb node2</span>
+<span class="cp"># ceph-deploy osd create --data /dev/vdb node3</span>
+
+<span class="cp"># 启动OSDnode分为两步：prepare(准备)和activate(激活)。OSD node是真正存储数据的节点，我们需要为ceph——osd提供独立存储空间，一般是一个独立的disk。但我们环境不具备这个条件，于是在本地盘上创建了个目录，提供给OSD。</span>
+<span class="err">$</span> <span class="k">for</span> <span class="n">i</span> <span class="n">in</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span> <span class="p">;</span><span class="k">do</span> <span class="n">ssh</span> <span class="err">$</span><span class="n">i</span> <span class="s">&quot;mkdir -pv /data5/ceph-cluster/{osd0,osd1,osd2} &amp;&amp; chown -R ceph:ceph /data5/ceph-*;done</span>
+
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">osd</span> <span class="n">prepare</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span><span class="o">:/</span><span class="n">data5</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">cluster</span><span class="o">/</span><span class="n">osd0</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span><span class="o">:/</span><span class="n">data5</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">cluster</span><span class="o">/</span><span class="n">osd1</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span><span class="o">:/</span><span class="n">data5</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">cluster</span><span class="o">/</span><span class="n">osd2</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">osd</span> <span class="n">activate</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span><span class="o">:/</span><span class="n">data5</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">cluster</span><span class="o">/</span><span class="n">osd0</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span><span class="o">:/</span><span class="n">data5</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">cluster</span><span class="o">/</span><span class="n">osd1</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span><span class="o">:/</span><span class="n">data5</span><span class="o">/</span><span class="n">ceph</span><span class="o">-</span><span class="n">cluster</span><span class="o">/</span><span class="n">osd2</span>
+
+<span class="cp"># 把管理节点的配置文件与keyring同步至其它节点</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="o">--</span><span class="n">overwrite</span><span class="o">-</span><span class="n">conf</span> <span class="n">admin</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s02</span><span class="o">-</span><span class="mi">235</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s03</span><span class="o">-</span><span class="mi">236</span> <span class="n">hadoop</span><span class="o">-</span><span class="n">s04</span><span class="o">-</span><span class="mi">237</span> 
+
+<span class="cp"># 确保每个节点对 ceph.client.admin.keyring 有正确的操作权限</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">chmod</span> <span class="o">+</span><span class="n">r</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ceph</span><span class="o">/</span><span class="n">ceph</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">admin</span><span class="p">.</span><span class="n">keyring</span> 
+
+<span class="cp"># 其他命令</span>
+<span class="nl">http:</span><span class="c1">//docs.ceph.org.cn/rados/operations/operating/#sysvinit-ceph </span>
+</pre></div>
+
+
+<h3 id="expanding-your-cluster">EXPANDING YOUR CLUSTER</h3>
+<blockquote>
+<p>扩展集群，提高可靠性和可用性</p>
+</blockquote>
+<p><strong>ADD A METADATA SERVER</strong></p>
+<div class="hlcode"><pre><span class="cp"># 使用CephFS需要创建元数据服务</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mds</span> <span class="n">create</span> <span class="n">node1</span>
+</pre></div>
+
+
+<p><strong>ADDING MONITORS</strong></p>
+<blockquote>
+<p>ADD 多个监视器，单个监视器故障不会导致Ceph存储集群崩溃。<br />
+当您使用多个监视器运行Ceph时，您应该在每个监视器主机上安装和配置NTP。确保监视器是NTP对等方。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># Ceph使用Paxos算法，监视器(N)数量大于N/2。</span>
+<span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mon</span> <span class="n">add</span> <span class="n">node2</span> <span class="n">node3</span>
+<span class="cp"># 查看仲裁状态</span>
+<span class="n">ceph</span> <span class="n">quorum_status</span> <span class="o">--</span><span class="n">format</span> <span class="n">json</span><span class="o">-</span><span class="n">pretty</span>
+</pre></div>
+
+
+<p><strong>ADDING MANAGERS</strong> </p>
+<blockquote>
+<p>active/standby 活动/备用模式，发生故障，另个守护进程接管。ceph &gt; luminous+ builds</p>
+</blockquote>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mgr</span> <span class="n">create</span> <span class="n">node2</span> <span class="n">node3</span>
+<span class="cp"># 状态查看</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="o">-</span><span class="n">s</span>
+</pre></div>
+
+
+<p><strong>ADD AN RGW INSTANCE</strong></p>
+<blockquote>
+<p>对象存储<br />
+要使用<a href="https://docs.ceph.com/docs/master/glossary/#term-ceph-object-gateway">Ceph的Ceph对象网关</a>组件，必须部署<a href="https://docs.ceph.com/docs/master/glossary/#term-rgw">RGW</a>实例。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># example</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">rgw</span> <span class="n">create</span> <span class="n">node1</span>
+
+<span class="cp"># 默认情况RGW监听7480端口</span>
+<span class="p">[</span><span class="n">client</span><span class="p">]</span>
+<span class="n">rgw</span> <span class="n">frontends</span> <span class="o">=</span> <span class="n">civetweb</span> <span class="n">port</span><span class="o">=</span><span class="mi">80</span>
+</pre></div>
+
+
+<h3 id="storingretrieving-object-data">STORING/RETRIEVING OBJECT DATA</h3>
+<blockquote>
+<p>数据存储和检索对象数据<br />
+<a href="https://docs.ceph.com/docs/master/start/quick-ceph-deploy/#storing-retrieving-object-data">REFERNECE</a></p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 1.设置对象名称</span>
+<span class="cp"># 2.指定一个池</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">osd</span> <span class="n">map</span> <span class="p">{</span><span class="n">poolname</span><span class="p">}</span> <span class="p">{</span><span class="n">object</span><span class="o">-</span><span class="n">name</span><span class="p">}</span>
+
+<span class="cp"># Test例子，查看REFERNECE</span>
+<span class="n">echo</span> <span class="p">{</span><span class="n">Test</span><span class="o">-</span><span class="n">data</span><span class="p">}</span> <span class="o">&gt;</span> <span class="n">testfile</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">ceph</span> <span class="n">osd</span> <span class="n">pool</span> <span class="n">create</span> <span class="n">mytest</span> <span class="mi">8</span>
+<span class="n">rados</span> <span class="n">put</span> <span class="p">{</span><span class="n">object</span><span class="o">-</span><span class="n">name</span><span class="p">}</span> <span class="p">{</span><span class="n">file</span><span class="o">-</span><span class="n">path</span><span class="p">}</span> <span class="o">--</span><span class="n">pool</span><span class="o">=</span><span class="n">mytest</span>
+<span class="n">rados</span> <span class="n">put</span> <span class="n">test</span><span class="o">-</span><span class="n">object</span><span class="o">-</span><span class="mi">1</span> <span class="n">testfile</span><span class="p">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">pool</span><span class="o">=</span><span class="n">mytest</span>
+</pre></div>
+
+
+<h3 id="refernece">REFERNECE</h3>
+<p><a href="http://docs.ceph.org.cn/cephfs/disaster-recovery">Ceph 灾难恢复</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-22 23:29:13</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
