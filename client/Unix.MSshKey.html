@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>MultipleSshKey - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/client">../../../Dropbox/wiki/client</a>
+    &nbsp;&#187;&nbsp;MultipleSshKey
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="configure-multiple-key">Configure Multiple Key</h2>
+<p>生成特定key</p>
+<div class="hlcode"><pre><span class="n">ssh</span><span class="o">-</span><span class="n">keygen</span> <span class="o">-</span><span class="n">t</span> <span class="n">rsa</span> <span class="o">-</span><span class="n">C</span> <span class="err">&#39;</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="err">@</span><span class="n">gmail</span><span class="p">.</span><span class="n">com</span><span class="err">&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa_github</span>
+</pre></div>
+
+
+<p>将key 添加ssh密钥链中, 否则重启会Forgot id_rsa_github</p>
+<div class="hlcode"><pre><span class="cp"># 添加</span>
+<span class="n">ssh</span><span class="o">-</span><span class="n">add</span> <span class="o">-</span><span class="n">K</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa_github</span>
+<span class="cp"># 查看</span>
+<span class="n">ssh</span><span class="o">-</span><span class="n">add</span> <span class="o">-</span><span class="n">l</span>
+</pre></div>
+
+
+<p>创建本地配置文件~/.ssh/config</p>
+<blockquote>
+<p>Optionally replace <code>~/.ssh/id_rsa</code> with the path to your key. To add additional keys, add a new line for each key with: <code>IdentityFile /path/to/your_key</code>.</p>
+</blockquote>
+<div class="hlcode"><pre><span class="n">Host</span> <span class="o">*</span>
+  <span class="n">UseKeychain</span> <span class="n">yes</span>
+  <span class="n">AddKeysToAgent</span> <span class="n">yes</span>
+  <span class="n">IdentityFile</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa_github</span>
+  <span class="n">IdentityFile</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa_xxx</span>
+  <span class="n">IdentityFile</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa_xxxx</span>
+</pre></div>
+
+
+<p>Test</p>
+<div class="hlcode"><pre><span class="n">ssh</span> <span class="o">-</span><span class="n">T</span> <span class="n">git</span><span class="err">@</span><span class="p">{</span><span class="n">username</span><span class="p">}.</span><span class="n">github</span><span class="p">.</span><span class="n">com</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-23 21:38:29</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

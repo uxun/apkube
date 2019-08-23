@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>GitCMD - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/client">../../../Dropbox/wiki/client</a>
+    &nbsp;&#187;&nbsp;GitCMD
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="git-command">Git Command</h2>
+<h3 id="branch">branch(分支)</h3>
+<div class="hlcode"><pre><span class="cp"># new branch</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+<span class="cp"># 切换分支操作(创建+切换)</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+
+<span class="cp"># push </span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+<span class="cp"># 映射本地目录origin目录</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span><span class="o">:</span><span class="n">wiki</span>
+
+<span class="cp"># 追踪远端分支,生成用于工作的本地分支</span>
+<span class="cp"># 推荐使用 --track </span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">checkout</span> <span class="o">--</span><span class="n">track</span> <span class="n">origin</span><span class="o">/</span><span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+<span class="cp"># default</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span> <span class="n">origin</span><span class="o">/</span><span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+</pre></div>
+
+
+<h3 id="delete">Delete</h3>
+<div class="hlcode"><pre><span class="cp"># Delete branch (bug001,idea,hotfix,使用后delete) </span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">d</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span> 
+<span class="cp"># 强制</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">D</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+<span class="cp"># delete origin branch</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="o">--</span><span class="n">delete</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+
+<span class="cp"># 切换分支回退版本</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">reset</span> <span class="o">--</span><span class="n">hard</span> <span class="err">版本号的</span><span class="n">sha1</span>
+</pre></div>
+
+
+<h3 id="check">Check</h3>
+<div class="hlcode"><pre><span class="cp"># 当前分支提交历史</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">log</span> <span class="o">--</span><span class="n">oneline</span> <span class="o">--</span><span class="n">decorate</span>
+
+<span class="cp"># 所有分支的提交历史</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">log</span> <span class="o">--</span><span class="n">oneline</span> <span class="o">--</span><span class="n">decorate</span> <span class="o">--</span><span class="n">graph</span> <span class="o">--</span><span class="n">all</span>
+
+<span class="cp"># check branch</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">v</span>
+
+<span class="cp"># 查看合并，未合并的分支</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="o">--</span><span class="n">merged</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">merged</span>
+
+<span class="cp"># 远程分支列表</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">ls</span><span class="o">-</span><span class="n">remote</span>
+</pre></div>
+
+
+<h3 id="merge">merge</h3>
+<div class="hlcode"><pre><span class="cp"># 切换master 分支，将gh-pages合并</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">merge</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span>
+</pre></div>
+
+
+<h3 id="rename">Rename</h3>
+<div class="hlcode"><pre><span class="cp"># Git branch rename</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">m</span> <span class="n">oldName</span> <span class="n">newName</span>
+<span class="cp"># 删除远程分支</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">delete</span> <span class="n">origin</span> <span class="n">oldName</span>
+<span class="cp"># 上传新命名的localhost分支</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">newName</span>
+<span class="cp"># 修改后的localhost分支关联远程分支</span>
+<span class="err">$</span><span class="n">git</span> <span class="n">branch</span> <span class="o">--</span><span class="n">set</span><span class="o">-</span><span class="n">upstream</span><span class="o">-</span><span class="n">to</span> <span class="n">origin</span><span class="o">/</span><span class="n">newName</span>
+</pre></div>
+
+
+<h2 id="git-fork-rsync">Git Fork Rsync</h2>
+<h3 id="quick-operating-cd-githubproject">Quick-operating (cd github/project)</h3>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">merge</span> <span class="n">upstream</span><span class="o">/</span><span class="n">master</span>
+</pre></div>
+
+
+<h3 id="the-detailed-process">The detailed process</h3>
+<p>1.Fork project</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/uxun/kubeasz.git</span>
+<span class="cp"># 查看fork项目</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">remote</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+
+
+<p>2.设置同步的上游仓库</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">upstream</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/gjmzj/kubeasz.git</span>
+<span class="cp"># 验证</span>
+<span class="err">$</span> <span class="n">git</span> <span class="n">remote</span> <span class="o">-</span><span class="n">v</span>
+<span class="n">origin</span>  <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/uxun/kubes.git (fetch)</span>
+<span class="n">origin</span>  <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/uxun/kubes.git (push)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/gjmzj/kubeasz.git (fetch)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/gjmzj/kubeasz.git (push)</span>
+</pre></div>
+
+
+<p>3.将上游仓库commits内容存到本地upstream/master</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span>
+</pre></div>
+
+
+<p>4.切换项目分支 master 上</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+<span class="n">Already</span> <span class="n">on</span> <span class="err">&#39;</span><span class="n">master</span><span class="err">&#39;</span>
+<span class="n">Your</span> <span class="n">branch</span> <span class="n">is</span> <span class="n">up</span> <span class="n">to</span> <span class="n">date</span> <span class="n">with</span> <span class="err">&#39;</span><span class="n">origin</span><span class="o">/</span><span class="n">master</span><span class="err">&#39;</span><span class="p">.</span>
+</pre></div>
+
+
+<p>5.将upstream/master 改动的内容合并到本地master </p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">git</span> <span class="n">merge</span> <span class="n">upstream</span><span class="o">/</span><span class="n">master</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-23 21:38:29</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

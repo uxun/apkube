@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Vagrant - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/client">../../../Dropbox/wiki/client</a>
+    &nbsp;&#187;&nbsp;Vagrant
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="vagrant">Vagrant</h2>
+<h3 id="doc">DOC</h3>
+<blockquote>
+<p><a href="https://www.vagrantup.com/docs/">官方文档</a> <a href="https://atlas.hashicorp.com/boxes/search">官方仓库</a></p>
+<p><a href="http://www.vagrantbox.es">第三方box</a>  <a href="http://cloud.centos.org/centos/7/vagrant/x86_64/images/">Centos-box</a></p>
+<p>Mac <br />
+BOX：CentOS-7-x86_64-Vagrant-1805_01.VirtualBox.box</p>
+</blockquote>
+<h3 id="1installos-x">1.Install(OS X)</h3>
+<p><strong>Download images <a href="http://www.vagrantbox.es">Download</a></strong></p>
+<div class="hlcode"><pre><span class="n">brew</span> <span class="n">cask</span> <span class="n">install</span> <span class="n">Virtuabox</span>
+<span class="n">brew</span> <span class="n">cask</span> <span class="n">install</span> <span class="n">vagrant</span>
+</pre></div>
+
+
+<p><strong>添加下载的镜像到Vagrant</strong></p>
+<div class="hlcode"><pre><span class="cp"># example: vagrant box add {boxname} ~/Download/imagesxxx.box </span>
+<span class="err">$</span> <span class="n">vagrant</span> <span class="n">box</span> <span class="n">add</span> <span class="n">k8s</span> <span class="o">~/</span><span class="n">Download</span><span class="o">/</span><span class="n">Centos7_3</span><span class="p">.</span><span class="n">box</span>
+<span class="err">$</span> <span class="n">mkdir</span> <span class="o">~/</span><span class="n">vagrant</span> <span class="o">&amp;&amp;</span> <span class="n">cd</span> <span class="o">~/</span><span class="n">vagrant</span> <span class="o">&amp;&amp;</span> <span class="n">vagrant</span> <span class="n">init</span> <span class="n">k8s</span> <span class="o">&amp;&amp;</span> <span class="n">vagrant</span> <span class="n">up</span> <span class="o">&amp;&amp;</span> <span class="n">vagrant</span> <span class="n">ssh</span>
+</pre></div>
+
+
+<p><strong>Plugins</strong></p>
+<div class="hlcode"><pre><span class="cp"># (自定义共享目录插件) </span>
+<span class="err">$</span> <span class="n">vagrant</span> <span class="n">plugin</span> <span class="n">install</span> <span class="n">vagrant</span><span class="o">-</span><span class="n">vbguest</span>
+<span class="cp"># (实现宿主机用主机名访问虚机) </span>
+<span class="err">$</span> <span class="n">vagrant</span> <span class="n">plugin</span> <span class="n">install</span> <span class="n">vagrant</span><span class="o">-</span><span class="n">hostmanager</span>
+<span class="cp"># (支持多种共享) </span>
+<span class="err">$</span> <span class="n">vagrant</span> <span class="n">plugin</span> <span class="n">install</span> <span class="n">vagrant</span><span class="o">-</span><span class="n">bindfs</span>
+</pre></div>
+
+
+<p><strong>常用操作：</strong></p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>注释</th>
+<th>command line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vagrant box add</td>
+<td>添加box</td>
+<td name="name">$ vagrant box add </td>
+</tr>
+<tr>
+<td>Vagrant init</td>
+<td>初始化box</td>
+<td name="name">$ vagrant init </td>
+</tr>
+<tr>
+<td>Vagrant up</td>
+<td>启动虚拟机</td>
+<td>$ vagrant up [VM_NAME]</td>
+</tr>
+<tr>
+<td>Vagrant ssh</td>
+<td>登陆虚拟机</td>
+<td>$ vagrant ssh [VM_NAME]</td>
+</tr>
+<tr>
+<td>Vagrant box list</td>
+<td>显示已添加的box列表</td>
+<td>$ vagrant box list</td>
+</tr>
+<tr>
+<td>Vagrant destroy</td>
+<td>停止当前运行的虚拟机并销毁所有创建的资源</td>
+<td>$ vagrant destroy</td>
+</tr>
+<tr>
+<td>Vagrant halt</td>
+<td>关机</td>
+<td>$ vagrant halt</td>
+</tr>
+<tr>
+<td>Vagrant package</td>
+<td>当前运行的虚拟机环境打包</td>
+<td>$ vagrant package</td>
+</tr>
+<tr>
+<td>Vagrant plugin</td>
+<td>安装卸载插件</td>
+<td></td>
+</tr>
+<tr>
+<td>Vagrant reload</td>
+<td>重启虚拟机，载入配置文件</td>
+<td>$ vagrant reload [VM_NAME]</td>
+</tr>
+<tr>
+<td>Vagrant status</td>
+<td>当前虚拟机的状态</td>
+<td></td>
+</tr>
+<tr>
+<td>Vagrant suspend</td>
+<td>挂起当前的虚拟机</td>
+<td></td>
+</tr>
+<tr>
+<td>Vagrent resume</td>
+<td>恢复前面被挂起的状态</td>
+<td></td>
+</tr>
+<tr>
+<td>Vagrant box remove</td>
+<td>删除对应box</td>
+<td>$ vagrant box remove base virtualbox</td>
+</tr>
+<tr>
+<td>Vagrant ssh-config</td>
+<td>输出ssh连接的一些信息</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>定义主机</strong></p>
+<p><code>$ cat Vagrantfile</code></p>
+<div class="hlcode"><pre><span class="cp"># -*- mode: ruby -*-</span>
+<span class="cp"># vi: set ft=ruby :</span>
+<span class="n">Vagrant</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>  <span class="err">#</span> <span class="err">使用内部</span><span class="mi">2</span><span class="err">版本</span>
+  <span class="n">config</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">box</span> <span class="o">=</span> <span class="s">&quot;centos7&quot;</span>               <span class="err">#</span> <span class="n">box</span> <span class="n">name</span>
+  <span class="n">config</span><span class="p">.</span><span class="n">hostmanager</span><span class="p">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="nb">true</span>       <span class="err">#</span> <span class="err">启用</span><span class="n">hostmanager</span>
+  <span class="n">config</span><span class="p">.</span><span class="n">hostmanager</span><span class="p">.</span><span class="n">manage_guest</span> <span class="o">=</span> <span class="nb">true</span>  <span class="err">#</span> <span class="err">允许更新虚拟机上的文件</span>
+  <span class="n">config</span><span class="p">.</span><span class="n">hostmanager</span><span class="p">.</span><span class="n">manage_host</span> <span class="o">=</span> <span class="nb">true</span>   <span class="err">#</span> <span class="err">允许更新主机上的文件</span>
+
+        <span class="err">#</span> <span class="err">定义主机第一台主机</span>
+     <span class="n">config</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">define</span> <span class="s">&quot;k8s1&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">k8s1</span><span class="o">|</span>
+        <span class="err">#</span> <span class="err">设置虚拟机的</span><span class="n">Box</span>
+        <span class="n">k8s1</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">box</span> <span class="o">=</span> <span class="s">&quot;centos7&quot;</span>
+        <span class="err">#</span> <span class="err">设置</span><span class="n">hostname</span>
+        <span class="n">k8s1</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">host_name</span> <span class="o">=</span> <span class="s">&quot;k8s1&quot;</span>
+        <span class="err">#</span> <span class="err">设置内部网络</span>
+        <span class="n">k8s1</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">network</span> <span class="s">&quot;private_network&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="o">:</span> <span class="s">&quot;10.10.10.10&quot;</span>
+        <span class="err">#</span> <span class="err">设置</span><span class="n">virtuabox</span> <span class="err">属性</span>
+        <span class="n">k8s1</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">provider</span> <span class="s">&quot;virtualbox&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+            <span class="err">#</span> <span class="err">设置</span><span class="n">virtualbox</span><span class="err">显示名称</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;k8s1&quot;</span>
+            <span class="err">#</span> <span class="err">设置虚拟机的内存大小</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">memory</span> <span class="o">=</span> <span class="mi">1024</span>
+            <span class="err">#</span> <span class="err">设置虚拟机的</span><span class="n">CPU</span><span class="err">个数</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">cpus</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">end</span>
+     <span class="n">end</span>
+        <span class="err">#</span> <span class="err">定义主机第二台</span>
+     <span class="n">config</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">define</span> <span class="s">&quot;k8s2&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">k8s2</span><span class="o">|</span>
+        <span class="n">k8s2</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">box</span> <span class="o">=</span> <span class="s">&quot;centos7&quot;</span>
+        <span class="n">k8s2</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">host_name</span> <span class="o">=</span> <span class="s">&quot;k8s2&quot;</span>
+        <span class="n">k8s2</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">network</span> <span class="s">&quot;private_network&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="o">:</span> <span class="s">&quot;10.10.10.11&quot;</span>
+        <span class="n">k8s2</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">provider</span> <span class="s">&quot;virtualbox&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;k8s2&quot;</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">memory</span> <span class="o">=</span> <span class="mi">1024</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">cpus</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">end</span>
+     <span class="n">end</span>
+<span class="n">end</span>
+</pre></div>
+
+
+<h3 id="_1">网络设置（两种网络连接方式）</h3>
+<table>
+<thead>
+<tr>
+<th>host-only（主机）：宿主访问</th>
+<th>Bridge（桥接）：独立ip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>config.vm.network :private_network, ip: "10.10.10.10"</td>
+<td>路由自定义 config.vm.network "public_network", bridge: "en1: Wi-Fi (AirPort)"</td>
+</tr>
+<tr>
+<td>config.vm.network "private_network", type: "dhcp"</td>
+<td>固定IP config.vm.network "public_network", ip: "192.168.20.10"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>主机名/共享目录/端口转发</strong></p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>config</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hostname 设置</td>
+<td>config.vm.hostname = "hostname"</td>
+</tr>
+<tr>
+<td>挂载目录 <br />参数：主机目录----虚拟机目录</td>
+<td>config.vm.synced_folder  "/Users/axun/vagrant/config", "/vagrant"</td>
+</tr>
+<tr>
+<td guest="guest" 虚拟机：="虚拟机：">端口转发：<br /></td>
+<td>config.vm.network :forwarded_port, guest: 80, host: 8080</td>
+</tr>
+</tbody>
+</table>
+<p><strong>多种共享类型</strong></p>
+<p>插件bindfs可以支持多种共享模式，如nfs，samba</p>
+<p><code>$ vagrant plugin install vagrant-bindfs</code></p>
+<div class="hlcode"><pre><span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">define</span> <span class="s2">&quot;node1&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">node1</span><span class="o">|</span>
+  <span class="n">node1</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span> <span class="s2">&quot;private_network&quot;</span><span class="p">,</span> <span class="ss">ip</span><span class="p">:</span> <span class="s2">&quot;192.168.10.101&quot;</span>
+  <span class="n">node1</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">hostname</span><span class="o">=</span><span class="s2">&quot;node1.uxun.com&quot;</span>
+  <span class="n">node1</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">synced_folder</span> <span class="s2">&quot;./app&quot;</span> <span class="s2">&quot;/mnt/app-data&quot;</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="s2">&quot;nfs&quot;</span>
+  <span class="n">node1</span><span class="o">.</span><span class="n">bindfs</span><span class="o">.</span><span class="n">bind_folder</span> <span class="s2">&quot;/mnt/app-data&quot;</span> <span class="s2">&quot;/app&quot;</span>
+    <span class="n">force_user</span><span class="p">:</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="n">force_group</span><span class="p">:</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="ss">o</span><span class="p">:</span> <span class="s2">&quot;noempty&quot;</span>
+</pre></div>
+
+
+<p><strong>环境打包</strong></p>
+<div class="hlcode"><pre><span class="cp"># 虚拟机删除规则文件</span>
+<span class="n">sudo</span> <span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">udev</span><span class="o">/</span><span class="n">rules</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="mi">70</span><span class="o">-</span><span class="n">persistent</span><span class="o">-</span><span class="n">net</span><span class="p">.</span><span class="n">rules</span>  
+<span class="cp"># 生成box文件</span>
+<span class="n">vagrant</span> <span class="n">package</span> <span class="o">--</span><span class="n">output</span> <span class="n">name</span><span class="p">.</span><span class="n">box</span>
+</pre></div>
+
+
+<p><strong>集群部署</strong></p>
+<blockquote>
+<p>config.vm.define 定义角色<br />
+</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># -*- mode: ruby -*-</span>
+<span class="cp"># vi: set ft=ruby :</span>
+<span class="n">Vagrant</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+
+    <span class="p">(</span><span class="mf">1..5</span><span class="p">).</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+
+        <span class="n">config</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">define</span> <span class="s">&quot;node#{i}&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+
+        <span class="err">#</span> <span class="err">设置虚拟机的</span><span class="n">Box</span>
+        <span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">box</span> <span class="o">=</span> <span class="s">&quot;centos7&quot;</span>
+
+        <span class="err">#</span> <span class="err">设置虚拟机的主机名</span>
+        <span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;node#{i}&quot;</span>
+
+        <span class="err">#</span> <span class="err">设置虚拟机的</span><span class="n">IP</span>
+        <span class="err">#</span><span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">network</span> <span class="s">&quot;private_network&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="o">:</span> <span class="s">&quot;192.168.10.1#{i}&quot;</span>
+        <span class="err">#</span><span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">network</span> <span class="s">&quot;private_network&quot;</span><span class="p">,</span> <span class="n">type</span><span class="o">:</span> <span class="s">&quot;dhcp&quot;</span>
+        <span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">network</span> <span class="s">&quot;public_network&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="o">:</span> <span class="s">&quot;192.168.10.10#{i}&quot;</span>
+
+        <span class="err">#</span> <span class="err">设置主机与虚拟机的共享目录</span>
+        <span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">synced_folder</span> <span class="s">&quot;/Users/axun/vagrant/Centos7/data&quot;</span><span class="p">,</span> <span class="s">&quot;/data&quot;</span>
+
+        <span class="err">#</span> <span class="n">VirtaulBox</span><span class="err">相关配置</span>
+        <span class="n">node</span><span class="p">.</span><span class="n">vm</span><span class="p">.</span><span class="n">provider</span> <span class="s">&quot;virtualbox&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">v</span><span class="o">|</span>
+            <span class="err">#</span> <span class="err">设置虚拟机的名称</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;node#{i}&quot;</span>
+            <span class="err">#</span> <span class="err">设置虚拟机的内存大小</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">memory</span> <span class="o">=</span> <span class="mi">1024</span>
+            <span class="err">#</span> <span class="err">设置虚拟机的</span><span class="n">CPU</span><span class="err">个数</span>
+            <span class="n">v</span><span class="p">.</span><span class="n">cpus</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">end</span>
+
+        <span class="n">end</span>
+    <span class="n">end</span>
+<span class="n">end</span>
+</pre></div>
+
+
+<h3 id="other">Other</h3>
+<p><a href="https://www.jianshu.com/p/d56d42b8d97f">blog</a> </p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-23 21:38:29</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

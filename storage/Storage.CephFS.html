@@ -67,6 +67,11 @@
 </pre></div>
 
 
+<h5 id="ceph-cephclientadminkeyring-secret-key">获取 Ceph ceph.client.admin.keyring 并生成 secret key</h5>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">ceph</span> <span class="n">auth</span> <span class="n">get</span><span class="o">-</span><span class="n">key</span> <span class="n">client</span><span class="p">.</span><span class="n">admin</span> <span class="o">|</span><span class="n">base64</span>
+</pre></div>
+
+
 <h3 id="3mount">3.Mount</h3>
 <blockquote>
 <p>内核驱动程序 or 用户空间(FUSE)</p>
@@ -115,7 +120,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-08-23 18:01:40</p>
+        <p>Page Updated 2019-08-23 21:38:29</p>
       </div> <!-- end footer-right -->
     </div>
 

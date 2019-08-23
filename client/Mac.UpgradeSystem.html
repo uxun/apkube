@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>MacUpgradeSystem - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/client">../../../Dropbox/wiki/client</a>
+    &nbsp;&#187;&nbsp;MacUpgradeSystem
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="mac-upgrade-system">Mac upgrade system</h2>
+<p>upgrade git apple  xcrun: error:***</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">xcode</span><span class="o">-</span><span class="n">select</span> <span class="o">--</span><span class="n">install</span>
+</pre></div>
+
+
+<p>update zsh latest version</p>
+<div class="hlcode"><pre><span class="cp"># check the zsh info</span>
+<span class="n">brew</span> <span class="n">info</span> <span class="n">zsh</span>
+
+<span class="cp"># install zsh</span>
+<span class="n">brew</span> <span class="n">install</span> <span class="o">--</span><span class="n">without</span><span class="o">-</span><span class="n">etcdir</span> <span class="n">zsh</span>
+
+<span class="cp"># add shell path</span>
+<span class="n">sudo</span> <span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">shells</span>
+
+<span class="cp"># add the following line into the very end of the file(/etc/shells)</span>
+<span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">zsh</span>
+
+<span class="cp"># change default shell</span>
+<span class="n">chsh</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">zsh</span>
+</pre></div>
+
+
+<p>upgrade oh_my_zsh</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">upgrade_oh_my_zsh</span>
+</pre></div>
+
+
+<p>Upgrade git homebrew</p>
+<div class="hlcode"><pre><span class="n">Check</span> <span class="n">version</span>
+<span class="err">$</span> <span class="n">git</span> <span class="o">--</span><span class="n">version</span>
+
+<span class="n">Backup</span> <span class="p">(</span><span class="n">or</span> <span class="n">remove</span><span class="p">)</span> <span class="n">Apple</span> <span class="n">git</span> <span class="p">(</span><span class="n">Optional</span><span class="p">)</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">mv</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">git</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">apple</span>
+
+<span class="n">Install</span> <span class="n">Homebrew</span> 
+<span class="err">$</span> <span class="n">brew</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">brew</span> <span class="n">upgrade</span>
+
+<span class="n">Install</span> <span class="n">Git</span> <span class="n">with</span> <span class="n">Homebrew</span>
+<span class="err">$</span> <span class="n">brew</span> <span class="n">install</span> <span class="n">git</span>
+
+<span class="n">Symbolic</span> <span class="n">link</span>
+<span class="err">$</span> <span class="n">brew</span> <span class="n">link</span> <span class="o">--</span><span class="n">force</span> <span class="n">git</span>
+
+<span class="n">Close</span> <span class="n">Terminal</span> <span class="n">and</span> <span class="n">reopen</span> <span class="n">then</span> <span class="n">check</span> <span class="n">version</span>
+<span class="err">$</span> <span class="n">git</span> <span class="o">--</span><span class="n">version</span>
+<span class="n">You</span> <span class="n">should</span> <span class="n">see</span><span class="err">…</span>
+
+<span class="n">git</span> <span class="n">version</span> <span class="mf">2.18.0</span>
+<span class="n">Nice</span><span class="o">!</span> <span class="n">We</span><span class="err">’</span><span class="n">re</span> <span class="n">safe</span> <span class="n">now</span><span class="o">!</span> <span class="n">And</span> <span class="n">next</span> <span class="n">time</span> <span class="n">you</span> <span class="n">can</span> <span class="n">just</span><span class="err">…</span>
+
+<span class="err">$</span> <span class="n">brew</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">brew</span> <span class="n">upgrade</span>
+</pre></div>
+
+
+<p>install homebrew https://brew.sh/</p>
+<blockquote>
+<p>Dock 错乱</p>
+</blockquote>
+<div class="hlcode"><pre><span class="err">➜</span>  <span class="o">~</span> <span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">Library</span><span class="o">/</span><span class="n">Application</span> <span class="n">Support</span><span class="o">/</span><span class="n">Dock</span><span class="o">/</span><span class="n">desktoppicture</span><span class="p">.</span><span class="n">db</span>
+<span class="err">➜</span>  <span class="o">~</span> <span class="n">killall</span> <span class="n">Dock</span>
+</pre></div>
+
+
+<blockquote>
+<p>Mac系统调整Launchpad图标</p>
+</blockquote>
+<div class="hlcode"><pre><span class="err">➜</span>  <span class="o">~</span> <span class="n">defaults</span> <span class="n">write</span> <span class="n">com</span><span class="p">.</span><span class="n">apple</span><span class="p">.</span><span class="n">dock</span> <span class="n">springboard</span><span class="o">-</span><span class="n">columns</span> <span class="o">-</span><span class="kt">int</span> <span class="mi">10</span>
+<span class="err">➜</span>  <span class="o">~</span> <span class="n">defaults</span> <span class="n">write</span> <span class="n">com</span><span class="p">.</span><span class="n">apple</span><span class="p">.</span><span class="n">dock</span> <span class="n">ResetLaunchPad</span> <span class="o">-</span><span class="kt">bool</span> <span class="n">TRUE</span><span class="p">;</span><span class="n">killall</span> <span class="n">Dock</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-23 21:38:29</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
