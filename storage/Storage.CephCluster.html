@@ -29,49 +29,20 @@
 </div>
 <div class="clearfix"></div>
 <div id="content">
-  <h2 id="intro-to-ceph">Intro to Ceph</h2>
-<p><strong>简单来说块存储读写快，不利于共享，文件存储读写慢，利于共享。能否弄一个读写快，利于共享的出来呢。于是就有了对象存储。</strong></p>
+  <h2 id="ceph-cluster-deploy">Ceph Cluster Deploy</h2>
 <blockquote>
-<p>Ceph Version &gt; Jewel（v10.2.0）<br />
-从Ceph 10.x（Jewel）开始，你应该使用至少一个4.x内核。如果您必须使用较旧的内核，则应使用fuse客户端而不是内核客户端。</p>
-<p>对于RBD，如果您选择跟踪长期内核，我们目前推荐基于4.x的“长期维护”内核系列：<br />
-- 4.19.z<br />
-- 4.14.z</p>
-<p><a href="https://docs.ceph.com/docs/master/cephfs/best-practices/#cephfs-best-practices">系统版本</a></p>
-<p><a href="https://docs.ceph.com/docs/master/cephfs/best-practices/#cephfs-best-practices">CEPHFS BEST PRACTICES</a></p>
+<p>提供基于RADOS的无限可扩展Ceph Storage Cluster</p>
 </blockquote>
-<h3 id="archiecture"><a href="https://docs.ceph.com/docs/master/architecture/#architecture">Archiecture</a></h3>
-<ol>
-<li>提供对象，块和文件存储。</li>
-<li>集群至少需要一个：<ul>
-<li>Monitors (ceph-mon): 监视集群状态，维护集群状态映射。HA ceph-mon &gt; 3</li>
-<li>Manager (ceph-mgr): 负责跟踪运行时指标和Ceph集群的当前状态，API。HA ceph-mgr &gt; 2</li>
-<li>OSDs (ceph-osd): 存储数据，处理数据复制，恢复，获取心跳信息。HA ceph-osd &gt; 3</li>
-<li>MDS (ceph-mds): 代表<a href="https://docs.ceph.com/docs/master/glossary/#term-ceph-filesystem">Ceph文件系统</a>存储元数据，(对象，块不使用)</li>
-</ul>
-</li>
-<li>存储集群两类守护进程组成：OSDs and Monitors</li>
-<li>4.Flow: obj() —&gt; File() —&gt; Disk()<br />
-        obj(数据存储为对象) —&gt; File(对象应用于文件系统中的文件) —&gt; Disk(该文件存储在对象存储设备上)</li>
-<li>使用 <a href="https://docs.ceph.com/docs/master/glossary/#term-crush">CRUSH</a>算法，Ceph计算应该包含对象的放置组，并进一步计算哪个Ceph OSD守护进程应该存储放置组。CRUSH算法使Ceph存储集群能够动态扩展，重新平衡和恢复。</li>
-</ol>
+<p>Daemons:</p>
 <blockquote>
-<p>OSDs: Ceph的OSD守护进程（OSD）存储数据，处理数据复制，恢复，回填，重新调整。<br />
-Ceph OSD守护程序作为一个心跳向Ceph的监视器报告一些检测信息。Ceph的存储集群需要至少2个OSD守护进程来保持一个 active + clean状态。（Ceph默认制作2个备份，但你可以调整它）</p>
-<p>Monitors:Ceph的监控保持集群状态映射，包括OSD(守护进程)映射,分组(PG)映射，和CRUSH映射。 Ceph 保持一个在Ceph监视器, Ceph OSD 守护进程和 PG的每个状态改变的历史（称之为“epoch”）<br />
-MDS: MDS是Ceph的元数据服务器，代表存储元数据的Ceph文件系统（即Ceph的块设备和Ceph的对象存储不使用MDS）。Ceph的元数据服务器使用POSIX文件系统，用户可以执行基本命令如 ls, find,等，并且不需要在Ceph的存储集群上造成巨大的负载。</p>
-<p>Ceph把客户端的数据以对象的形式存储到了存储池里。利用CRUSH算法，Ceph可以计算出安置组所包含的对象，并能进一步计算出Ceph OSD集合所存储的安置组。CRUSH算法能够使Ceph存储集群拥有动态改变大小、再平衡和数据恢复的能力。</p>
+<p>Ceph OSD Daemons处理存储磁盘上的读/写操作。</p>
 </blockquote>
-<h3 id="ceph-api">Ceph API</h3>
-<p>Object：有原生的API，而且也兼容Swift和S3的API <br />
-Block：支持精简配置、快照、克隆 <br />
-File：Posix接口，支持快照 </p>
-<p><strong>Ceph也是分布式存储系统，它的特点是：</strong></p>
-<p>高扩展性：使用普通x86服务器，支持10~1000台服务器，支持TB到PB级的扩展。 <br />
-高可靠性：没有单点故障，多数据副本，自动管理，自动修复。 <br />
-高性能：数据分布均衡，并行化度高。对于objects storage和block storage,不需要元数据服务器。</p>
-<p><strong>一个Ceph存储集群要求至少有一个Ceph监视器和两个Ceph OSD守护进程。当运行Ceph文件系统客户端时，必须要有Ceph元数据服务器。</strong></p>
-<h2 id="ceph-cluster-deploy">Ceph Cluster Deploy</h2>
+<p><img alt="" src="https://docs.ceph.com/docs/master/_images/ditaa-4cf6d0983521ea66cd16f98b7ce624e6666eed77.png" /></p>
+<p>Storaing DATA</p>
+<blockquote>
+<p>Ceph客户端接收数据(块，Gw，FS，librados)，将数据存储为对象(obj)，每个对象应于文件系统中的文件(File)，该文件存储在对象存储设备上(Disk)。</p>
+</blockquote>
+<p><img alt="" src="https://docs.ceph.com/docs/master/_images/ditaa-518f1eba573055135eb2f6568f8b69b4bb56b4c8.png" /></p>
 <h3 id="env-prepare">ENV Prepare</h3>
 <table>
 <thead>
@@ -136,6 +107,7 @@ File：Posix接口，支持快照 </p>
 
 
 <h3 id="2add-repo-s">2.Add Repo (S)</h3>
+<p><a href="https://docs.ceph.com/docs/master/install/mirrors/">ceph mirrors</a></p>
 <p><strong>el7</strong></p>
 <div class="hlcode"><pre><span class="n">wget</span> <span class="o">-</span><span class="n">O</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="p">.</span><span class="n">repos</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">Base</span><span class="p">.</span><span class="n">repo</span> <span class="n">http</span><span class="o">:</span><span class="c1">//mirrors.163.com/.help/CentOS7-Base-163.repo &amp;&amp; yum clean all &amp;&amp; yum makecache</span>
 
@@ -229,7 +201,6 @@ File：Posix接口，支持快照 </p>
 <span class="nx">ceph</span><span class="na">-deploy</span> <span class="nx">purge</span> <span class="p">{</span><span class="nx">ceph</span><span class="na">-node</span><span class="p">}</span> <span class="err">[</span><span class="p">{</span><span class="nx">ceph</span><span class="na">-node</span><span class="p">}</span><span class="cp">]</span>
 ceph-deploy purgedata {ceph-node} <span class="cp">[</span><span class="p">{</span><span class="nx">ceph</span><span class="na">-node</span><span class="p">}</span><span class="cp">]</span>
 ceph-deploy forgetkeys
-
 # 安装期间由本地ceph-deploy写出的所有文件
 rm ceph.*
 
@@ -237,10 +208,8 @@ rm ceph.*
 # 管理节点上创建一个目录，用于保存 ceph-deploy 生成的配置文件和密钥对<span class="nt">&lt;br&gt;</span>
 $ mkdir -pv /data5/ceph-cluster <span class="err">&amp;&amp;</span> cd /data5/ceph-cluster
 
-# 创建监视器 (创建1个monitor监视器)，当前目录输出
-# $ ceph-deploy new $hostname
+# 创建集群(ceph-deploy new ceph-node1 ceph-node2 ceph-node3）
 # ImportError: No module named ceph_deploy.cli ----&gt; python env #!/usr/bin/python2.7
-# 多个监视器 (ceph-deploy new ceph-node1 ceph-node2 ceph-node3）
 $ ceph-deploy new hadoop-s02-235 hadoop-s03-236 hadoop-s04-237
 
 $ ls /data5/ceph-cluster
@@ -250,6 +219,7 @@ ceph.conf  ceph-deploy-ceph.log ceph.mon.keyring
 
 <h3 id="7cephconf-s">7.Ceph.conf (S)</h3>
 <blockquote>
+<p>其他配置参考：<a href="https://docs.ceph.com/docs/master/rados/#ceph-storage-cluster">ceph-storage-cluster</a></p>
 <p>网络设置参考：https://docs.ceph.com/docs/master/rados/configuration/network-config-ref/</p>
 </blockquote>
 <div class="hlcode"><pre><span class="cp"># ceph.conf配置</span>
@@ -340,6 +310,15 @@ ceph.conf  ceph-deploy-ceph.log ceph.mon.keyring
 <blockquote>
 <p>扩展集群，提高可靠性和可用性</p>
 </blockquote>
+<p><strong>KEYS MANAGEMENT</strong></p>
+<div class="hlcode"><pre><span class="cp"># 配置主机以运行OSD或元数据服务器之前，必须收集监视器密钥以及OSD和MDS引导密钥环</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">gatherkeys</span> <span class="p">{</span><span class="n">monitor</span><span class="o">-</span><span class="n">host</span><span class="p">}</span>
+
+<span class="cp"># FORGET KEYS</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">forgetkeys</span>
+</pre></div>
+
+
 <p><strong>ADD A METADATA SERVER</strong></p>
 <div class="hlcode"><pre><span class="cp"># 使用CephFS需要创建元数据服务</span>
 <span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mds</span> <span class="n">create</span> <span class="n">node1</span>
@@ -352,9 +331,12 @@ ceph.conf  ceph-deploy-ceph.log ceph.mon.keyring
 当您使用多个监视器运行Ceph时，您应该在每个监视器主机上安装和配置NTP。确保监视器是NTP对等方。</p>
 </blockquote>
 <div class="hlcode"><pre><span class="cp"># Ceph使用Paxos算法，监视器(N)数量大于N/2。</span>
-<span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mon</span> <span class="n">add</span> <span class="n">node2</span> <span class="n">node3</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mon</span> <span class="n">add</span> <span class="n">node2</span> <span class="n">node3</span>
 <span class="cp"># 查看仲裁状态</span>
-<span class="n">ceph</span> <span class="n">quorum_status</span> <span class="o">--</span><span class="n">format</span> <span class="n">json</span><span class="o">-</span><span class="n">pretty</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">quorum_status</span> <span class="o">--</span><span class="n">format</span> <span class="n">json</span><span class="o">-</span><span class="n">pretty</span>
+
+<span class="cp"># delete mon</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">mon</span> <span class="n">destroy</span> <span class="p">{</span><span class="n">host</span><span class="o">-</span><span class="n">name</span> <span class="p">[</span><span class="n">host</span><span class="o">-</span><span class="n">name</span><span class="p">]...}</span>
 </pre></div>
 
 
@@ -400,7 +382,11 @@ ceph.conf  ceph-deploy-ceph.log ceph.mon.keyring
 
 
 <h3 id="refernece">REFERNECE</h3>
-<p><a href="http://docs.ceph.org.cn/cephfs/disaster-recovery">Ceph 灾难恢复</a></p>
+<p><a href="https://docs.ceph.com/docs/master/rados/configuration/ceph-conf/">ceph-conf</a></p>
+<p><a href="https://docs.ceph.com/docs/master/install/upgrading-ceph/">UPGRADING CEPH</a></p>
+<p><a href="https://docs.ceph.com/docs/master/rados/troubleshooting/#troubleshooting">Troubleshooting</a></p>
+<p><a href="https://docs.ceph.com/docs/master/rados/api/librados-intro/">LIBRADOS简介</a>: custom API</p>
+<p><a href="https://docs.ceph.com/docs/master/rados/configuration/#configuration">性能优化参考</a></p>
   
 </div>
     </div>
@@ -413,7 +399,7 @@ ceph.conf  ceph-deploy-ceph.log ceph.mon.keyring
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-08-22 23:29:13</p>
+        <p>Page Updated 2019-08-23 18:01:40</p>
       </div> <!-- end footer-right -->
     </div>
 

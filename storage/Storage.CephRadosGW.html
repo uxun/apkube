@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>CephRadosGW - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;CephRadosGW
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 16:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="ceph-object-gateway">Ceph Object Gateway</h2>
+<blockquote>
+<p>对象存储接口，提供RESTful网关，支持compatible API (S3|Swift)</p>
+</blockquote>
+<h3 id="design"><strong>Design</strong></h3>
+<p><img alt="" src="https://docs.ceph.com/docs/master/_images/ditaa-50d12451eb76c5c72c4574b08f0320b39a42e5f1.png" /></p>
+<h3 id="1deploy">1.Deploy</h3>
+<blockquote>
+<p>Gateway守护进程嵌套入Civetweb。需要开启默认端口7480。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># install ceph object gateway</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">install</span> <span class="o">--</span><span class="n">rgw</span> <span class="o">&lt;</span><span class="n">client</span><span class="o">-</span><span class="n">node</span><span class="o">&gt;</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">client</span><span class="o">-</span><span class="n">node</span><span class="o">&gt;</span> <span class="p">...]</span>
+<span class="cp"># 创建实例</span>
+<span class="err">$</span> <span class="n">ceph</span><span class="o">-</span><span class="n">deploy</span> <span class="n">rgw</span> <span class="n">create</span> <span class="o">&lt;</span><span class="n">client</span><span class="o">-</span><span class="n">node</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<h3 id="2configuration">2.Configuration</h3>
+<div class="hlcode"><pre><span class="cp"># [client.rgw.&lt;client-node&gt;]</span>
+<span class="cp"># modify port</span>
+<span class="p">[</span><span class="n">client</span><span class="p">.</span><span class="n">rgw</span><span class="p">.</span><span class="n">client</span><span class="o">-</span><span class="n">node</span><span class="p">]</span>
+<span class="n">rgw_frontends</span> <span class="o">=</span> <span class="s">&quot;civetweb port=8333&quot;</span>
+
+<span class="cp"># start or centos6 service radosgw restart id=rgw.&lt;short-hostname&gt;</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">restart</span> <span class="n">ceph</span><span class="o">-</span><span class="n">radosgw</span><span class="p">.</span><span class="n">service</span>
+
+<span class="cp"># 重新配置防火墙</span>
+<span class="n">sudo</span> <span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">list</span><span class="o">-</span><span class="n">all</span>
+<span class="n">sudo</span> <span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">zone</span><span class="o">=</span><span class="n">public</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">port</span> <span class="mi">8333</span><span class="o">/</span><span class="n">tcp</span> <span class="o">--</span><span class="n">permanent</span>
+<span class="n">sudo</span> <span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">reload</span>
+
+<span class="cp"># Test</span>
+<span class="nl">http:</span><span class="c1">//&lt;client-node&gt;:8333</span>
+</pre></div>
+
+
+<h3 id="3refernece">3.REFERNECE</h3>
+<p>配置参数参考 <a href="https://docs.ceph.com/docs/master/start/quick-rgw/">Configuration parameters</a> </p>
+<p><a href="https://docs.ceph.com/docs/master/radosgw/#ceph-object-gateway">INFO</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-23 18:01:40</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
