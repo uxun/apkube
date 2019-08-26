@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>SomokepingAlerts - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/ops">../../../Dropbox/wiki/ops</a>
+    &nbsp;&#187;&nbsp;SomokepingAlerts
+    <span class="updated">Page Updated&nbsp;
+    2019-08-25 15:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="smokeping-alerts">Smokeping alerts</h2>
+<blockquote>
+<p>smokeping 阀值报警 <br />
+docker hub : uxun/smokeping</p>
+</blockquote>
+<h3 id="1depended">1.Depended</h3>
+<p>Mail install</p>
+<div class="hlcode"><pre><span class="cp"># deploy</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">mailx</span>
+<span class="err">$</span> <span class="n">cp</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">mail</span><span class="p">.</span><span class="n">rc</span><span class="p">{,.</span><span class="n">back</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">mail</span><span class="p">.</span><span class="n">rc</span> 
+
+<span class="cp"># add configuration</span>
+<span class="n">set</span> <span class="n">from</span><span class="o">=</span><span class="n">server</span><span class="err">@</span><span class="n">xxxx</span><span class="p">.</span><span class="n">com</span>
+<span class="n">set</span> <span class="n">smtp</span><span class="o">=</span><span class="n">smtp</span><span class="p">.</span><span class="n">exmail</span><span class="p">.</span><span class="n">qq</span><span class="p">.</span><span class="n">com</span>
+<span class="n">set</span> <span class="n">smtp</span><span class="o">-</span><span class="n">auth</span><span class="o">-</span><span class="n">user</span><span class="o">=</span><span class="n">server</span><span class="err">@</span><span class="n">xxxx</span><span class="p">.</span><span class="n">com</span>
+<span class="n">set</span> <span class="n">smtp</span><span class="o">-</span><span class="n">auth</span><span class="o">-</span><span class="n">password</span><span class="o">=</span><span class="s">&quot;YOU_MAIL_PASSWD&quot;</span>
+
+<span class="cp"># Test mail</span>
+<span class="n">echo</span> <span class="s">&quot; hello world &quot;</span> <span class="o">|</span> <span class="n">mail</span> <span class="o">-</span><span class="n">s</span> <span class="s">&quot; this is email&quot;</span> <span class="n">YOU</span><span class="err">@</span><span class="n">mail</span><span class="p">.</span><span class="n">com</span>
+</pre></div>
+
+
+<h3 id="2the-alarm-script">2.The alarm script</h3>
+<p>/opt/smokeping/bin/mailx_alert.sh</p>
+<div class="hlcode"><pre><span class="c">#!/bin/bash</span>
+<span class="c"># 解析变量</span>
+<span class="nv">title</span><span class="o">=</span><span class="s2">&quot;smokeping personal mail alter!!&quot;</span>
+<span class="nv">alertname</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">target</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">losspattern</span><span class="o">=</span><span class="nv">$3</span>
+<span class="nv">rtt</span><span class="o">=</span><span class="nv">$4</span>
+<span class="nv">hostname</span><span class="o">=</span><span class="nv">$5</span>
+<span class="nv">DATE</span><span class="o">=</span><span class="k">$(</span> date <span class="s1">&#39;+%Y-%m-%d %H:%M:%S&#39;</span> <span class="k">)</span>
+
+<span class="nv">messages</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> -e <span class="s2">&quot; 报警策略名: \t $alertname \n 报警目标: \t $target \n 丢包率: \t $losspattern \n 延迟时间: \t $rtt \n 主机地址: \t$hostname \n 报警时间: \t$DATE &quot;</span><span class="sb">`</span>
+
+<span class="c"># modify</span>
+<span class="nv">email</span><span class="o">=</span><span class="s2">&quot;uxn@gmail.com,test@foxmail.com&quot;</span>
+<span class="nb">echo</span> <span class="s2">&quot;$DATE -- $alertname -- $target -- $losspattern -- $rtt -- $hostname&quot;</span> &gt;&gt; /tmp/smokeping-baojin
+<span class="nb">echo</span> <span class="s2">&quot;$messages&quot;</span> | mail -s <span class="s2">&quot;$title&quot;</span> <span class="nv">$email</span> &gt;&gt;/tmp/mailx.log 2&gt;&amp;1
+</pre></div>
+
+
+<h2 id="3smokeping-config">3.Smokeping config</h2>
+<p>需要修改项目 tag</p>
+<div class="hlcode"><pre><span class="n">Alerts</span> 
+<span class="n">to</span> <span class="o">=</span> <span class="o">|/</span><span class="n">opt</span><span class="o">/</span><span class="n">smokeping</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">mailx_alert</span><span class="p">.</span><span class="n">sh</span>
+<span class="cp"># tag</span>
+<span class="n">from</span> <span class="o">=</span> <span class="n">server</span><span class="err">@</span><span class="n">mail</span><span class="p">.</span><span class="n">com</span>
+
+<span class="o">+</span><span class="n">someloss</span>
+<span class="n">type</span> <span class="o">=</span> <span class="n">loss</span>
+<span class="n">edgetrigger</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="o">==</span><span class="mi">0</span><span class="o">%</span><span class="p">,</span><span class="o">==</span><span class="mi">0</span><span class="o">%</span><span class="p">,</span><span class="o">==</span><span class="mi">0</span><span class="o">%</span><span class="p">,</span><span class="o">==</span><span class="mi">0</span><span class="o">%</span><span class="p">,</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">%</span>
+<span class="n">comment</span> <span class="o">=</span> <span class="n">loss</span> <span class="mi">3</span> <span class="n">times</span>  <span class="n">in</span> <span class="n">a</span> <span class="n">row</span>
+
+<span class="o">+</span><span class="n">rttdetect</span>
+<span class="n">type</span> <span class="o">=</span> <span class="n">rtt</span>
+<span class="n">edgetrigger</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mi">100</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">150</span><span class="p">,</span><span class="o">&gt;</span><span class="mi">150</span><span class="p">,</span><span class="o">&gt;</span><span class="mi">150</span><span class="p">,</span><span class="o">&gt;</span><span class="mi">150</span>
+<span class="n">comment</span> <span class="o">=</span> <span class="err">连续</span><span class="mi">3</span><span class="err">次采样延迟增大</span><span class="o">-</span><span class="err">超过</span><span class="mi">150</span><span class="n">ms</span>
+
+<span class="err">告警类型</span>
+<span class="n">alerts</span> <span class="o">=</span> <span class="n">someloss</span><span class="p">,</span><span class="n">rttdetect</span>
+
+<span class="o">++++</span> <span class="n">TO_FS_FIREWALLD_TEL1</span>
+<span class="n">menu</span> <span class="o">=</span> <span class="n">to</span> <span class="n">local</span> <span class="err">防火墙电信</span><span class="mi">1</span>
+<span class="cp"># tag</span>
+<span class="n">title</span> <span class="o">=</span> <span class="n">to</span> <span class="n">local</span><span class="err">防火墙电信</span> <span class="n">xx</span><span class="p">.</span><span class="n">xx</span><span class="p">.</span><span class="n">xx</span><span class="p">.</span><span class="n">xx</span>
+<span class="cp"># tag</span>
+<span class="n">host</span> <span class="o">=</span> <span class="n">xx</span><span class="p">.</span><span class="n">xx</span><span class="p">.</span><span class="n">xx</span><span class="p">.</span><span class="n">xx</span>
+<span class="n">alerts</span> <span class="o">=</span> <span class="n">someloss</span><span class="p">,</span><span class="n">rttdetect</span>
+</pre></div>
+
+
+<h2 id="reference">Reference</h2>
+<p><a href="https://boke.wsfnk.com/archives/646.html">钉钉告警</a><br />
+<a href="https://lqdflying.info/linux/webservice/centos_caddy_smokepin/">centos7 install smokeping</a><br />
+<a href="https://smokeping-users.oetiker.narkive.com/9dtEfpv2/smokeping-email-alerts">smokeping email alerts</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-26 13:47:27</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

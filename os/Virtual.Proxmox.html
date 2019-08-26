@@ -1,0 +1,607 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Proxmox - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/os">../../../Dropbox/wiki/os</a>
+    &nbsp;&#187;&nbsp;Proxmox
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#proxmox-53-2">Proxmox 5.3-2</a><ul>
+<li><a href="#1env-prepare">1.ENV Prepare</a></li>
+<li><a href="#2proxmox-ve">2.Proxmox VE 角色和权限设置</a></li>
+<li><a href="#3proxmox-ve-cluster-storage">3.Proxmox VE Cluster Storage</a></li>
+<li><a href="#4proxmox-ve-create-vm">4.Proxmox VE Create VM</a></li>
+<li><a href="#5preparing-cloud-init-tamplate">5.Preparing Cloud-Init tamplate</a></li>
+<li><a href="#6proxmox-ve-intro">6.Proxmox VE Intro</a></li>
+<li><a href="#7other">7.Other</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="proxmox-53-2">Proxmox 5.3-2</h1>
+<h2 id="1env-prepare">1.ENV Prepare</h2>
+<p><a href="https://www.proxmox.com/en/downloads">download-image</a></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Note</th>
+<th>Disk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dell T620</td>
+<td>X1</td>
+<td>2x RAID 1 3x RAID 5  3x RAID 5  8x 2T</td>
+</tr>
+<tr>
+<td>Dell R720xd</td>
+<td>X1</td>
+<td>2x RAID 1  6x RAID 5  8x 600G</td>
+</tr>
+<tr>
+<td>Dell T620</td>
+<td>X1</td>
+<td>2x RAID 1  6x RAID 5  8x 600G</td>
+</tr>
+</tbody>
+</table>
+<p><strong>1.1 Prepare</strong></p>
+<ol>
+<li>Proxmox 5.3 image 写入 CD-ROM   <ul>
+<li>Tools：UltraISO </li>
+</ul>
+</li>
+<li>BIOS 开启虚拟化 <ul>
+<li>(F2 --&gt; System setup --&gt; Processor settings --&gt; virtualization Technology )</li>
+</ul>
+</li>
+<li>CD-ROM 启动安装 <ul>
+<li>(F11 --&gt; boot menu --&gt; CD-ROM)</li>
+</ul>
+</li>
+</ol>
+<p><strong>1.2 Install</strong></p>
+<blockquote>
+<p>需要注意的设置hostname：pve01.xxxx.com ...</p>
+</blockquote>
+<p>next --&gt; next  --&gt;</p>
+<p><strong>1.3 Create Cluster 在pve01上创建集群，然后执行pvecm status确认创建集群成功</strong></p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">pvecm</span> <span class="n">create</span> <span class="n">CLUSTER</span><span class="o">-</span><span class="n">NAME</span>
+<span class="err">$</span> <span class="n">pvecm</span> <span class="n">status</span>
+</pre></div>
+
+
+<p><strong>1.4 在pve02，pve03上执行pvecm add  pve01的IP地址</strong></p>
+<div class="hlcode"><pre><span class="cp">#pvecm add PVE01-IP</span>
+
+<span class="n">root</span><span class="err">@</span><span class="n">pve02</span><span class="o">:~</span><span class="err">#</span> <span class="n">pvecm</span> <span class="n">add</span> <span class="mf">192.168.0.2</span>
+<span class="n">Please</span> <span class="n">enter</span> <span class="n">superuser</span> <span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="n">password</span> <span class="k">for</span> <span class="err">&#39;</span><span class="mf">192.168.0.2</span><span class="err">&#39;</span><span class="o">:</span>
+<span class="n">Password</span> <span class="k">for</span> <span class="n">root</span><span class="err">@</span><span class="mf">192.168.0.2</span><span class="o">:</span> <span class="o">********</span>
+
+<span class="n">root</span><span class="err">@</span><span class="n">pve03</span><span class="o">:~</span><span class="err">#</span> <span class="n">pvecm</span> <span class="n">add</span> <span class="mf">192.168.0.2</span>
+<span class="n">Please</span> <span class="n">enter</span> <span class="n">superuser</span> <span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="n">password</span> <span class="k">for</span> <span class="err">&#39;</span><span class="mf">192.168.0.2</span><span class="err">&#39;</span><span class="o">:</span>
+<span class="n">Password</span> <span class="k">for</span> <span class="n">root</span><span class="err">@</span><span class="mf">192.168.0.2</span><span class="o">:</span> <span class="o">********</span>
+</pre></div>
+
+
+<p><strong>1.5 查看节点</strong></p>
+<div class="hlcode"><pre><span class="cp"># pvecm ndoes</span>
+
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pvecm</span> <span class="n">nodes</span>
+
+<span class="n">Membership</span> <span class="n">information</span>
+<span class="o">----------------------</span>
+    <span class="n">Nodeid</span>      <span class="n">Votes</span> <span class="n">Name</span>
+         <span class="mi">1</span>          <span class="mi">1</span> <span class="mf">192.168.0.2</span> <span class="p">(</span><span class="n">local</span><span class="p">)</span>
+         <span class="mi">2</span>          <span class="mi">1</span> <span class="mf">192.168.0.3</span>
+         <span class="mi">3</span>          <span class="mi">1</span> <span class="mf">192.168.0.4</span>
+</pre></div>
+
+
+<h2 id="2proxmox-ve">2.Proxmox VE 角色和权限设置</h2>
+<blockquote>
+<p>PVE 的权限设定方式 是由 userid@ [REALM] group role [PATH] 这四块組成的.<br />
+除了 path 是因为系统根据 pve node, datstore, vm/ct 而创建出来以外, 其它的 user, group &amp; role 都可以自己建立.</p>
+</blockquote>
+<p><strong>2.1.创建PVE admin （系统 user）</strong></p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">useradd</span> <span class="n">pveadmin</span>
+</pre></div>
+
+
+<p><strong>2.2.创建Proxmox VE 用户并授权</strong></p>
+<div class="hlcode"><pre><span class="cp"># 建立用户</span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">useradd</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span> <span class="o">-</span><span class="n">comment</span> <span class="err">&#39;</span><span class="n">LMB</span> <span class="n">vm</span> <span class="n">admin</span><span class="err">&#39;</span>
+<span class="cp"># 设置密码</span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">passwd</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span>
+<span class="cp"># 建立role </span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">roleadd</span> <span class="n">PVE_Power</span><span class="o">-</span><span class="n">only</span> <span class="o">-</span><span class="n">privs</span> <span class="s">&quot;VM.PowerMgmt VM.Console&quot;</span>
+<span class="cp"># 建立群组 admin</span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">groupadd</span> <span class="n">admin</span> <span class="o">-</span><span class="n">comment</span> <span class="s">&quot;System Administrators&quot;</span>
+<span class="cp"># 建立群组权限, 重点在于 PATH 是 /</span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">aclmod</span> <span class="o">/</span> <span class="o">-</span><span class="n">group</span> <span class="n">admin</span> <span class="o">-</span><span class="n">role</span> <span class="n">Administrator</span>
+<span class="cp"># 把系统user拉入群组中</span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">usermod</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span> <span class="o">-</span><span class="n">group</span> <span class="n">admin</span>
+
+<span class="cp"># 停用账户</span>
+<span class="err">$</span> <span class="n">pveum</span> <span class="n">usermod</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span> <span class="o">-</span><span class="n">enable</span> <span class="mi">0</span>
+
+<span class="n">example</span><span class="err">：</span>
+<span class="o">----</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">useradd</span> <span class="n">pveadmin</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pveum</span> <span class="n">useradd</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span> <span class="o">-</span><span class="n">comment</span> <span class="err">&#39;</span><span class="n">LMB</span> <span class="n">vm</span> <span class="n">admin</span><span class="err">&#39;</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pveum</span> <span class="n">passwd</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span>
+<span class="n">Enter</span> <span class="n">new</span> <span class="n">password</span><span class="o">:</span> <span class="o">*****</span>
+<span class="n">Retype</span> <span class="n">new</span> <span class="n">password</span><span class="o">:</span> <span class="o">*****</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pveum</span> <span class="n">roleadd</span> <span class="n">PVE_Power</span><span class="o">-</span><span class="n">only</span> <span class="o">-</span><span class="n">privs</span> <span class="s">&quot;VM.PowerMgmt VM.Console&quot;</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pveum</span> <span class="n">groupadd</span> <span class="n">admin</span> <span class="o">-</span><span class="n">comment</span> <span class="s">&quot;System Administrators&quot;</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pveum</span> <span class="n">aclmod</span> <span class="o">/</span> <span class="o">-</span><span class="n">group</span> <span class="n">admin</span> <span class="o">-</span><span class="n">role</span> <span class="n">Administrator</span>
+<span class="n">root</span><span class="err">@</span><span class="n">pve01</span><span class="o">:~</span><span class="err">#</span> <span class="n">pveum</span> <span class="n">usermod</span> <span class="n">pveadmin</span><span class="err">@</span><span class="n">pam</span> <span class="o">-</span><span class="n">group</span> <span class="n">admin</span>
+<span class="o">----</span>
+</pre></div>
+
+
+<h2 id="3proxmox-ve-cluster-storage">3.Proxmox VE Cluster Storage</h2>
+<p><strong>REFERNECE</strong><br />
+<a href="https://pve.proxmox.com/wiki/Storage">Storage Types</a><br />
+<a href="https://alanxelsys.com/using-proxmox-to-build-a-working-ceph-cluster/">Ceph Cluster</a></p>
+<p><strong>3.1 创建NFS共享镜像</strong></p>
+<blockquote>
+<p>Proxmox集群中，ISO放于本地，只提供本节点。通过共享NFS 解决ISO 共享问题<br />
+需要NFS 服务器</p>
+</blockquote>
+<p><code>Datacenter --&gt; Storage --&gt; Add --&gt; NFS</code> </p>
+<p><strong>3.2 创建ceph RBD 存放Container，Disk image</strong></p>
+<blockquote>
+<p>Ceph 版本<br />
+​ luminous 为ceph10.2<br />
+​ hammer  为ceph0.94</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp">#1.各节点执行安装</span>
+<span class="err">$</span> <span class="n">pveceph</span> <span class="n">install</span> <span class="o">--</span><span class="n">version</span> <span class="n">luminous</span>
+
+<span class="cp">#2.主节点配置ceph网络</span>
+<span class="err">$</span> <span class="n">pveceph</span> <span class="n">init</span> <span class="o">--</span><span class="n">network</span> <span class="mf">192.168.0.0</span><span class="o">/</span><span class="mi">24</span>
+
+<span class="cp">#3.各节点执行创建ceph监视器(奇数)</span>
+<span class="err">$</span> <span class="n">pveceph</span> <span class="n">createmon</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">mon</span> <span class="n">stat</span>
+
+<span class="cp">#4.各节点创建OSD</span>
+<span class="err">$</span> <span class="n">pveceph</span> <span class="n">createosd</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdb</span>
+
+<span class="cp">#各节点可查看ceph osd 运行状态</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">osd</span> <span class="n">stat</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">osd</span> <span class="n">tree</span>
+
+<span class="cp">#5.主节点创建存储池</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">osd</span> <span class="n">pool</span> <span class="n">create</span> <span class="n">pvepool</span> <span class="mi">128</span> <span class="mi">128</span>
+
+<span class="cp">#6.主节点ID or key 复制指定目录</span>
+<span class="err">$</span> <span class="n">mkdir</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pve</span><span class="o">/</span><span class="n">priv</span><span class="o">/</span><span class="n">ceph</span>
+<span class="err">$</span> <span class="n">cp</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ceph</span><span class="o">/</span><span class="n">ceph</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">admin</span><span class="p">.</span><span class="n">keyring</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pve</span><span class="o">/</span><span class="n">priv</span><span class="o">/</span><span class="n">ceph</span><span class="p">.</span><span class="n">keyring</span>
+<span class="err">$</span> <span class="n">cp</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pve</span><span class="o">/</span><span class="n">priv</span><span class="o">/</span><span class="n">ceph</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">admin</span><span class="p">.</span><span class="n">keyring</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pve</span><span class="o">/</span><span class="n">priv</span><span class="o">/</span><span class="n">ceph</span><span class="o">/</span><span class="n">ceph1</span><span class="p">.</span><span class="n">keyring</span>
+
+<span class="cp">#查看集群状态</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="o">-</span><span class="n">s</span>
+
+<span class="cp">#7.主节点开启RBD存储</span>
+<span class="err">$</span> <span class="n">ceph</span> <span class="n">osd</span> <span class="n">pool</span> <span class="n">application</span> <span class="n">enable</span> <span class="n">pvepool</span> <span class="n">rbd</span>
+
+<span class="cp"># 开启RBD存储后，配置webgui，存储配置文件 vi /etc/pve/storage.cfg</span>
+<span class="n">Datacenter</span> <span class="o">--&gt;</span> <span class="n">Storage</span> <span class="o">--&gt;</span> <span class="n">Add</span> <span class="o">--&gt;</span> <span class="n">RBD</span>
+</pre></div>
+
+
+<p><strong>3.3 Error</strong></p>
+<div class="hlcode"><pre><span class="cp"># Error: {HEALTH_WARN clock skew detected on mon.pve03}</span>
+<span class="cp"># 编辑配置文件，global添加配置，错误节点重启mon服务</span>
+
+<span class="err">$</span> <span class="n">vi</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ceph</span><span class="o">/</span><span class="n">ceph</span><span class="p">.</span><span class="n">conf</span>  
+<span class="n">mon</span> <span class="n">clock</span> <span class="n">drift</span> <span class="n">allowed</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">mon</span> <span class="n">clock</span> <span class="n">drift</span> <span class="n">warn</span> <span class="n">backoff</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">restart</span> <span class="n">ceph</span><span class="o">-</span><span class="n">mon</span><span class="p">.</span><span class="n">target</span>
+</pre></div>
+
+
+<h2 id="4proxmox-ve-create-vm">4.Proxmox VE Create VM</h2>
+<p><a href="https://pve.proxmox.com/pve-docs/">DOCS</a></p>
+<p><strong>4.1 Configure the HA</strong></p>
+<p>创建HA组，将需要的对象添加</p>
+<div class="hlcode"><pre><span class="n">a</span><span class="o">:</span><span class="n">Datacenter</span> <span class="o">--&gt;</span> <span class="n">HA</span> <span class="o">--&gt;</span> <span class="n">Groups</span> <span class="o">--&gt;</span> <span class="n">Create</span>
+<span class="n">b</span><span class="o">:</span><span class="n">Datacenter</span> <span class="o">--&gt;</span> <span class="n">HA</span> <span class="o">--&gt;</span> <span class="n">Add</span>
+</pre></div>
+
+
+<p><strong>4.2 Create VM</strong></p>
+<blockquote>
+<p>配置文件/etc/pve/qemu-server/*</p>
+</blockquote>
+<p><a href="https://pve.proxmox.com/pve-docs/chapter-qm.html">Create Qemu/KVM</a></p>
+<p><code>Datacenter(数据中心) --&gt; 右上角 Create VM --&gt; 勾选Advanced 勾选QEMU(VNC,SPICE等远程终端服务)</code></p>
+<p><strong>4.3 WebGUI 安装Centos 7</strong></p>
+<p>安装创建好OS后，将主机转为模板</p>
+<p><a href="https://pve.proxmox.com/pve-docs/qm.1.html">qm command info</a></p>
+<div class="hlcode"><pre><span class="cp"># clone </span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">clone</span> <span class="mi">108</span> <span class="mi">999</span> <span class="o">--</span><span class="n">name</span> <span class="n">centos7</span>
+<span class="cp"># template</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">template</span> <span class="mi">999</span>
+</pre></div>
+
+
+<p><strong>4.4 由模板创建VM</strong></p>
+<div class="hlcode"><pre><span class="cp">#1.clone </span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">clone</span> <span class="mi">999</span> <span class="n">NEWID</span> <span class="o">--</span><span class="n">name</span> <span class="p">{</span><span class="n">HOSTNAME</span><span class="o">:</span><span class="n">centos7</span><span class="p">}</span> <span class="o">--</span><span class="n">full</span> <span class="o">--</span><span class="n">storage</span> <span class="n">ceph</span> 
+<span class="cp">#2.modify memory,cpu,net(模板无法满足要求，更改clone后的属性)</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">101</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">8192</span> <span class="o">--</span><span class="n">cores</span> <span class="mi">4</span> <span class="o">--</span><span class="n">sockets</span> <span class="mi">1</span> <span class="o">--</span><span class="n">ostype</span> <span class="n">l26</span> <span class="o">-</span><span class="n">net0</span> <span class="n">e1000</span><span class="p">,</span><span class="n">bridge</span><span class="o">=</span><span class="n">vmbr0</span>
+<span class="cp">#添加磁盘容量，通过LVM 配置 可在线扩容 </span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">resize</span> <span class="mi">103</span> <span class="n">scsi0</span> <span class="o">+</span><span class="mi">20</span><span class="n">G</span>
+
+<span class="cp">#VM主机中扩增磁盘</span>
+<span class="err">$</span> <span class="n">parted</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sda</span>
+   <span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">resizepart</span> <span class="mi">2</span> <span class="mi">100</span><span class="o">%</span>
+   <span class="p">(</span><span class="n">parted</span><span class="p">)</span> <span class="n">quit</span>
+<span class="err">$</span> <span class="n">pvresize</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sda2</span>
+<span class="err">$</span> <span class="n">lvresize</span> <span class="o">--</span><span class="n">extents</span> <span class="o">+</span><span class="mi">100</span><span class="o">%</span><span class="n">FREE</span> <span class="o">--</span><span class="n">resizefs</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">centos</span><span class="o">-</span><span class="n">root</span>
+</pre></div>
+
+
+<p><strong>4.5 通过ISO 安装系统</strong></p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">qm</span> <span class="n">create</span> <span class="n">NEWID</span> <span class="o">--</span><span class="n">name</span> <span class="n">Centos7</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span><span class="n">description</span> <span class="err">&#39;</span><span class="n">test</span><span class="err">&#39;</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">2024</span> <span class="o">--</span><span class="n">cores</span> <span class="mi">1</span> <span class="o">--</span><span class="n">sockets</span> <span class="mi">1</span> <span class="o">--</span><span class="n">ostype</span> <span class="n">l26</span>  <span class="o">--</span><span class="n">bootdisk</span> <span class="n">scsi0</span> <span class="o">-</span><span class="n">scsihw</span> <span class="n">virtio</span><span class="o">-</span><span class="n">scsi</span><span class="o">-</span><span class="n">pci</span> <span class="o">-</span><span class="n">scsi0</span> <span class="n">ceph</span><span class="o">:</span><span class="mi">50</span> <span class="o">-</span><span class="n">cdrom</span> <span class="n">NFS</span><span class="o">-</span><span class="mf">1.253</span><span class="o">:</span><span class="n">iso</span><span class="o">/</span><span class="n">CentOS</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">Minimal</span><span class="o">-</span><span class="mf">1804.</span><span class="n">iso</span> <span class="o">-</span><span class="n">net0</span> <span class="n">e1000</span><span class="p">,</span><span class="n">bridge</span><span class="o">=</span><span class="n">vmbr0</span>
+</pre></div>
+
+
+<p><strong>ostype 类型</strong></p>
+<table>
+<thead>
+<tr>
+<th>ostype</th>
+<th>OS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>124</td>
+<td>Linux 2.4 Kernel</td>
+</tr>
+<tr>
+<td>126</td>
+<td>Linux 2.6/3.X Kernel</td>
+</tr>
+<tr>
+<td>other</td>
+<td>unspecified OS</td>
+</tr>
+</tbody>
+</table>
+<p><strong>4.6 Create CT(LXC)</strong></p>
+<blockquote>
+<p>配置文件 /etc/pve/lxc/*</p>
+</blockquote>
+<p><a href="https://www.hostfav.com/blog/index.php/2017/08/05/how-to-create-a-proxmox-container/">WebGUI Create LXC</a></p>
+<p><a href="https://pve.proxmox.com/pve-docs/chapter-pct.html">Command Create LXC</a></p>
+<p><a href="https://www.reddit.com/r/homelab/comments/5xvfbf/how_to_proxmox_modify_a_ct_container_template/">Proxmox Modify a CT template</a></p>
+<div class="hlcode"><pre><span class="cp">#Container images update</span>
+<span class="err">$</span> <span class="n">pveam</span> <span class="n">update</span>
+<span class="err">$</span> <span class="n">pveam</span> <span class="n">available</span>
+<span class="p">...</span>
+<span class="n">system</span>          <span class="n">centos</span><span class="o">-</span><span class="mi">6</span><span class="o">-</span><span class="n">default_20161207_amd64</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">xz</span>
+<span class="n">system</span>          <span class="n">centos</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="n">default_20171212_amd64</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">xz</span>
+<span class="p">...</span>
+
+<span class="cp">#download images</span>
+<span class="err">$</span> <span class="n">pveam</span> <span class="n">download</span> <span class="n">local</span> <span class="n">centos</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="n">default_20171212_amd64</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">xz</span>
+<span class="cp">#check</span>
+<span class="err">$</span> <span class="n">pveam</span> <span class="n">list</span> <span class="n">local</span>
+<span class="cp">#remove</span>
+<span class="err">$</span> <span class="n">pveam</span> <span class="n">remove</span> <span class="n">local</span><span class="o">:</span><span class="n">vztmpl</span><span class="o">/</span><span class="n">centos</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="n">default_20171212_amd64</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">xz</span>
+</pre></div>
+
+
+<p>CLI Usage LXC</p>
+<div class="hlcode"><pre><span class="cp">#create CT</span>
+<span class="err">$</span> <span class="n">pct</span> <span class="n">create</span> <span class="mi">106</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">vz</span><span class="o">/</span><span class="n">template</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">centos</span><span class="o">-</span><span class="mi">7</span><span class="o">-</span><span class="n">default_20171212_amd64</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">xz</span> <span class="o">--</span><span class="n">storage</span> <span class="n">ceph</span> <span class="o">-</span><span class="n">net0</span> <span class="n">name</span><span class="o">=</span><span class="n">eth0</span><span class="p">,</span><span class="n">bridge</span><span class="o">=</span><span class="n">vmbr0</span><span class="p">,</span><span class="n">ip</span><span class="o">=</span><span class="mf">192.168.0.17</span><span class="o">/</span><span class="mi">24</span><span class="p">,</span><span class="n">gw</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">1024</span> <span class="o">--</span><span class="n">swap</span> <span class="mi">128</span> <span class="o">--</span><span class="n">hostname</span> <span class="n">centos3</span> <span class="o">--</span><span class="n">rootfs</span> <span class="n">ceph</span><span class="o">:</span><span class="mi">50</span> <span class="o">-</span><span class="n">password</span>
+
+<span class="cp">#modification </span>
+<span class="err">$</span> <span class="n">pct</span> <span class="n">set</span> <span class="mi">106</span> <span class="o">-</span><span class="n">net0</span> <span class="n">name</span><span class="o">=</span><span class="n">eth0</span><span class="p">,</span><span class="n">bridge</span><span class="o">=</span><span class="n">vmbr0</span><span class="p">,</span><span class="n">ip</span><span class="o">=</span><span class="mf">192.168.0.18</span><span class="o">/</span><span class="mi">24</span><span class="p">,</span><span class="n">gw</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">1024</span> <span class="o">--</span><span class="n">swap</span> <span class="mi">128</span>
+<span class="err">$</span> <span class="n">pct</span> <span class="n">config</span> <span class="mi">105</span>
+
+<span class="cp">#start or stop </span>
+<span class="err">$</span> <span class="n">pct</span> <span class="n">start</span><span class="o">|</span><span class="n">stop</span> <span class="mi">106</span>
+
+<span class="cp">#run a shell as root user</span>
+<span class="err">$</span> <span class="n">pct</span> <span class="n">enter</span> <span class="mi">106</span>
+
+<span class="cp">#login </span>
+<span class="err">$</span> <span class="n">pct</span> <span class="n">console</span> <span class="mi">106</span>
+</pre></div>
+
+
+<p><strong>4.7 Other operating</strong></p>
+<p><a href="https://blog.51cto.com/6222666/2161762">参考1</a></p>
+<h2 id="5preparing-cloud-init-tamplate">5.Preparing Cloud-Init tamplate</h2>
+<p><a href="https://pve.proxmox.com/wiki/Cloud-Init_Support">wiki</a></p>
+<p><a href="https://zhangguanzhang.github.io/2019/01/22/proxmox-cloud-init/#%E6%A8%A1%E6%9D%BF%E5%88%B6%E4%BD%9C">centos7 cloudinit</a></p>
+<p><strong>5.1 create .img cloud (ubuntu)</strong></p>
+<div class="hlcode"><pre><span class="cp"># 创建 VM</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">create</span> <span class="mi">9998</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">8192</span> <span class="o">--</span><span class="n">cores</span> <span class="mi">4</span> <span class="o">--</span><span class="n">sockets</span> <span class="mi">1</span> <span class="o">--</span><span class="n">ostype</span> <span class="n">l26</span> <span class="o">-</span><span class="n">net0</span> <span class="n">e1000</span><span class="p">,</span><span class="n">bridge</span><span class="o">=</span><span class="n">vmbr0</span>
+
+<span class="cp"># 导入磁盘</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">importdisk</span> <span class="mi">9998</span> <span class="n">bionic</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">cloudimg</span><span class="o">-</span><span class="n">amd64</span><span class="p">.</span><span class="n">img</span> <span class="n">ceph</span>
+
+<span class="cp"># finally attach the new disk to the VM as scsi drive</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">9998</span> <span class="o">--</span><span class="n">scsihw</span> <span class="n">virtio</span><span class="o">-</span><span class="n">scsi</span><span class="o">-</span><span class="n">pci</span> <span class="o">--</span><span class="n">scsi0</span> <span class="n">ceph</span><span class="o">:</span><span class="n">vm</span><span class="o">-</span><span class="mi">9998</span><span class="o">-</span><span class="n">disk</span><span class="o">-</span><span class="mi">0</span>
+
+<span class="cp"># 将虚拟机转为cloud</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">9998</span> <span class="o">--</span><span class="n">ide2</span> <span class="n">ceph</span><span class="o">:</span><span class="n">cloudinit</span>
+
+<span class="cp"># To be able to boot directly from the Cloud-Init image, set the bootdisk parameter to scsi0, and restrict BIOS to boot from disk only. This will speed up booting, because VM BIOS skips the testing for a bootable CDROM.</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">9998</span> <span class="o">--</span><span class="n">boot</span> <span class="n">c</span> <span class="o">--</span><span class="n">bootdisk</span> <span class="n">scsi0</span>
+
+<span class="cp"># Also configure a serial console and use it as a display. Many Cloud-Init images rely on this, as it is an requirement for OpenStack images.</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">9998</span> <span class="o">--</span><span class="n">serial0</span> <span class="n">socket</span> <span class="o">--</span><span class="n">vga</span> <span class="n">serial0</span>
+
+<span class="cp"># 制作模板</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">template</span> <span class="mi">9998</span>
+
+<span class="cp"># 创建vm (ubuntu images 官方下载)默认需要密钥登录 </span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">clone</span> <span class="mi">9998</span> <span class="mi">110</span> <span class="o">--</span><span class="n">name</span> <span class="n">Ubuntu18</span><span class="o">-</span><span class="n">jack</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">110</span> <span class="o">--</span><span class="n">ipconfig0</span> <span class="n">ip</span><span class="o">=</span><span class="mf">192.168.0.30</span><span class="o">/</span><span class="mi">24</span><span class="p">,</span><span class="n">gw</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="o">--</span><span class="n">cipassword</span> <span class="n">adminadmin</span> <span class="o">--</span><span class="n">ciuser</span> <span class="n">root</span> <span class="o">--</span><span class="n">sshkey</span> <span class="o">~/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">id_rsa</span><span class="p">.</span><span class="n">pub</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">resize</span> <span class="mi">110</span> <span class="n">scsi0</span> <span class="o">+</span><span class="mi">50</span><span class="n">G</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">start</span> <span class="mi">110</span>
+</pre></div>
+
+
+<p><strong> 5.2 create cloudinit image</strong></p>
+<div class="hlcode"><pre><span class="cp"># Default Install a virtual machine (Proxmox webgui install centos 7)</span>
+<span class="cp"># 1. modify Network dns=dhcp, onboot=yes , ssh UseDNS=no</span>
+<span class="cp"># 2. disable selinux,firewalld,NetworkManager</span>
+
+<span class="cp"># virtual auto restart install acpid.service ,In order to properly size the root partition and install cloud-utils-growpart,cloud-init supports writing the preset information to instance</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">acpid</span> <span class="n">cloud</span><span class="o">-</span><span class="n">init</span> <span class="n">cloud</span><span class="o">-</span><span class="n">utils</span><span class="o">-</span><span class="n">growpart</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">enable</span> <span class="n">acpid</span>
+
+<span class="cp"># disable zeroconf</span>
+<span class="err">$</span> <span class="n">echo</span> <span class="s">&quot;NOZEROCONF=yes&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">network</span>
+
+<span class="cp"># modify /etc/cloud/cloud.cfg</span>
+<span class="cp"># 1.ssh_pwauth = 0|1 (0:Login with password is prohibited)</span>
+<span class="cp"># 2.disable_root = 0|1 (1:Root is banned)</span>
+<span class="err">$</span> <span class="n">sed</span> <span class="o">-</span><span class="n">ri</span> <span class="err">&#39;</span><span class="o">/</span><span class="n">disable_root</span><span class="o">/</span><span class="p">{</span><span class="n">s</span><span class="err">#\</span><span class="n">S</span><span class="err">$#</span><span class="mi">0</span><span class="err">#</span><span class="p">}</span><span class="err">&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">cloud</span><span class="o">/</span><span class="n">cloud</span><span class="p">.</span><span class="n">cfg</span>
+<span class="err">$</span> <span class="n">sed</span> <span class="o">-</span><span class="n">ri</span> <span class="err">&#39;</span><span class="o">/</span><span class="n">ssh_pwauth</span><span class="o">/</span><span class="p">{</span><span class="n">s</span><span class="err">#\</span><span class="n">S</span><span class="err">$#</span><span class="mi">1</span><span class="err">#</span><span class="p">}</span><span class="err">&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">cloud</span><span class="o">/</span><span class="n">cloud</span><span class="p">.</span><span class="n">cfg</span>
+<span class="err">$</span> <span class="n">sed</span> <span class="o">-</span><span class="n">ri</span> <span class="err">&#39;</span><span class="o">/</span><span class="n">package</span><span class="o">-</span><span class="n">update</span><span class="o">/</span><span class="n">s</span><span class="err">@</span><span class="o">^</span><span class="err">@#@&#39;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">cloud</span><span class="o">/</span><span class="n">cloud</span><span class="p">.</span><span class="n">cfg</span>
+
+<span class="cp"># /etc/cloud/cloud.cfg cloud-init Create a user </span>
+<span class="cp">#  注释</span>
+<span class="cp">#  default_user:</span>
+<span class="cp">#    name: centos</span>
+<span class="cp">#    lock_passwd: true</span>
+<span class="cp">#    gecos: Cloud User</span>
+<span class="cp">#    groups: [wheel, adm, systemd-journal]</span>
+<span class="cp">#    sudo: [&quot;ALL=(ALL) NOPASSWD:ALL&quot;]</span>
+<span class="cp">#    shell: /bin/bash</span>
+
+<span class="cp"># 关机注意清理 </span>
+<span class="cp"># rm -f /etc/udev/rules.d/*</span>
+<span class="cp"># yum clean all</span>
+<span class="cp"># &gt; /etc/machie-id</span>
+
+<span class="cp"># 将虚拟机转为cloud</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">clone</span> <span class="mi">105</span> <span class="mi">1000</span> <span class="o">--</span><span class="n">name</span> <span class="n">centos7cloud</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">1000</span> <span class="o">--</span><span class="n">ide2</span> <span class="n">ceph</span><span class="o">:</span><span class="n">cloudinit</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">template</span> <span class="mi">1000</span>
+</pre></div>
+
+
+<p>Ubuntu custom </p>
+<div class="hlcode"><pre><span class="cp"># 自定义官方镜像开启root login</span>
+<span class="cp"># 配置vm镜像</span>
+<span class="n">qm</span> <span class="n">create</span> <span class="mi">9997</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">2048</span> <span class="o">--</span><span class="n">cores</span> <span class="mi">2</span> <span class="o">--</span><span class="n">sockets</span> <span class="mi">1</span> <span class="o">--</span><span class="n">ostype</span> <span class="n">l26</span> <span class="o">-</span><span class="n">net0</span> <span class="n">e1000</span><span class="p">,</span><span class="n">bridge</span><span class="o">=</span><span class="n">vmbr0</span>
+<span class="n">qm</span> <span class="n">importdisk</span> <span class="mi">9997</span> <span class="n">ubuntu</span><span class="o">-</span><span class="mf">16.04</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">cloudimg</span><span class="o">-</span><span class="n">amd64</span><span class="o">-</span><span class="n">disk1</span><span class="p">.</span><span class="n">img</span> <span class="n">ceph</span>
+<span class="n">qm</span> <span class="n">set</span> <span class="mi">9997</span> <span class="o">--</span><span class="n">scsihw</span> <span class="n">virtio</span><span class="o">-</span><span class="n">scsi</span><span class="o">-</span><span class="n">pci</span> <span class="o">--</span><span class="n">scsi0</span> <span class="n">ceph</span><span class="o">:</span><span class="n">vm</span><span class="o">-</span><span class="mi">9997</span><span class="o">-</span><span class="n">disk</span><span class="o">-</span><span class="mi">0</span>
+<span class="n">qm</span> <span class="n">set</span> <span class="mi">9997</span> <span class="o">--</span><span class="n">boot</span> <span class="n">c</span> <span class="o">--</span><span class="n">bootdisk</span> <span class="n">scsi0</span>
+<span class="n">qm</span> <span class="n">set</span> <span class="mi">9997</span> <span class="o">--</span><span class="n">serial0</span> <span class="n">socket</span> <span class="o">--</span><span class="n">vga</span> <span class="n">serial0</span>
+<span class="n">qm</span> <span class="n">set</span> <span class="mi">9997</span> <span class="o">--</span><span class="n">ide2</span> <span class="n">ceph</span><span class="o">:</span><span class="n">cloudinit</span>
+<span class="cp"># 修改镜像 /etc/cloud/cloud.cfg cloud-init</span>
+<span class="n">qm</span> <span class="n">start</span> <span class="mi">9997</span>
+<span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">cloud</span><span class="o">/</span><span class="n">cloud</span><span class="p">.</span><span class="n">cfg</span>
+
+<span class="cp"># users: 注释</span>
+<span class="cp">#   - default</span>
+<span class="cp"># - package-update-upgrade-install</span>
+<span class="cp">#  default_user:</span>
+<span class="nl">disable_root:</span> <span class="nb">false</span>
+<span class="nl">ssh_pwauth:</span> <span class="nb">true</span>
+
+<span class="cp"># 配置root loggin</span>
+<span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ssh</span><span class="o">/</span><span class="n">sshd_config</span>
+<span class="cp">#PermitRootLogin prohibit-password</span>
+<span class="n">PermitRootLogin</span> <span class="n">yes</span>
+
+<span class="cp"># 关机注意清理 </span>
+<span class="cp"># rm -f /etc/udev/rules.d/*</span>
+<span class="cp"># yum clean all</span>
+
+<span class="cp"># 转为模板 </span>
+<span class="n">qm</span> <span class="n">template</span> <span class="mi">9997</span> 
+</pre></div>
+
+
+<p><strong>5.3 deploy cloudinit image</strong></p>
+<div class="hlcode"><pre><span class="cp"># deploy</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">clone</span> <span class="mi">1000</span> <span class="mi">10</span><span class="n">x</span> <span class="o">--</span><span class="n">name</span> <span class="n">centos7</span><span class="o">-</span><span class="mo">01</span> 
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">10</span><span class="n">x</span> <span class="o">--</span><span class="n">ipconfig0</span> <span class="n">ip</span><span class="o">=</span><span class="mf">192.168.0.21</span><span class="o">/</span><span class="mi">24</span><span class="p">,</span><span class="n">gw</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="o">--</span><span class="n">memory</span> <span class="mi">2048</span> <span class="o">--</span><span class="n">cores</span> <span class="mi">1</span> <span class="o">--</span><span class="n">sockets</span> <span class="mi">1</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">start</span> <span class="mi">10</span><span class="n">x</span>
+
+<span class="cp"># example</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">set</span> <span class="mi">104</span> <span class="o">--</span><span class="n">name</span> <span class="n">test</span> <span class="o">--</span><span class="n">ipconfig0</span> <span class="n">ip</span><span class="o">=</span><span class="mf">192.168.0.30</span><span class="o">/</span><span class="mi">24</span><span class="p">,</span><span class="n">gw</span><span class="o">=</span><span class="mf">192.168.0.1</span> <span class="o">--</span><span class="n">cipassword</span> <span class="n">adminadmin</span> <span class="o">--</span><span class="n">ciuser</span> <span class="n">root</span>
+
+<span class="cp"># 扩容磁盘</span>
+<span class="err">$</span> <span class="n">qm</span> <span class="n">resize</span> <span class="mi">101</span> <span class="n">scsi0</span> <span class="o">+</span><span class="mi">20</span><span class="n">G</span>
+</pre></div>
+
+
+<h2 id="6proxmox-ve-intro">6.Proxmox VE Intro</h2>
+<p><strong>特色:</strong></p>
+<ul>
+<li>
+<p>支持 KVM，LXC，ZFS 技术</p>
+</li>
+<li>
+<p>支持多数存储方案 Ceph，NFS，LVM，iSCSI</p>
+</li>
+<li>可分派相对应主机与权限，方便管理</li>
+<li>镜像支持主流VMDK、QCOW2、RAW，转移成本低</li>
+<li>webpage manage，降低了学习成本</li>
+<li>quorum机制 宕机快速切换</li>
+<li>备份还原，特定日期和时间自动执行备份作业</li>
+</ul>
+<p><strong>缺点:</strong></p>
+<ol>
+<li>多机集群依赖外部存储设备</li>
+<li>单机虚拟化，可靠性不高，缺乏冗余</li>
+<li>双机集群，业务承载能力有限，且一主一备的方式，计算资源利用率较低。且限于DRBD的配置方式，集群规模难以进一步横向扩展</li>
+</ol>
+<p><strong>6.1 Quorum 机制</strong></p>
+<p>无中心结构</p>
+<blockquote>
+<p>集群每个服务器各自在本节点的 /etc/pve目录下维护了一个fuse文件系统pmxcfs，并在其中保存了Proxmox集群的全部状态信息。为了确保各个节点维护的集群状态信息及时同步，Proxmox采用了Corosync集群组件管理所有节点，并采用Quorum机制来确保所有集群状态信息的一致性。</p>
+</blockquote>
+<p><strong>6.2 节点宕机恢复</strong></p>
+<blockquote>
+<p>Proxmox集群文件系统服务pve-cluster会立刻把宕机的pve02 下的/etc/pve目录设置为只读</p>
+</blockquote>
+<p>1.pve02 故障无法登入 webgui</p>
+<ul>
+<li>登入pve01 将/etc/pve/nodes/pve02/qemu-server 移动到 /etc/pve/nodes/pve01/qemu-serve</li>
+</ul>
+<p>2.pve02 恢复后加入集群</p>
+<ul>
+<li>集群会同步所有节点</li>
+</ul>
+<p>3.双节点集群的话，会导致‘脑裂’，各占一票，目录将自动设置写保护。</p>
+<ul>
+<li>手动删除节点<code>$ Pvecm delnode NodeName</code></li>
+</ul>
+<p><strong>6.3 本地磁盘管理</strong></p>
+<blockquote>
+<p>某些情况下，LVM不会正确计算元数据池/块大小。请检查metadatapool是否足够大。必须满足的公式是：<br />
+PoolSize / ChunkSize * 64b = MetadataPoolSize</p>
+<p>LVM</p>
+<p>1) 优点:可直接存放文件</p>
+<p>2) 缺点:vm or ct 沒有快照功能，不能超额分配空间</p>
+<p>LVM-Thin</p>
+<p>1) 好处:用来建vm or ct 可以有 snapshot(快照)的功能，而且可以超额分配硬碟空间</p>
+<p>2) 坏处:这分割区只能給 vm or ct 专用</p>
+</blockquote>
+<p>获取信息这些信息</p>
+<p><code>$ lvs -a -o name,size,chunk_size</code></p>
+<div class="hlcode"><pre><span class="err">#</span> <span class="nx">查看磁盘分区情况</span>
+<span class="err">$</span> <span class="nx">fdisk</span> <span class="na">-l</span>
+<span class="err">#</span> <span class="nx">存在</span><span class="p">/</span><span class="nx">dev</span><span class="p">/</span><span class="nx">sdb的话</span>
+<span class="err">$</span> <span class="nx">sgdisk</span> <span class="na">-N</span> <span class="mi">1</span> <span class="p">/</span><span class="nx">dev</span><span class="p">/</span><span class="nx">sdb</span>
+<span class="err">#</span> <span class="nx">创建pv</span><span class="err">，</span><span class="nx">vg</span><span class="err">，</span><span class="nx">lv</span><span class="err">。</span><span class="nx">lv根据自己磁盘实际情况调整</span>
+<span class="err">$</span> <span class="nx">pvcreate</span> <span class="o">--</span><span class="nx">metadatasize</span> <span class="mi">250</span><span class="nx">k</span> <span class="na">-y</span> <span class="na">-ff</span> <span class="p">/</span><span class="nx">dev</span><span class="p">/</span><span class="nx">sdb1</span>
+<span class="err">$</span> <span class="nx">vgcreate</span> <span class="nx">pve1</span> <span class="p">/</span><span class="nx">dev</span><span class="p">/</span><span class="nx">sdb1</span>
+<span class="err">$</span> <span class="nx">lvcreate</span> <span class="na">-L</span> <span class="mi">1000</span><span class="nx">g</span> <span class="na">-n</span> <span class="kd">data</span> <span class="nx">pve1</span>
+<span class="err">#</span> <span class="nx">转换为thin</span><span class="na">-pool</span> <span class="nx">lvcreate</span> <span class="na">-n</span> <span class="o">&lt;</span><span class="nb">Name</span><span class="o">&gt;</span> <span class="na">-V</span> <span class="o">&lt;</span><span class="nb">Size</span><span class="err">[</span><span class="nx">M</span><span class="p">,</span><span class="nx">G</span><span class="p">,</span><span class="nb">T</span><span class="cp">]</span>&gt; <span class="nt">&lt;VG&gt;</span>/<span class="nt">&lt;LVThin</span><span class="na">_pool</span><span class="nt">&gt;</span>
+$ lvconvert --type thin-pool pve1/data
+
+
+添加存储
+# 1.通过web数据中心直接添加lvm-thin id:lvm1, 卷组:pve1, thin pool:data
+# 2.vim /etc/pve/storage.cfg
+
+LVM使用
+# 移除 local-lvm
+$ lvremove /dev/pve/data
+# 查看PE
+$ vgdisplay pve |grep Free
+# create new lvm
+$ lvcreate -l $FREE -n data pve
+# 格式化
+$ mkfs.ext4 /dev/pve/data
+$ mkdir -pv /data/pve
+$ mount /dev/pve/data /data/pve
+</pre></div>
+
+
+<h2 id="7other">7.Other</h2>
+<p><strong>1.Create VM template seal script</strong></p>
+<div class="hlcode"><pre><span class="c">#!/bin/bash </span>
+<span class="nb">echo</span> <span class="s2">&quot;Seal This Centos 6x and 7x Server&quot;</span>
+yum clean all
+&gt; /etc/machie-id
+rm -f /etc/ssh/ssh_host_rm -rf /root/.ssh/
+rm -f /root/anaconda-ks.cfg
+rm -f /root/.bash_history
+<span class="nb">unset </span>HISTFILE
+rm -f /var/log/boot.log
+rm -f /var/log/cron
+rm -f /var/log/dmesg
+rm -f /var/log/grubby
+rm -f /var/log/lastlog
+rm -f /var/log/maillog
+rm -f /var/log/messages
+rm -f /var/log/secure
+rm -f /var/log/spooler
+rm -f /var/log/tallylog
+rm -f /var/log/wpa_supplicant.log
+rm -f /var/log/wtmp
+rm -f /var/log/yum.log
+rm -f /var/log/audit/audit.log
+rm -f /var/log/tuned/tuned.logroot
+</pre></div>
+
+
+<p><strong>7.2 配置双网卡</strong></p>
+<p><img alt="" src="https://www.dropbox.com/s/uf00h77tig77mti/proxmox-vm-nic.png?dl=0" /></p>
+<div class="hlcode"><pre><span class="n">node</span> <span class="o">--&gt;</span> <span class="n">system</span> <span class="o">--&gt;</span> <span class="n">network</span> <span class="o">--&gt;</span> <span class="n">create</span> <span class="n">Linux</span> <span class="n">Bridge</span> <span class="o">--&gt;</span> <span class="n">vmbr1</span>
+<span class="n">vm</span> <span class="o">--&gt;</span> <span class="n">Hardware</span> <span class="o">--&gt;</span> <span class="n">Add</span> <span class="o">--&gt;</span> <span class="n">Network</span> <span class="n">Devive</span> <span class="o">--&gt;</span> <span class="n">e1000</span><span class="o">=</span> <span class="n">bridge</span><span class="o">=</span><span class="n">vmbr1</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-26 13:47:27</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
