@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>RST(TCP) - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/os">../../../Dropbox/wiki/os</a>
+    &nbsp;&#187;&nbsp;RST(TCP)
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="rsttcp">RST(TCP)</h2>
+<blockquote>
+<p>TCP表头中的复位"RST" </p>
+</blockquote>
+<p><strong>产生RST分节情况</strong></p>
+<ol>
+<li>
+<p>服务端口未打开</p>
+<p>连接某个没有监听对应端口的服务器上。回复请求端使用复位RST，中断连接请求。</p>
+</li>
+<li>
+<p>主动关闭连接</p>
+<p>主动取消一个已有连接。通常是等待数据发送完成之后发送 FIN，称为有序释放 (orderly release)。发送重置报文段RST替代FIN来终止，称为异常释放 (abortive release)，</p>
+</li>
+<li>
+<p>半开连接</p>
+<p>TCP 接收到一个根本不存在该连接上的分组。比如 server 掉电重启，而 client 认为连接还存在，然后发送分组，这种称为半打开连接 (half-open connection)，server 会以 RST 分节响应。</p>
+</li>
+</ol>
+<h3 id="refernece">REFERNECE</h3>
+<p><a href="https://juejin.im/post/5d1c84c4f265da1ba77cbfeb">https://juejin.im/post/5d1c84c4f265da1ba77cbfeb</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-27 18:21:48</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

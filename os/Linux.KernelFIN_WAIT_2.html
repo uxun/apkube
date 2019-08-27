@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>FIN_WAIT_2 - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/os">../../../Dropbox/wiki/os</a>
+    &nbsp;&#187;&nbsp;FIN_WAIT_2
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="kernel-fin_wait_2">Kernel FIN_WAIT_2</h1>
+<blockquote>
+<p>FIN_WAIT_2 大量导致 "time wait bucket table overflow"</p>
+</blockquote>
+<h3 id="keywords">keywords</h3>
+<p><strong>TCP状态转换</strong><br />
+FIN_WAIT_2 出现在主动关闭一方发送FIN，对方回复ACK确认，此过程需要一对FIN和ACK，分别两方端点发出。进入等待远程TCP的连接终止请求的半关闭状态。这时可以接收数据，但不再发送数据。<br />
+FIN_WAIT_2 无超时时间。</p>
+<p><strong>2MSL 时间</strong> (TIME_WAIT状态中)</p>
+<blockquote>
+<p>why 2MSL后才能返回CLOSED？</p>
+<p>1.可靠的实现TCP全双工连接的终止。</p>
+<p>2.避免同一端口对应多个套接字。</p>
+</blockquote>
+<p>被动发出FIN，并且响应ACK。那么TIME_WAIT状态下TCP就会超时等待2*MSL时间，然后关闭连接。超时等待时间内，本地端口不能被新连接使用；避免延时包的到达与新连接混淆《The TCP/IP Guide》。<a href="https://tools.ietf.org/html/rfc793#page-37">RFC793定义</a>MSL为默认2分钟，Linux设置30s。</p>
+<p><img alt="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Tcp_state_diagram_fixed_new.svg/1280px-Tcp_state_diagram_fixed_new.svg.png" /></p>
+<p>类Unix系统tcp<a href="https://www.ibm.com/developerworks/cn/aix/library/0808_zhengyong_tcp/index.html">连接的保活定时器</a>，对应设置</p>
+<div class="hlcode"><pre><span class="cp"># 单位为s，AIX系统为0.5s</span>
+<span class="err">$</span> <span class="n">sysctl</span> <span class="o">-</span><span class="n">A</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">keep</span>
+<span class="cp"># 两个探测的时间间隔 默认75秒</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_keepalive_intvl</span> <span class="o">=</span> <span class="mi">75</span>  
+<span class="cp"># 关闭一个非活跃连接之前进行探测的最大次数，默认为9次</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_keepalive_probes</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="cp"># 对一个连接进行有效性探测之前运行的最大非活跃时间间隔，默认值为7200s（即2个小时）</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_keepalive_time</span> <span class="o">=</span> <span class="mi">7200</span>
+
+
+<span class="cp">### 线上配置</span>
+<span class="cp">#https:</span><span class="c1">//www.ibm.com/support/knowledgecenter/ro/SSEPGG_9.7.0/com.ibm.db2.luw.admin.ha.doc/doc/t0058764.html</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_keepalive_time</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_keepalive_intvl</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_keepalive_probes</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="cp">#开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_syncookies</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="cp">#套接字由本端要求关闭，这个参数决定了它保持在FIN-WAIT-2状态的时间</span>
+<span class="cp">#https:</span><span class="c1">//access.redhat.com/solutions/41776</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_fin_timeout</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="cp">#容纳网络连接数</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_max_syn_backlog</span> <span class="o">=</span> <span class="mi">262144</span>
+
+<span class="cp">#系统允许TIME_WAIT套接字的最大数量，默认值NR_FILE*2，取决与内存。</span>
+<span class="cp">#https:</span><span class="c1">//access.redhat.com/solutions/41776</span>
+<span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">tcp_max_tw_buckets</span> <span class="o">=</span> <span class="mi">6000</span>
+</pre></div>
+
+
+<p><strong>FIN_WAIT_2 原理</strong></p>
+<blockquote>
+<p>（主动关闭）收到对方关闭确认，等待对方关闭请求</p>
+</blockquote>
+<p>FIN_WAIT_2 状态下的 SOCKET 表示半连接，一端的Socket调用close后，另一端的Socket没有调用close，一端处于FIN_WAIT2 ，而另一端处于CLOSE_WAIT，对于client发起的FIN，Server的Socket在客户端已经关闭时而没有调用关闭。</p>
+<p>Tip：<code>FIN_WAIT_2 无超时状态。对方不关闭（不完成4次挥手过程），FIN_WAIT_2 状态将一直保持，越来越多的 FIN_WAIT_2状态会导致内核崩溃。</code></p>
+<p><img alt="" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/TCP_CLOSE.svg/1280px-TCP_CLOSE.svg.png" /></p>
+<p>原理上说：发起主动关闭的一方发送FIN后，被动关闭方回应一个ACK(TCP的回应)，被动处于CLOSE_WAIT，如果被动方不调用closesocket，那么接下来被动方不发送FIN，导致被动方处于CLOSE_WAIT，主动关闭方处于FIN_WAIT_2状态。</p>
+<p>正常情况被动关闭的是客户端， 调用closesocket的时候，就会发送一个FIN过去，被动关闭方的状态就变迁到LAST_ACK。</p>
+<h3 id="refernece">REFERNECE</h3>
+<p><a href="https://www.ibm.com/developerworks/cn/aix/library/0808_zhengyong_tcp/index.html">TCP 连接断连问题剖析</a></p>
+<p><a href="https://blog.csdn.net/ximenying/article/details/1489810">CLOSE_WAIT</a></p>
+<p><a href="https://zh.wikipedia.org/wiki/传输控制协议">TCP态迁移</a></p>
+<p><a href="https://github.com/BeginMan/PersonNotes/blob/master/Unix/Unix-Network-Programming-Volume-1-The-Sockets-Networking-API-3rd-Edition/top2.md">TCP/IP协议概况</a></p>
+<p><a href="https://github.com/BeginMan/PersonNotes/blob/master/Unix/Unix-Network-Programming-Volume-1-The-Sockets-Networking-API-3rd-Edition/top2.md">服务端主动终止连接的情况</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-27 18:21:48</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
