@@ -29,11 +29,55 @@
 </div>
 <div class="clearfix"></div>
 <div id="content">
-  <h2 id="linux-increase-the-maximum-number-of-open-files-file-descriptors-fd">Linux Increase The Maximum Number Of Open Files / File Descriptors (FD)</h2>
-<p><strong><a href="https://www.kernel.org/doc/Documentation/sysctl/fs.txt">NR_OPEN</a></strong></p>
-<p>在linux kernel 2.6.25之前通过ulimit -n(setrlimit(RLIMIT_NOFILE))设置每个进程的最大打开文件句柄数不能超过NR_OPEN (1024*1024),也就是100多w(除非重新编译内核)，而在25之后，内核导出了一个sys接口可以修改这个最大值(/proc/sys/fs /nr_open).具体的changelog在<a href="http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=9cfe015aa424b3c003baba3841a60dd9b5ad319b">这里</a></p>
-<p>NR_FILE</p>
-<p>command</p>
+  <h2 id="linux-maximum-number-of-open-files-file-descriptors-fd">Linux Maximum Number Of Open Files / File Descriptors (FD)</h2>
+<blockquote>
+<p>资源限制，linux最大文件描述符数，一个作用于内核(file-max)，一个作用于用户(RLIMIT_NOFILE)</p>
+</blockquote>
+<p><strong>几个关键词：</strong></p>
+<p><strong><a href="http://man7.org/linux/man-pages/man5/proc.5.html">file-max</a></strong></p>
+<blockquote>
+<p>内核能打开的最大文件描述符数量为<code>/proc/sys/fs/file-max</code> 里的数值，服务器性能决定。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># /etc/sysctl.conf </span>
+<span class="n">fs</span><span class="p">.</span><span class="n">file</span><span class="o">-</span><span class="n">max</span><span class="o">=</span><span class="mi">790981</span>
+</pre></div>
+
+
+<p><strong><a href="http://man7.org/linux/man-pages/man2/getrlimit.2.html">RLIMIT_NOFILE</a></strong> </p>
+<blockquote>
+<p>定义进程可以打开的最大文件描述符数限制，不能超过<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9cfe015aa424b3c003baba3841a60dd9b5ad319b">/proc/sys/fs /nr_open</a>。</p>
+<p>root or capability(CAP_SYS_RESOURCE) 的进程，可以自由调整 RLIMIT_NOFILE 的软、硬限制。</p>
+<p>limits.conf <a href="https://linux.die.net/man/5/limits.conf">文件的格式</a></p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># ulimit -n</span>
+<span class="cp"># 配置文件支持配置各个资源限制项的软、硬限制，支持从用户、用户组、全局三个层级进行配置</span>
+<span class="cp"># ulimit -Sn &lt;= ulimit -Hn &lt;= cat /proc/sys/fs/nr_open</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">security</span><span class="o">/</span><span class="n">limits</span><span class="p">.</span><span class="n">conf</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">security</span><span class="o">/</span><span class="n">limits</span><span class="p">.</span><span class="n">d</span><span class="o">/*</span>
+</pre></div>
+
+
+<p><strong>修改运行中的进程资源限制的方式(kernel version ≥ 2.6.36)：</strong></p>
+<ol>
+<li>使用 <a href="https://linux.die.net/man/2/prlimit"><code>prlimit</code></a> (<a href="https://www.kernel.org/pub/linux/utils/util-linux/"><code>util-linux</code></a> ≥ 2.21) 修改指定进程的资源限制</li>
+<li>直接修改进程对应的 <code>/proc/$PID/limits</code> 文件</li>
+</ol>
+<h3 id="systemd"><a href="https://wiki.archlinux.org/index.php/systemd_(简体中文)">Systemd</a></h3>
+<p><a href="https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Process%20Properties">进程配置</a></p>
+<blockquote>
+<p>Centos7 中进程限制</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># service 文件中写入</span>
+<span class="n">LimitNOFILE</span> <span class="o">=</span> <span class="mi">1048576</span>
+</pre></div>
+
+
+<h3 id="sysvinit"><a href="https://wiki.archlinux.org/index.php/SysVinit_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)">SysVinit</a></h3>
+<div class="hlcode"><pre><span class="c"># 启动脚本中执行 ulimit</span>
+</pre></div>
+
+
+<p><strong>ulimit command</strong></p>
 <div class="hlcode"><pre><span class="na">-a</span><span class="err">：</span><span class="nx">显示目前资源限制的设定</span><span class="err">；</span>
 <span class="na">-c</span> <span class="o">&lt;</span><span class="nx">core文件上限</span><span class="o">&gt;</span><span class="err">：</span><span class="nx">设定core文件的最大值</span><span class="err">，</span><span class="nx">单位为区块</span><span class="err">；</span>
 <span class="na">-d</span> <span class="o">&lt;</span><span class="nx">数据节区大小</span><span class="o">&gt;</span><span class="err">：</span><span class="nx">程序数据节区的最大值</span><span class="err">，</span><span class="nx">单位为KB</span><span class="err">；</span>
@@ -50,6 +94,7 @@
 </pre></div>
 
 
+<p><strong>info</strong></p>
 <div class="hlcode"><pre><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="o">~</span><span class="p">]</span><span class="err">#</span> <span class="n">ulimit</span> <span class="o">-</span><span class="n">a</span>
 <span class="n">core</span> <span class="n">file</span> <span class="n">size</span>          <span class="p">(</span><span class="n">blocks</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="p">)</span> <span class="mi">0</span>           <span class="err">#</span><span class="n">core</span><span class="err">文件的最大值为</span><span class="mi">100</span> <span class="n">blocks</span><span class="err">。</span>
 <span class="n">data</span> <span class="n">seg</span> <span class="n">size</span>           <span class="p">(</span><span class="n">kbytes</span><span class="p">,</span> <span class="o">-</span><span class="n">d</span><span class="p">)</span> <span class="n">unlimited</span>   <span class="err">#进程的数据段可以任意大。</span>
@@ -68,6 +113,12 @@
 <span class="n">virtual</span> <span class="n">memory</span>          <span class="p">(</span><span class="n">kbytes</span><span class="p">,</span> <span class="o">-</span><span class="n">v</span><span class="p">)</span> <span class="n">unlimited</span>   <span class="err">#没有限制进程的最大地址空间。</span>
 <span class="n">file</span> <span class="n">locks</span>                      <span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="n">unlimited</span>   <span class="err">#所能锁住的文件的最大个数没有限制。</span>
 </pre></div>
+
+
+<h3 id="refernece">REFERNECE</h3>
+<p><a href="https://leokongwq.github.io/2016/11/09/linux-max-fd.html">https://leokongwq.github.io/2016/11/09/linux-max-fd.html</a></p>
+<p><a href="https://wweir.cc/post/资源限制rlimit_nofile的调整细节及内部实现/">https://wweir.cc/post/资源限制rlimit_nofile的调整细节及内部实现/</a></p>
+<p><a href="https://segmentfault.com/a/1190000009724931">https://segmentfault.com/a/1190000009724931</a></p>
   
 </div>
     </div>
@@ -80,7 +131,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-08-28 21:20:06</p>
+        <p>Page Updated 2019-08-28 23:40:10</p>
       </div> <!-- end footer-right -->
     </div>
 
