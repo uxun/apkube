@@ -1,0 +1,345 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>SersyncInotify - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;SersyncInotify
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="rsync-sersync-inotify">Rsync Sersync Inotify</h1>
+<blockquote>
+<p>可靠高效的数据实时同步方式，服务器镜像解决方案<br />
+同步线程的最佳数量 = 核数 x 2 + 2</p>
+<p><code>sersync</code>是国人基于前两者(rsync+inotify-tools)开发的工具</p>
+</blockquote>
+<h3 id="quick-to-use">Quick to use</h3>
+<div class="hlcode"><pre><span class="cp"># 主服务器修改配置 </span>
+<span class="mf">1.</span> <span class="n">vim</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">sersync</span><span class="o">/</span><span class="n">confxml</span><span class="p">.</span><span class="n">xml</span>
+<span class="mf">2.</span> <span class="n">rsync</span> <span class="o">-</span><span class="n">ar</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">cluster</span><span class="o">/</span><span class="n">web</span><span class="o">/</span> <span class="mf">192.168.0.191</span><span class="o">:/</span><span class="n">data</span><span class="o">/</span><span class="n">cluster</span><span class="o">/</span><span class="n">web</span><span class="o">/</span>
+<span class="cp"># 服务器添加配置 (centos6 /usr/bin/rsync --daemon --config=/etc/rsyncd.conf)</span>
+<span class="mf">1.</span> <span class="err">配置</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">conf</span>
+<span class="mf">2.</span> <span class="err">启动</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">rsyncd</span> <span class="o">&amp;&amp;</span> <span class="n">systemctl</span> <span class="n">enabled</span> <span class="n">rsyncd</span>
+</pre></div>
+
+
+<h3 id="1master-installed-refernece">1.Master Installed <a href="https://github.com/wsgzao/sersync">refernece</a></h3>
+<p>download <a href="https://github.com/rvoicilas/inotify-tools/releases">Inotify-tools</a><br />
+download <a href="https://code.google.com/archive/p/sersync/downloads">Sersync</a></p>
+<div class="hlcode"><pre><span class="cp"># master install inotify</span>
+<span class="err">$</span> <span class="n">wget</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/rvoicilas/inotify-tools/archive/3.20.1.tar.gz</span>
+<span class="err">$</span> <span class="n">tar</span> <span class="n">xf</span> <span class="mf">3.20.1</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span> <span class="o">&amp;&amp;</span> <span class="n">cd</span> <span class="n">inotify</span><span class="o">-</span><span class="n">tools</span><span class="o">-</span><span class="mf">3.20.1</span>
+<span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">prefix</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">inotify</span>
+<span class="err">$</span> <span class="n">make</span> <span class="o">&amp;&amp;</span> <span class="n">make</span> <span class="n">install</span>
+
+<span class="cp"># 当文件变化时，sersync变会自动拼接一个rsync命令并执行，从而完成文件同步</span>
+<span class="cp"># master install Sersync</span>
+<span class="err">$</span> <span class="n">wget</span> <span class="n">https</span><span class="o">:</span><span class="c1">//storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/sersync/sersync2.5.4_64bit_binary_stable_final.tar.gz</span>
+<span class="err">$</span> <span class="n">tar</span> <span class="n">xf</span> <span class="n">sersync2</span><span class="mf">.5.4</span><span class="n">_64bit_binary_stable_final</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="err">$</span> <span class="n">mv</span> <span class="n">GNU</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">x86</span><span class="o">/</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">sersync</span>
+
+<span class="cp"># yum install rsync</span>
+<span class="err">$</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">rsync</span> <span class="o">-</span><span class="n">y</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">rsyncd</span> <span class="o">&amp;&amp;</span> <span class="n">systemctl</span> <span class="n">enable</span> <span class="n">rsyncd</span>
+
+<span class="cp"># rsync 编译</span>
+<span class="err">$</span> <span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//rsync.samba.org/ftp/rsync/src/rsync-3.1.1.tar.gz</span>
+<span class="err">$</span> <span class="n">tar</span> <span class="n">zxf</span> <span class="n">rsync</span><span class="o">-</span><span class="mf">3.1.1</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="err">$</span> <span class="n">cd</span> <span class="n">rsync</span><span class="o">-</span><span class="mf">3.1.1</span>
+<span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">prefix</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">rsync</span>
+<span class="err">$</span> <span class="n">make</span> <span class="o">&amp;&amp;</span> <span class="n">make</span> <span class="n">install</span>
+<span class="cp"># start</span>
+<span class="err">$</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">rsync</span> <span class="o">--</span><span class="n">daemon</span> <span class="o">--</span><span class="n">config</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">conf</span>
+</pre></div>
+
+
+<h3 id="1master-sersync">1.Master sersync 配置</h3>
+<blockquote>
+<p>注意事项 --delete 删除那些DST中SRC没有的文件<br />
+指定要排除复制的文件rsync -avz --delete --exclude-from=/etc/rsync_exclude.lst 或目录或者在rsyncd.conf配置exclude选项</p>
+</blockquote>
+<div class="hlcode"><pre><span class="err">#</span> <span class="nx">配置下密码文件</span><span class="err">，</span><span class="nx">因为这个密码是要访问从服务器需要的密码和从服务的密码必须一致</span>
+<span class="err">$</span> <span class="nx">echo</span> <span class="s2">&quot;123456&quot;</span> <span class="o">&gt;</span> <span class="p">/</span><span class="nx">usr</span><span class="p">/</span><span class="nb">local</span><span class="p">/</span><span class="nx">sersync</span><span class="p">/</span><span class="nx">user.pass</span>
+<span class="err">#</span> <span class="nx">修改权限</span>
+<span class="err">$</span> <span class="nb">chmod</span> <span class="mi">600</span> <span class="p">/</span><span class="nx">usr</span><span class="p">/</span><span class="nb">local</span><span class="p">/</span><span class="nx">sersync</span><span class="p">/</span><span class="nx">user.pass</span>
+<span class="err">$</span> <span class="nx">cp</span> <span class="p">/</span><span class="nx">usr</span><span class="p">/</span><span class="nb">local</span><span class="p">/</span><span class="nx">sersync</span><span class="o">/</span><span class="p">{</span><span class="nx">confxml.xml</span><span class="p">,</span><span class="nx">mydata.xml</span><span class="p">}</span>
+<span class="err">$</span> <span class="nx">vim</span> <span class="p">/</span><span class="nx">usr</span><span class="p">/</span><span class="nb">local</span><span class="p">/</span><span class="nx">sersync</span><span class="p">/</span><span class="nx">mydata.xml</span>
+<span class="err">#</span><span class="nx">修改部分</span>
+<span class="nx">...</span>
+    <span class="o">&lt;</span><span class="nx">sersync</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">localpath</span> <span class="n">watch</span><span class="o">=</span><span class="s2">&quot;/data/web&quot;</span><span class="o">&gt;</span> <span class="err">#</span> <span class="nx">master服务器要同步的文件路径</span>
+        <span class="o">&lt;</span><span class="nx">remote</span> <span class="n">ip</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;web&quot;</span><span class="o">/&gt;</span> <span class="err">#</span> <span class="nx">设置从服务器的IP和模块名</span>
+        <span class="o">&lt;!--&lt;</span><span class="nx">remote</span> <span class="n">ip</span><span class="o">=</span><span class="s2">&quot;192.168.8.39&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;tongbu&quot;</span><span class="o">/&gt;--&gt;</span>
+        <span class="o">&lt;!--&lt;</span><span class="nx">remote</span> <span class="n">ip</span><span class="o">=</span><span class="s2">&quot;192.168.8.40&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;tongbu&quot;</span><span class="o">/&gt;--&gt;</span>
+    <span class="o">&lt;/</span><span class="nx">localpath</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">rsync</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">commonParams</span> <span class="k">params</span><span class="o">=</span><span class="s2">&quot;-artuz&quot;</span><span class="o">/&gt;</span>
+        <span class="o">&lt;</span><span class="nb">auth</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;true&quot;</span> <span class="n">users</span><span class="o">=</span><span class="s2">&quot;root&quot;</span> <span class="n">passwordfile</span><span class="o">=</span><span class="s2">&quot;/usr/local/sersync/rsync.passd&quot;</span><span class="o">/&gt;</span> <span class="err">#</span> <span class="nx">设置同步的用户名和密码文件和从服务器</span><span class="p">/</span><span class="nx">etc</span><span class="p">/</span><span class="nx">rsyncd.passwd</span> <span class="nx">一样</span>
+        <span class="o">&lt;</span><span class="nx">userDefinedPort</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;false&quot;</span> <span class="n">port</span><span class="o">=</span><span class="s2">&quot;874&quot;</span><span class="o">/&gt;&lt;!--</span> <span class="n">port</span><span class="o">=</span><span class="mi">874</span> <span class="o">--&gt;</span> <span class="err">#</span> <span class="nx">设置rsync的端口</span><span class="p">,</span><span class="nx">要和从那边开启的端口一致</span>
+<span class="nx">...</span>
+</pre></div>
+
+
+<h3 id="12">1.2 启动</h3>
+<blockquote>
+<p>-d: 启用守护进程模式<br />
+-r: 参数运行sersync，将本地与远程整体同步一次.<br />
+如果设置了过滤器，即在xml文件中，filter为true，则暂时不能使用-r参数进行整体同步。-r参数将会无效，而且文件要修改了才会同步<br />
+注意server上设置同步的用户要有对同步的目录要有权限才可以<br />
+-n: 指定开启守护线程的数量，默认为10个<br />
+-o: 指定配置文件，默认使用confxml.xml文件</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 启动sersync</span>
+<span class="err">$</span> <span class="n">nohup</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">sersync</span><span class="o">/</span><span class="n">sersync2</span> <span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">o</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">sersync</span><span class="o">/</span><span class="n">mydata</span><span class="p">.</span><span class="n">xml</span> <span class="o">&gt;/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">sersync</span><span class="o">/</span><span class="n">rsync</span><span class="p">.</span><span class="n">log</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">&amp;</span>
+</pre></div>
+
+
+<h3 id="13">1.3 配置脚本</h3>
+<blockquote>
+<p>计划任务</p>
+<p><em>/5 * </em> * * /var/script/check_sersync.sh &gt; /dev/null 2&gt;&amp;1</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp">#check_sersync.sh</span>
+<span class="cp">#!/bin/bash</span>
+<span class="n">SERSYNC</span><span class="o">=</span><span class="s">&quot;/usr/local/sersync/sersync2&quot;</span>
+<span class="n">CONF_FILE</span><span class="o">=</span><span class="s">&quot;/usr/local/sersync/mydata.xml&quot;</span>
+<span class="n">STATUS</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">ps</span> <span class="n">aux</span> <span class="o">|</span><span class="n">grep</span> <span class="err">&#39;</span><span class="n">sersync2</span><span class="err">&#39;</span><span class="o">|</span><span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="err">&#39;</span><span class="n">grep</span><span class="err">&#39;</span><span class="o">|</span><span class="n">wc</span> <span class="o">-</span><span class="n">l</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="p">[</span> <span class="err">$</span><span class="n">STATUS</span> <span class="o">-</span><span class="n">eq</span> <span class="mi">0</span> <span class="p">];</span>
+<span class="n">then</span>
+<span class="n">nohup</span> <span class="err">$</span><span class="n">SERSYNC</span> <span class="o">-</span><span class="n">d</span> <span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">o</span> <span class="err">$</span><span class="n">CONF_FILE</span> <span class="o">&gt;/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">sersync</span><span class="o">/</span><span class="n">rsync</span><span class="p">.</span><span class="n">log</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">&amp;</span>
+<span class="k">else</span>
+<span class="n">exit</span> <span class="mi">0</span>
+<span class="n">fi</span>
+</pre></div>
+
+
+<h2 id="2">2.从服务器配置</h2>
+<div class="hlcode"><pre><span class="cp"># 编译或者yum 安装 rsync</span>
+<span class="n">yum</span> <span class="o">-</span><span class="n">y</span> <span class="n">install</span> <span class="n">rsync</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">rsyncd</span> <span class="o">&amp;&amp;</span> <span class="n">systemctl</span> <span class="n">enable</span> <span class="n">rsyncd</span>
+<span class="cp"># 设置rsync为服务启动项（centos6 可选）</span>
+<span class="n">echo</span> <span class="s">&quot;/usr/local/bin/rsync --daemon&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rc</span><span class="p">.</span><span class="n">local</span>
+
+<span class="cp"># check</span>
+<span class="n">netstat</span> <span class="o">-</span><span class="n">an</span> <span class="o">|</span> <span class="n">grep</span> <span class="mi">873</span>
+<span class="n">lsof</span> <span class="o">-</span><span class="n">i</span> <span class="n">tcp</span><span class="o">:</span><span class="mi">873</span>
+
+<span class="cp"># 创建rsync认证文件可以设置多个(虚拟用户，系统无关)，每行一个用户名:密码，注意中间以“:”分割</span>
+<span class="err">$</span> <span class="n">echo</span> <span class="s">&quot;root:123456&quot;</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">passwd</span>
+<span class="err">$</span> <span class="n">chmod</span> <span class="mi">600</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">conf</span>
+<span class="err">$</span> <span class="n">chmod</span> <span class="mi">600</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">passwd</span>
+
+<span class="cp"># restart rsync 不要用 kill -HUP {PID} 的方式重启进程 </span>
+<span class="err">$</span> <span class="n">pkill</span> <span class="n">rsync</span>
+</pre></div>
+
+
+<h3 id="21-cat-etcrsyncdconf">2.1 从服务配置 cat /etc/rsyncd.conf</h3>
+<blockquote>
+<p>tip: 注意从服务器/etc/rsyncd.conf 中模块path路径为同步到从服务器的目录路径</p>
+<p>设置auth users 启用认证模块</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 匿名用户</span>
+<span class="n">uid</span><span class="o">=</span><span class="n">www</span>
+<span class="n">gid</span><span class="o">=</span><span class="n">www</span>
+<span class="n">max</span> <span class="n">connections</span><span class="o">=</span><span class="mi">36000</span>
+<span class="n">use</span> <span class="n">chroot</span><span class="o">=</span><span class="n">no</span>
+<span class="n">log</span> <span class="n">file</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">log</span>
+<span class="n">pid</span> <span class="n">file</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">pid</span>
+<span class="n">lock</span> <span class="n">file</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">lock</span>
+
+<span class="p">[</span><span class="n">web</span><span class="p">]</span>
+<span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">web</span>
+<span class="n">comment</span> <span class="o">=</span> <span class="n">search</span> <span class="n">server</span>
+<span class="n">ignore</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">read</span> <span class="n">only</span> <span class="o">=</span> <span class="n">no</span>
+<span class="n">hosts</span> <span class="n">allow</span> <span class="o">=</span> <span class="mf">192.168.1.0</span><span class="o">/</span><span class="mi">24</span>
+<span class="n">hosts</span> <span class="n">deny</span> <span class="o">=</span> <span class="o">*</span>
+
+<span class="p">[</span><span class="n">cweb</span><span class="p">]</span>
+<span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">cluster</span><span class="o">/</span><span class="n">web</span>
+<span class="n">comment</span> <span class="o">=</span> <span class="n">search</span> <span class="n">server</span>
+<span class="n">ignore</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">read</span> <span class="n">only</span> <span class="o">=</span> <span class="n">no</span>
+<span class="n">hosts</span> <span class="n">allow</span> <span class="o">=</span> <span class="mf">192.168.1.0</span><span class="o">/</span><span class="mi">24</span>
+<span class="n">hosts</span> <span class="n">allow</span> <span class="o">=</span> <span class="mf">192.168.0.0</span><span class="o">/</span><span class="mi">24</span>
+<span class="n">hosts</span> <span class="n">deny</span> <span class="o">=</span> <span class="o">*</span>
+
+
+<span class="cp"># 开启用户认证</span>
+<span class="n">uid</span> <span class="o">=</span> <span class="n">root</span>
+<span class="n">gid</span> <span class="o">=</span> <span class="n">root</span>
+<span class="n">max</span> <span class="n">connections</span> <span class="o">=</span> <span class="mi">36000</span>         <span class="err">#</span> <span class="err">最大连接数</span>
+<span class="n">use</span> <span class="n">chroot</span> <span class="o">=</span> <span class="n">no</span>                 <span class="err">#</span> <span class="err">默认为</span><span class="nb">true</span><span class="p">,</span><span class="err">修改为</span><span class="n">no</span><span class="p">,</span><span class="err">增加对目录文件软连接的备份</span>
+<span class="n">read</span> <span class="n">only</span> <span class="o">=</span> <span class="n">no</span>                  <span class="err">#</span> <span class="err">设置</span><span class="n">rsync</span><span class="err">服务端文件为读写权限</span>
+<span class="n">ignore</span> <span class="n">nonreadable</span> <span class="o">=</span> <span class="n">yes</span>        <span class="err">#</span> <span class="err">忽略无法读取的文件</span>
+<span class="n">ignore</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">yes</span>             <span class="err">#</span> <span class="err">忽略无关错误</span>
+<span class="n">timeout</span> <span class="o">=</span> <span class="mi">900</span>                   <span class="err">#</span> <span class="err">超时时间</span>
+<span class="n">transfer</span> <span class="n">logging</span> <span class="o">=</span> <span class="n">yes</span>          <span class="err">#</span> <span class="err">传输日志</span>
+<span class="n">auth</span> <span class="n">users</span> <span class="o">=</span> <span class="n">root</span>               <span class="err">#</span> <span class="err">认证的用户与系统账户无关在认证文件做配置</span><span class="p">,</span><span class="err">如果没有则表示匿名</span>
+<span class="n">secrets</span> <span class="n">file</span> <span class="o">=</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">passwd</span> <span class="err">#</span> <span class="err">密码认证文件</span><span class="p">,</span><span class="err">格式</span><span class="p">(</span><span class="err">虚拟用户名</span><span class="o">:</span><span class="err">密码</span><span class="p">)</span>
+<span class="n">log</span> <span class="n">file</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">log</span>  <span class="err">#</span> <span class="err">定义日志文件</span>
+<span class="n">pid</span> <span class="n">file</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">pid</span>  <span class="err">#</span> <span class="err">定义</span><span class="n">pid</span>
+<span class="n">lock</span> <span class="n">file</span> <span class="o">=</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">run</span><span class="o">/</span><span class="n">rsyncd</span><span class="p">.</span><span class="n">lock</span>
+<span class="n">list</span> <span class="o">=</span> <span class="nb">false</span>                    <span class="err">#</span> <span class="err">客户端请求显示模块列表时，本模块名称是否显示，默认为</span><span class="nb">true</span>
+
+<span class="p">[</span><span class="n">mydata</span><span class="p">]</span>                        <span class="err">#</span> <span class="err">认证的模块名</span><span class="p">,</span><span class="err">在</span><span class="n">client</span><span class="err">端需要指定</span><span class="p">,</span><span class="err">可以设置多个模块和路径</span>
+<span class="n">path</span> <span class="o">=</span> <span class="o">/</span><span class="n">mydata</span><span class="o">/</span><span class="n">data</span>             <span class="err">#</span> <span class="err">同步到从服务器的目录</span>
+<span class="n">comment</span> <span class="o">=</span> <span class="n">web</span> <span class="n">server</span>            <span class="err">#</span> <span class="err">注释</span>
+<span class="n">exclude</span> <span class="o">=</span> <span class="n">cache</span>                 <span class="err">#</span> <span class="err">排除</span><span class="n">path</span> <span class="err">路径下的</span><span class="n">cache</span><span class="err">目录</span>
+</pre></div>
+
+
+<p>/usr/local/sersync/confxml.xml</p>
+<div class="hlcode"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;</span>
+<span class="nt">&lt;head</span> <span class="na">version=</span><span class="s">&quot;2.5&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- hostip与port是针对插件的保留字段，对于同步功能没有任何作用，保留默认即可。  --&gt;</span>
+    <span class="nt">&lt;host</span> <span class="na">hostip=</span><span class="s">&quot;localhost&quot;</span> <span class="na">port=</span><span class="s">&quot;8008&quot;</span><span class="nt">&gt;&lt;/host&gt;</span>
+
+    <span class="c">&lt;!-- 是否开启debug模式 --&gt;</span>
+    <span class="nt">&lt;debug</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!-- 如果是xfs文件系统，则需要设置为true才能同步，rehat/REEL/CentOS/Fedora新版本默认都是xfs文件系统，可使用df -Th命令查看 --&gt;</span>
+    <span class="nt">&lt;fileSystem</span> <span class="na">xfs=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!-- 过滤器，设置为true则会对里面的exclude对应的正则匹配到的文件进行过滤，即不同步 --&gt;</span>
+    <span class="nt">&lt;filter</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+        <span class="c">&lt;!-- &lt;exclude expression=&quot;(.*)\.svn&quot;&gt;&lt;/exclude&gt; --&gt;</span>
+        <span class="c">&lt;!-- &lt;exclude expression=&quot;(.*)\.gz&quot;&gt;&lt;/exclude&gt; --&gt;</span>
+        <span class="c">&lt;!-- &lt;exclude expression=&quot;^info/*&quot;&gt;&lt;/exclude&gt; --&gt;</span>
+        <span class="c">&lt;!-- &lt;exclude expression=&quot;^static/*&quot;&gt;&lt;/exclude&gt; --&gt;</span>
+        <span class="nt">&lt;exclude</span> <span class="na">expression=</span><span class="s">&quot;^cache/*&quot;</span><span class="nt">&gt;&lt;/exclude&gt;</span>
+    <span class="nt">&lt;/filter&gt;</span>
+
+    <span class="c">&lt;!-- inotify是linux的内核功能，这里用于设置创建/删除/修改/移动文件时，是否视为文件改变(进而进行同步) --&gt;</span>
+    <span class="nt">&lt;inotify&gt;</span>
+        <span class="c">&lt;!-- 删除一个文件是否视为文件改变(很明显我们要设置为true) --&gt;</span>
+        <span class="nt">&lt;delete</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 创建一个文件夹是否视为文件改变(很明显我们要设置为true) --&gt;</span>
+        <span class="nt">&lt;createFolder</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 创建一个文件是否触发文件改变事件(这里要设置false，因为创建一个文件除了有createFile事件还会有closeWrite事件，我们只要把closeWrite事件设置为true即可监控到创建一个文件) --&gt;</span>
+        <span class="nt">&lt;createFile</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 创建文件或修改文件后再关闭会触发该事件，比如vim打开一个文件，修改后用(:wq)保存，则会触发该事件，当然创建新文件一样会触发 --&gt;</span>
+        <span class="nt">&lt;closeWrite</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 从别的地方移到被监控目录是否视为文件改变，毫无疑问要设置为true --&gt;</span>
+        <span class="nt">&lt;moveFrom</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 被监控目录中的某个文件被移动到其他地方算不算文件改变？毫无疑问要设置为true --&gt;</span>
+        <span class="nt">&lt;moveTo</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 文件属性改变了，是否视为文件改变？这个我们可以认为文件没有改，所以设置false --&gt;</span>
+        <span class="nt">&lt;attrib</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">/&gt;</span>
+        <span class="c">&lt;!-- 文件内容被修改了是否视为文件改变？感觉文件改变肯定要设置为true，但其实不用，因为这个改变有可能是vim(:w)保存，还没有关闭文件，所以保存的时候没必要同步，而关闭的时候会触发closeWrite，所以修改的文件也是通过closeWrite来同步的 --&gt;</span>
+        <span class="nt">&lt;modify</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/inotify&gt;</span>
+
+    <span class="c">&lt;!-- servsync的模块 --&gt;</span>
+    <span class="nt">&lt;sersync&gt;</span>
+        <span class="c">&lt;!-- 指定要监控(即同步)的本地目录 --&gt;</span>
+        <span class="nt">&lt;localpath</span> <span class="na">watch=</span><span class="s">&quot;/data/wwwroot&quot;</span><span class="nt">&gt;</span>
+            <span class="c">&lt;!-- ip指定同步到远程的哪个服务器，name填写远程服务器中rsync配置文件中的自定义模块名称(即中括号括起来的那个名称) --&gt;</span>
+            <span class="nt">&lt;remote</span> <span class="na">ip=</span><span class="s">&quot;10.37.129.6&quot;</span> <span class="na">name=</span><span class="s">&quot;wwwroot&quot;</span><span class="nt">/&gt;</span>
+            <span class="c">&lt;!-- 如果你要同步到多台服务器，继续填写即可，每个服务器一个remote标签 --&gt;</span>
+            <span class="nt">&lt;remote</span> <span class="na">ip=</span><span class="s">&quot;10.37.129.7&quot;</span> <span class="na">name=</span><span class="s">&quot;wwwroot2&quot;</span><span class="nt">/&gt;</span>
+            <span class="c">&lt;!--&lt;remote ip=&quot;192.168.8.40&quot; name=&quot;tongbu&quot;/&gt;--&gt;</span>
+        <span class="nt">&lt;/localpath&gt;</span>
+
+        <span class="c">&lt;!-- rsync模块配置 --&gt;</span>
+        <span class="nt">&lt;rsync&gt;</span>
+            <span class="c">&lt;!-- 公共参数，即我们手动执行rsync的时候要带的选项就填在这里，servsync会自动组装 --&gt;</span>
+            <span class="c">&lt;!--&lt;commonParams params=&quot;-artuz&quot;/&gt; --&gt;</span>
+            <span class="nt">&lt;commonParams</span> <span class="na">params=</span><span class="s">&quot;-azP&quot;</span><span class="nt">/&gt;</span>
+            <span class="c">&lt;!-- 密码文件及指定用户名(用户名就是rsync服务器端配置文件中的&quot;auth user =&quot; 指定的用户名) --&gt;</span>
+            <span class="nt">&lt;auth</span> <span class="na">start=</span><span class="s">&quot;true&quot;</span> <span class="na">users=</span><span class="s">&quot;root&quot;</span> <span class="na">passwordfile=</span><span class="s">&quot;/usr/local/sersync/rsync.passd&quot;</span><span class="nt">/&gt;</span>
+            <span class="c">&lt;!-- 如果你rsync服务器不是默认端口873，那么就要在这里指定具体的端口，当然是默认的你也可以指定一下 --&gt;</span>
+            <span class="nt">&lt;userDefinedPort</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span> <span class="na">port=</span><span class="s">&quot;873&quot;</span><span class="nt">/&gt;</span>
+            <span class="c">&lt;!-- rsync超时时间 --&gt;</span>
+            <span class="nt">&lt;timeout</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span> <span class="na">time=</span><span class="s">&quot;100&quot;</span><span class="nt">/&gt;</span><span class="c">&lt;!-- timeout=100 --&gt;</span>
+            <span class="c">&lt;!-- 是否使用ssh方式传输 --&gt;</span>
+            <span class="nt">&lt;ssh</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/rsync&gt;</span>
+        <span class="c">&lt;!-- 对于失败的传输，会进行重新传送，再次失败就会写入rsync_fail_log，然后每隔一段时间（timeToExecute进行设置,单位sec）执行该脚本再次重新传送，然后清空该脚本。可以通过path来设置日志路径。 --&gt;</span>
+        <span class="nt">&lt;failLog</span> <span class="na">path=</span><span class="s">&quot;/tmp/rsync_fail_log.sh&quot;</span> <span class="na">timeToExecute=</span><span class="s">&quot;60&quot;</span><span class="nt">/&gt;</span><span class="c">&lt;!--default every 60mins execute once--&gt;</span>
+
+        <span class="c">&lt;!-- 定期整体同步功能，schedule表示crontab执行间隔，单位是min --&gt;</span>
+        <span class="nt">&lt;crontab</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span> <span class="na">schedule=</span><span class="s">&quot;600&quot;</span><span class="nt">&gt;</span><span class="c">&lt;!--600mins--&gt;</span>
+            <span class="c">&lt;!-- 同步过滤器，要开启请把start设置为true，用于 整体同步时，排除一些文件或目录，比如缓存目录可以不需要同步 --&gt;</span>
+            <span class="nt">&lt;crontabfilter</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;exclude</span> <span class="na">expression=</span><span class="s">&quot;*.php&quot;</span><span class="nt">&gt;&lt;/exclude&gt;</span>
+                <span class="nt">&lt;exclude</span> <span class="na">expression=</span><span class="s">&quot;info/*&quot;</span><span class="nt">&gt;&lt;/exclude&gt;</span>
+            <span class="nt">&lt;/crontabfilter&gt;</span>
+        <span class="nt">&lt;/crontab&gt;</span>
+        <span class="c">&lt;!-- 同步完成后，执行一个插件，name表示执行哪些插件，而这个插件必须在后边用plugin标签定义 --&gt;</span>
+        <span class="nt">&lt;plugin</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span> <span class="na">name=</span><span class="s">&quot;command&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/sersync&gt;</span>
+
+    <span class="c">&lt;!-- 定义一个command插件(command插件类型的一种，另外的类型有socket，refreshCDN,http(目前由于兼容性问题，http插件暂时不能用)) --&gt;</span>
+    <span class="nt">&lt;plugin</span> <span class="na">name=</span><span class="s">&quot;command&quot;</span><span class="nt">&gt;</span>
+        <span class="c">&lt;!-- command插件其实就是“.sh”结尾的shell脚本文件，prefix和subffix用于拼成一条执行shell命令的命令 --&gt;</span>
+        <span class="nt">&lt;param</span> <span class="na">prefix=</span><span class="s">&quot;/bin/sh&quot;</span> <span class="na">suffix=</span><span class="s">&quot;&quot;</span> <span class="na">ignoreError=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>  <span class="c">&lt;!--prefix /data/wwwroot/mmm.sh suffix--&gt;</span>
+        <span class="c">&lt;!-- 该脚本做操作时要过滤的文件正则 --&gt;</span>
+        <span class="nt">&lt;filter</span> <span class="na">start=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;include</span> <span class="na">expression=</span><span class="s">&quot;(.*)\.php&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;include</span> <span class="na">expression=</span><span class="s">&quot;(.*)\.sh&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/filter&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+
+    <span class="c">&lt;!-- 定义一个socket插件，注意插件定义了但没有调用的话，是不会被执行的 --&gt;</span>
+    <span class="nt">&lt;plugin</span> <span class="na">name=</span><span class="s">&quot;socket&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;localpath</span> <span class="na">watch=</span><span class="s">&quot;/data/wwwroot&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;deshost</span> <span class="na">ip=</span><span class="s">&quot;192.168.138.20&quot;</span> <span class="na">port=</span><span class="s">&quot;8009&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/localpath&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+
+    <span class="c">&lt;!-- 定义一个refreshCDN插件，主要用于同步数据到cdn --&gt;</span>
+    <span class="nt">&lt;plugin</span> <span class="na">name=</span><span class="s">&quot;refreshCDN&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;localpath</span> <span class="na">watch=</span><span class="s">&quot;/data0/htdocs/cms.xoyo.com/site/&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;cdninfo</span> <span class="na">domainname=</span><span class="s">&quot;ccms.chinacache.com&quot;</span> <span class="na">port=</span><span class="s">&quot;80&quot;</span> <span class="na">username=</span><span class="s">&quot;xxxx&quot;</span> <span class="na">passwd=</span><span class="s">&quot;xxxx&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;sendurl</span> <span class="na">base=</span><span class="s">&quot;http://pic.xoyo.com/cms&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;regexurl</span> <span class="na">regex=</span><span class="s">&quot;false&quot;</span> <span class="na">match=</span><span class="s">&quot;cms.xoyo.com/site([/a-zA-Z0-9]*).xoyo.com/images&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/localpath&gt;</span>
+    <span class="nt">&lt;/plugin&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-29 23:44:02</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>

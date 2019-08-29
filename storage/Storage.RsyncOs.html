@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>RsyncOs - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;RsyncOs
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="rsyncos">RsyncOS</h2>
+<blockquote>
+<p>系统同步</p>
+</blockquote>
+<h3 id="centos-6">Centos 6</h3>
+<p>rsync -avzP -r --exclude-from="./exclusion" --exclude='/data'  /* 192.168.1.221:/<br />
+rsync -e 'ssh' -azPx --delete-after --exclude-from="./exclusion" / root@x.x.x.x:/</p>
+<p><strong>exclusion：</strong></p>
+<div class="hlcode"><pre><span class="o">/</span><span class="n">boot</span>
+<span class="o">/</span><span class="n">proc</span>
+<span class="o">/</span><span class="n">sys</span>
+<span class="o">/</span><span class="n">tmp</span>
+<span class="o">/</span><span class="n">dev</span>
+<span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">lock</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">fstab</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">mtab</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">resolv</span><span class="p">.</span><span class="n">conf</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">conf</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">net</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">network</span><span class="o">/</span><span class="n">interfaces</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">networks</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">network</span><span class="o">*</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">hwconf</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">ip6tables</span><span class="o">-</span><span class="n">config</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">kernel</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hostname</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">HOSTNAME</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">hosts</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">modprobe</span><span class="o">*</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">modules</span>
+<span class="o">/</span><span class="n">net</span>
+<span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">modules</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">rc</span><span class="p">.</span><span class="n">conf</span>
+</pre></div>
+
+
+<h3 id="centos-7">Centos 7</h3>
+<div class="hlcode"><pre><span class="n">rsync</span> <span class="o">-</span><span class="n">aAXv</span> <span class="o">--</span><span class="n">exclude</span><span class="o">=</span><span class="p">{</span><span class="s">&quot;/dev/*&quot;</span><span class="p">,</span><span class="s">&quot;/proc/*&quot;</span><span class="p">,</span><span class="s">&quot;/sys/*&quot;</span><span class="p">,</span><span class="s">&quot;/tmp/*&quot;</span><span class="p">,</span><span class="s">&quot;/run/*&quot;</span><span class="p">,</span><span class="s">&quot;/mnt/*&quot;</span><span class="p">,</span><span class="s">&quot;/media/*&quot;</span><span class="p">,</span><span class="s">&quot;/lost+found&quot;</span><span class="p">,</span><span class="s">&quot;/boot&quot;</span><span class="p">,</span><span class="s">&quot;/lib/moudules&quot;</span><span class="p">,</span><span class="s">&quot;/etc/fstab&quot;</span><span class="p">,</span><span class="s">&quot;/etc/sysconfig/network*&quot;</span><span class="p">,</span><span class="s">&quot;/etc/sysconfig/kernel&quot;</span><span class="p">,</span><span class="s">&quot;/etc/hostname&quot;</span><span class="p">,</span><span class="s">&quot;/etc/hosts&quot;</span><span class="p">,</span><span class="s">&quot;/etc/resolv.conf&quot;</span><span class="p">,</span><span class="s">&quot;/data&quot;</span><span class="p">}</span> <span class="o">/*</span> <span class="mf">192.168.1.222</span><span class="o">:/</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-08-29 23:44:02</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
