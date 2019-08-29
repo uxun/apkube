@@ -35,30 +35,25 @@
 <span class="err">$</span> <span class="n">yum</span> <span class="o">-</span><span class="n">y</span> <span class="n">install</span> <span class="n">net</span><span class="o">-</span><span class="n">snmp</span> <span class="n">net</span><span class="o">-</span><span class="n">snmp</span><span class="o">-</span><span class="n">devel</span> <span class="n">net</span><span class="o">-</span><span class="n">snmp</span><span class="o">-</span><span class="n">utils</span>
 
 <span class="cp"># create snmp v3 user and passwd 对应server </span>
-<span class="err">$</span> <span class="n">net</span><span class="o">-</span><span class="n">snmp</span><span class="o">-</span><span class="n">create</span><span class="o">-</span><span class="n">v3</span><span class="o">-</span><span class="n">user</span> <span class="o">-</span><span class="n">ro</span> <span class="o">-</span><span class="n">A</span> <span class="n">lamaqun2014y</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="n">xwzc</span>
+<span class="err">$</span> <span class="n">net</span><span class="o">-</span><span class="n">snmp</span><span class="o">-</span><span class="n">create</span><span class="o">-</span><span class="n">v3</span><span class="o">-</span><span class="n">user</span> <span class="o">-</span><span class="n">ro</span> <span class="o">-</span><span class="n">A</span> <span class="n">PASSWORD</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="n">xwzc</span>
 
 <span class="cp"># start snmpd</span>
 <span class="err">$</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">snmpd</span>
 
 <span class="cp"># Local validation</span>
-<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">xwzc</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">lamaqun2014y</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="mf">127.0.0.1</span> <span class="mf">.1.3.6.1.4.1.2021.4.11.0</span>
+<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">USER</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">PASSWORD</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="mf">127.0.0.1</span> <span class="mf">.1.3.6.1.4.1.2021.4.11.0</span>
 
 <span class="cp"># Server Verify the client</span>
 <span class="cp"># v3 version</span>
 <span class="cp"># e.g: snmpwalk -v 3 -u $USER -a MD5 -A $PASSWD -l authNoPriv $IP .1.3.6.1.4.1.2021.4.11.0 </span>
-<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">xwzc</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">thisispassword</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="mf">192.168.1.41</span> <span class="mf">.1.3.6.1.4.1.2021.4.11.0</span> 
+<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">USER</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">PASSWORD</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="mf">192.168.1.41</span> <span class="mf">.1.3.6.1.4.1.2021.4.11.0</span> 
 
 <span class="cp"># v2 version</span>
-<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">c</span> <span class="n">public</span><span class="err">#</span><span class="n">xwzc</span> <span class="o">-</span><span class="n">v</span> <span class="mi">2</span><span class="n">c</span> <span class="mf">192.168.1.41</span> <span class="mf">.1.3.6.1.4.1.2021.11.53.0</span>
+<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">c</span> <span class="n">public</span><span class="err">#</span><span class="n">salt</span> <span class="o">-</span><span class="n">v</span> <span class="mi">2</span><span class="n">c</span> <span class="mf">192.168.1.41</span> <span class="mf">.1.3.6.1.4.1.2021.11.53.0</span>
 </pre></div>
 
 
 <h3 id="custom-oid">Custom OID</h3>
-<blockquote>
-<p>1.Scripts</p>
-<p>2./etc/snmp/snmpd.conf  </p>
-<p>3.Cacti-&gt;console-&gt;Templates-&gt;Data Templates</p>
-</blockquote>
 <p><strong>1.Scripts</strong></p>
 <p>编写所需脚本</p>
 <div class="hlcode"><pre><span class="cp"># e.g</span>
@@ -115,7 +110,7 @@
 
 
 <p>End test</p>
-<div class="hlcode"><pre><span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">xwzc</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">lamaqun2014y</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="n">localhost</span> <span class="mf">.1.3.6.1.4.1.2021.7001</span>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">USER</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">PASSWORD</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="n">localhost</span> <span class="mf">.1.3.6.1.4.1.2021.7001</span>
 <span class="n">UCD</span><span class="o">-</span><span class="n">SNMP</span><span class="o">-</span><span class="n">MIB</span><span class="o">::</span><span class="n">ucdavis</span><span class="mf">.7001.1.0</span> <span class="o">=</span> <span class="n">INTEGER</span><span class="o">:</span> <span class="mi">49</span> 
 <span class="p">....</span>
 <span class="n">UCD</span><span class="o">-</span><span class="n">SNMP</span><span class="o">-</span><span class="n">MIB</span><span class="o">::</span><span class="n">ucdavis</span><span class="mf">.7001.3.1.1.12.99.104.101.99.107.95.110.103.120.108.111.103</span> <span class="o">=</span> <span class="n">STRING</span><span class="o">:</span> <span class="s">&quot;3740&quot;</span>
@@ -125,7 +120,7 @@
 <span class="err">我们要的这个</span>
 <span class="n">OID</span> <span class="n">UCD</span><span class="o">-</span><span class="n">SNMP</span><span class="o">-</span><span class="n">MIB</span><span class="o">::</span><span class="n">ucdavis</span><span class="mf">.7001.4.1.2.12.99.104.101.99.107.95.110.103.120.108.111.103.1</span> <span class="o">=</span> <span class="n">STRING</span><span class="o">:</span> <span class="s">&quot;3740&quot;</span> 
 
-<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">xwzc</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">lamaqun2014y</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="n">localhost</span> <span class="mf">.1.3.6.1.4.1.2021.7001.4.1.2.12.99.104.101.99.107.95.110.103.120.108.111.103.1</span>
+<span class="err">$</span> <span class="n">snmpwalk</span> <span class="o">-</span><span class="n">v</span> <span class="mi">3</span> <span class="o">-</span><span class="n">u</span> <span class="n">USER</span> <span class="o">-</span><span class="n">a</span> <span class="n">MD5</span> <span class="o">-</span><span class="n">A</span> <span class="n">PASSWORD</span> <span class="o">-</span><span class="n">l</span> <span class="n">authNoPriv</span> <span class="n">localhost</span> <span class="mf">.1.3.6.1.4.1.2021.7001.4.1.2.12.99.104.101.99.107.95.110.103.120.108.111.103.1</span>
 <span class="n">UCD</span><span class="o">-</span><span class="n">SNMP</span><span class="o">-</span><span class="n">MIB</span><span class="o">::</span><span class="n">ucdavis</span><span class="mf">.7001.4.1.2.12.99.104.101.99.107.95.110.103.120.108.111.103.1</span> <span class="o">=</span> <span class="n">STRING</span><span class="o">:</span> <span class="s">&quot;11323&quot;</span>
 </pre></div>
 
@@ -156,7 +151,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-08-29 23:44:02</p>
+        <p>Page Updated 2019-08-29 23:48:13</p>
       </div> <!-- end footer-right -->
     </div>
 
