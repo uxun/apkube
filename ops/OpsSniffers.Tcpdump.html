@@ -1,0 +1,256 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>tcpdump - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/ops">../../../Dropbox/wiki/ops</a>
+    &nbsp;&#187;&nbsp;tcpdump
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="tcpdump">Tcpdump</h1>
+<blockquote>
+<p>后缀 .pcap 文件</p>
+</blockquote>
+<p><strong>syntax</strong></p>
+<div class="hlcode"><pre><span class="cp"># 语法</span>
+<span class="o">|</span> <span class="n">Protocol</span> <span class="o">|</span> <span class="n">Direction</span> <span class="o">|</span> <span class="n">Host</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">|</span> <span class="n">Value</span> <span class="o">|</span> <span class="n">Logical</span> <span class="n">Operations</span> <span class="o">|</span> <span class="n">Other</span> <span class="n">expression</span> <span class="o">|</span>
+<span class="cp"># e.g:</span>
+<span class="o">|</span> <span class="n">tcp</span>      <span class="o">|</span> <span class="n">dst</span>       <span class="o">|</span> <span class="mf">10.1.1.1</span> <span class="o">|</span> <span class="mi">80</span> <span class="o">|</span> <span class="n">and</span> <span class="o">|</span> <span class="n">tcp</span> <span class="n">dst</span> <span class="mf">10.2.2.2</span> <span class="mi">3128</span> <span class="o">|</span>
+
+<span class="cp"># full info</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="o">-</span><span class="n">ttttnnvvS</span> <span class="o">-</span><span class="n">i</span> <span class="n">em1</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mo">04</span> <span class="mi">12</span><span class="o">:</span><span class="mi">20</span><span class="o">:</span><span class="mf">33.113908</span> <span class="n">IP</span> <span class="p">(</span><span class="n">tos</span> <span class="mh">0x10</span><span class="p">,</span> <span class="n">ttl</span> <span class="mi">64</span><span class="p">,</span> <span class="n">id</span> <span class="mi">26354</span><span class="p">,</span> <span class="n">offset</span> <span class="mi">0</span><span class="p">,</span> <span class="n">flags</span> <span class="p">[</span><span class="n">DF</span><span class="p">],</span> <span class="n">proto</span> <span class="n">TCP</span> <span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">length</span> <span class="mi">176</span><span class="p">)</span>
+    <span class="mf">192.168.0.23.22</span> <span class="o">&gt;</span> <span class="mf">192.168.3.222.49927</span><span class="o">:</span> <span class="n">Flags</span> <span class="p">[</span><span class="n">P</span><span class="p">.],</span> <span class="n">cksum</span> <span class="mh">0x85e8</span> <span class="p">(</span><span class="n">incorrect</span> <span class="o">-&gt;</span> <span class="mh">0xdc84</span><span class="p">),</span> <span class="n">seq</span> <span class="mi">640434725</span><span class="o">:</span><span class="mi">640434849</span><span class="p">,</span> <span class="n">ack</span> <span class="mi">556575463</span><span class="p">,</span> <span class="n">win</span> <span class="mi">315</span><span class="p">,</span> <span class="n">options</span> <span class="p">[</span><span class="n">nop</span><span class="p">,</span><span class="n">nop</span><span class="p">,</span><span class="n">TS</span> <span class="n">val</span> <span class="mi">2310437329</span> <span class="n">ecr</span> <span class="mi">495297942</span><span class="p">],</span> <span class="n">length</span> <span class="mi">124</span>
+
+<span class="cp"># host filter</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="n">host</span> <span class="mf">192.168.3.222</span>
+<span class="mi">12</span><span class="o">:</span><span class="mi">21</span><span class="o">:</span><span class="mf">11.555868</span> <span class="n">IP</span> <span class="mf">192.168.3.222.49927</span> <span class="o">&gt;</span> <span class="n">ops</span><span class="o">-</span><span class="mf">03.</span><span class="n">ssh</span><span class="o">:</span> <span class="n">Flags</span> <span class="p">[.],</span> <span class="n">ack</span> <span class="mi">656496</span><span class="p">,</span> <span class="n">win</span> <span class="mi">2042</span><span class="p">,</span> <span class="n">options</span> <span class="p">[</span><span class="n">nop</span><span class="p">,</span><span class="n">nop</span><span class="p">,</span><span class="n">TS</span> <span class="n">val</span> <span class="mi">495336336</span> <span class="n">ecr</span> <span class="mi">2310475770</span><span class="p">],</span> <span class="n">length</span> <span class="mi">0</span>
+
+<span class="cp"># type</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="n">net</span> <span class="mf">192.168.1.0</span><span class="o">/</span><span class="mi">24</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="n">port</span> <span class="mi">22</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="n">icmp</span> 
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="n">src</span> <span class="mf">192.168.3.222</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="n">dst</span> <span class="mf">192.168.3.222</span>
+
+<span class="cp"># ipv6</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="o">-</span><span class="n">i</span> <span class="n">any</span> <span class="n">tcp</span> <span class="n">and</span> <span class="n">port</span> <span class="mi">8000</span> <span class="n">and</span> <span class="n">ip6</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="o">-</span><span class="n">i</span> <span class="n">any</span> <span class="n">tcp</span> <span class="n">and</span> <span class="n">port</span> <span class="mi">8000</span> <span class="n">and</span> <span class="err">&#39;</span><span class="p">(</span><span class="n">ip</span> <span class="n">or</span> <span class="n">ip6</span><span class="p">)</span><span class="err">&#39;</span>
+<span class="err">$</span> <span class="n">tcpdump</span> <span class="o">-</span><span class="n">i</span> <span class="n">any</span> <span class="n">icmp6</span>
+</pre></div>
+
+
+<p><strong>tcp 标志位</strong></p>
+<table>
+<thead>
+<tr>
+<th>tag</th>
+<th>status</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SYN</td>
+<td>"S"</td>
+<td>同步标志位，建立会话，同步序列号</td>
+</tr>
+<tr>
+<td>ACK</td>
+<td>"."</td>
+<td>确认标志位，确认接收数据</td>
+</tr>
+<tr>
+<td>FIN</td>
+<td>"F"</td>
+<td>完成标志位，不发送数据了，即将关闭连接</td>
+</tr>
+<tr>
+<td>RESET</td>
+<td>"R"</td>
+<td>重置标志位，用于连接复位，拒绝错误和非法的数据包</td>
+</tr>
+<tr>
+<td>PUSH</td>
+<td>"P"</td>
+<td>推送标志位，对方接收到数据包直接提交上层应用，不在缓冲区排队</td>
+</tr>
+<tr>
+<td>URGENT</td>
+<td>"U"</td>
+<td>紧急标志位，数据包紧急指针域有效，保证连接不被阻断，并督促中间设备尽快处理</td>
+</tr>
+</tbody>
+</table>
+<p><strong>parameter</strong>  <a href="https://www.zfl9.com/tcpdump.html">REFERNECE</a></p>
+<blockquote>
+<ul>
+<li>3x packets captured`：表示有 3x 个数据包被 tcpdump 处理了；</li>
+<li><code>2 packets received by filter</code>：表示有 2 个数据包符合过滤条件；</li>
+<li><code>0 packets dropped by kernel</code>：表示有 0 个数据包被内核丢弃了；</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>[]</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-i [em1| any]</td>
+<td>指定监听网卡，any 为所有接口</td>
+</tr>
+<tr>
+<td>-D</td>
+<td>打印当前可用于 tcpdump 监听的网卡</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>不解析主机名，而是显示 IP 地址</td>
+</tr>
+<tr>
+<td>-nn</td>
+<td>不解析主机名或端口对应的服务名，而是显示 IP 地址和端口号</td>
+</tr>
+<tr>
+<td>-q</td>
+<td>显示更少的协议信息</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>如 TTL、总长度、IP 包选项、IP/ICMP 报头校验和</td>
+</tr>
+<tr>
+<td>-vv</td>
+<td>NFS 附加字段、完全解码 SMB 数据包等</td>
+</tr>
+<tr>
+<td>-vvv</td>
+<td>telnet SB … SE 选项、以 16 进制打印 telnet 选项等</td>
+</tr>
+<tr>
+<td>-t,-tt</td>
+<td>-t：不显示时间戳；-tt：显示 1970-01-01 00:00:00 UTC 起的秒数</td>
+</tr>
+<tr>
+<td>-tttt,-ttttt</td>
+<td>-tttt，显示年月日、时分秒；-ttttt，显示相对第一个数据包的时间差(微秒)</td>
+</tr>
+<tr>
+<td>-c5</td>
+<td>捕获5个数据包后退出</td>
+</tr>
+<tr>
+<td>-S</td>
+<td>打印绝对序列号而不是相对序列号（TCP）</td>
+</tr>
+<tr>
+<td>-l</td>
+<td>打印时候使用行缓冲，易于使用管道</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>数据保存.pcap文件</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>读取.pcap文件</td>
+</tr>
+</tbody>
+</table>
+<p><strong>type</strong></p>
+<blockquote>
+<p>更多 tcpdump 参数请查阅<code>man tcpdump</code>帮助文档；<br />
+更多 expression 语法请查阅<code>man pcap-filter</code>帮助文档。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>host [default]</td>
+<td>IP or hostname</td>
+</tr>
+<tr>
+<td>net</td>
+<td>net 192.168.0.0/24</td>
+</tr>
+<tr>
+<td>port</td>
+<td>port NUM or /etc/service</td>
+</tr>
+<tr>
+<td>portrange</td>
+<td>端口范围 1000-12000</td>
+</tr>
+<tr>
+<td>dir</td>
+<td>src(源)，dst(目的)  default：src or dst</td>
+</tr>
+<tr>
+<td>proto</td>
+<td>ether, fddi, ip, arp, rarp, decnet, lat, sca, moprc, mopdl, tcp and udp.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tips</strong></p>
+<p><a href="https://danielmiessler.com/study/tcpdump/">A tcpdump Tutorial with Examples — 50 Ways to Isolate Traffic</a></p>
+<blockquote>
+<ul>
+<li>AND（<code>and</code> 或 <code>&amp;</code>）</li>
+<li>OR（<code>or</code> 或 <code>||</code>）</li>
+<li>EXCEPT （<code>not</code> 或 <code>!</code>）</li>
+</ul>
+</blockquote>
+<h3 id="refernece">REFERNECE</h3>
+<p><a href="https://opensource.com/article/18/10/introduction-tcpdump">An introduction to using tcpdump at the Linux command line</a></p>
+<p><a href="https://www.tecmint.com/12-tcpdump-commands-a-network-sniffer-tool/">12 Tcpdump Commands – A Network Sniffer Tool</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-04 12:29:23</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
