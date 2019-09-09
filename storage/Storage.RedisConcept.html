@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>RedisConcept - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/storage">../../../Dropbox/wiki/storage</a>
+    &nbsp;&#187;&nbsp;RedisConcept
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="redis-concept">Redis Concept</h2>
+<p><strong>Concept</strong></p>
+<ol>
+<li>Key-Value，单线程，工作在内存中，可以用作Cache and store</li>
+<li>尽量使用较短的key，因为较短的key可以节省内存和带宽</li>
+<li>性能极高 – Redis能读的速度是110000次/s,写的速度是81000次/s 。</li>
+<li>丰富的数据类型 – Redis支持二进制案例的 Strings, Lists, Hashes, Sets 及 Ordered Sets 数据类型操作。</li>
+<li>原子 – Redis的所有操作都是原子性的，意思就是要么成功执行要么失败完全不执行。单个操作是原子性的。多个操作也支持事务，即原子性，通过MULTI和EXEC指令包起来。</li>
+<li>丰富的特性 – Redis还支持 publish/subscribe, 通知, key 过期等等特性。</li>
+</ol>
+<p><strong>特性</strong></p>
+<p>1 持久化(redis会在一定时间内将内存中的数据写入到硬盘中从而实现数据持久化)<br />
+    基于Snapshotting方式(数据异步从内存传输到硬盘中)<br />
+    基于AOF方式(把每一次的写操作都存放在现有的文件中)<br />
+2 主从(借助于sentine实现一定意义上的高可用,可像Mysql主从一样,主实现写操作,从实现读操作)<br />
+3 cluster(分布式集群,读写操作可在多节点进行)<br />
+4 就地更新(可在内存中直接更新)</p>
+<h4 id="redis-5">Redis 5 个常用应用场景</h4>
+<h4 id="1"><strong>1.全页面缓存</strong></h4>
+<blockquote>
+<p>如果你使用的是服务器端内容渲染，你又不想为每个请求重新渲染每个页面，就可以使用 Redis 把常被请求的内容缓存起来，能够大大的降低页面请求的延迟，已经有很多框架用Redis来缓存页面，这就是页面静态化的一种方式<br />
+</p>
+</blockquote>
+<div class="hlcode"><pre><span class="nx">Strings</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="nb">SET</span>    <span class="p">:</span><span class="nx">是定义值的时候用的</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="nb">GET</span>    <span class="p">:</span><span class="nx">获取键的值时候用的</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="nb">EXISTS</span> <span class="p">:</span><span class="nx">判断键是否存在</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="nx">INCR</span>   <span class="p">:</span><span class="nx">整数</span><span class="o">+</span><span class="mi">1</span>
+<span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="nx">DECR</span>   <span class="p">:</span><span class="nx">整数减</span><span class="o">-</span><span class="mi">1</span>
+
+<span class="err">#</span> <span class="mi">1</span><span class="nx">分钟过期</span>
+<span class="nb">SET</span> <span class="nx">page1</span> <span class="s2">&quot;&lt;html&gt;&quot;</span> <span class="nx">EX</span> <span class="mi">60</span>
+<span class="nb">GET</span> <span class="nx">page1</span>
+</pre></div>
+
+
+<h4 id="2top"><strong>2.Top</strong></h4>
+<blockquote>
+<p>Redis 基于内存，可以非常快速高效的处理增加和减少的操作，相比于使用 SQL 请求的处理方式，性能的提升是非常巨大的。<br />
+</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># Redis 的有序集合可以轻松实现“从一个大型列表中取得排名最高的N个元素”，毫秒级，而且非常简单。</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">ZADD</span>     <span class="o">:</span><span class="err">添加一个有序集合</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">ZCARD</span>    <span class="o">:</span><span class="err">查看有序集合的元素个数</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">ZRANK</span>    <span class="o">:</span><span class="err">查看指定元素对应的</span><span class="n">SCORE</span><span class="err">号</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="n">ZRANGE</span>   <span class="o">:</span><span class="err">按照内置索引显示从</span><span class="s">&quot;min-max&quot;</span><span class="err">之间的索引</span>
+
+<span class="cp"># 有序集合添加元素</span>
+<span class="n">zadd</span> <span class="n">sorted</span> <span class="mi">1</span> <span class="s">&quot;hello&quot;</span>
+<span class="n">zadd</span> <span class="n">sorted</span> <span class="mi">2</span> <span class="s">&quot;world&quot;</span>
+
+<span class="cp"># 集合获取元素</span>
+<span class="n">zrange</span> <span class="n">sorted</span> <span class="mi">0</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="cp"># 根据权重从有序集合获取</span>
+<span class="n">zrange</span> <span class="n">sorted</span> <span class="mi">0</span> <span class="o">-</span><span class="mi">1</span> <span class="n">withscores</span>
+</pre></div>
+
+
+<h4 id="3session"><strong>3.session存储</strong></h4>
+<blockquote>
+<p>类似memcache的session存储，避免session突然消失带来的用户体验问题</p>
+</blockquote>
+<div class="hlcode"><pre><span class="n">list</span><span class="p">(</span><span class="err">列表</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">RPUSH</span>  <span class="o">:</span><span class="err">从右侧添加一个值到列表中</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">LPUSH</span>  <span class="o">:</span><span class="err">从左侧添加一个值到列表中</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">LPOP</span>   <span class="o">:</span><span class="err">从左侧逐一删除值</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="n">RPOP</span>   <span class="o">:</span><span class="err">从右侧逐一删除值</span>
+<span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="n">LINDEX</span> <span class="o">:</span><span class="err">指明索引位置并且获取值</span>
+<span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="n">LSET</span>   <span class="o">:</span><span class="err">修改列表中的值</span>
+</pre></div>
+
+
+<p>example:</p>
+<div class="hlcode"><pre><span class="cp"># set session EX 60</span>
+<span class="n">set</span> <span class="n">randomHash</span> <span class="s">&quot;userID&quot;</span> <span class="n">EX</span> <span class="mi">60</span>
+<span class="n">get</span> <span class="n">randomHash</span>
+</pre></div>
+
+
+<h4 id="4">4.队列</h4>
+<blockquote>
+<p>例如发送队列，等待被其他应用消费的数据队列，redis可以轻松而自然的创建一个高效队列</p>
+</blockquote>
+<p>Sets(集合):</p>
+<div class="hlcode"><pre><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">SADD</span>     <span class="o">:</span><span class="err">创建新的集合</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">SINTER</span>   <span class="o">:</span><span class="err">求两个集合的交集</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">SUNION</span>   <span class="o">:</span><span class="err">求两个集合的并集</span><span class="p">,</span><span class="err">就是两个集合中都存在的</span><span class="p">,</span><span class="err">并且打印出来一份</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="n">SISMEMBER</span><span class="o">:</span><span class="err">判断集合中指定的元素是否存在</span>
+<span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="n">SPOP</span>     <span class="o">:</span><span class="err">从集合中随机删除一个元素</span>
+</pre></div>
+
+
+<p>Sorted Sets(有序集合):</p>
+<div class="hlcode"><pre><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">ZADD</span>     <span class="o">:</span><span class="err">添加一个有序集合</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">ZCARD</span>    <span class="o">:</span><span class="err">查看有序集合的元素个数</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">ZRANK</span>    <span class="o">:</span><span class="err">查看指定元素对应的</span><span class="n">SCORE</span><span class="err">号</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="n">ZRANGE</span>   <span class="o">:</span><span class="err">按照内置索引显示从</span><span class="s">&quot;min-max&quot;</span><span class="err">之间的索引</span>
+</pre></div>
+
+
+<p>Hashes(哈希):</p>
+<div class="hlcode"><pre> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">HSET</span>     <span class="o">:</span><span class="err">定义一个</span><span class="n">hash</span>
+ <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="n">HGET</span>     <span class="o">:</span><span class="err">获取键中子键对应的值</span>
+ <span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="n">HDEL</span>     <span class="o">:</span><span class="err">删除键中子键</span>
+ <span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="n">HKEYS</span>    <span class="o">:</span><span class="err">获取</span><span class="n">h1</span><span class="err">键中所有的子键名称</span>
+ <span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="n">HVALES</span>   <span class="o">:</span><span class="err">获取</span><span class="n">h1</span><span class="err">键中所有子键对应的值</span>
+ <span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="n">HLEN</span>     <span class="o">:</span><span class="err">获取</span><span class="n">h1</span><span class="err">键中拥有的</span><span class="n">hash</span><span class="err">个数</span>
+</pre></div>
+
+
+<p>example:</p>
+<div class="hlcode"><pre><span class="err">#</span> <span class="nb">add</span> <span class="nb">msg</span>
+<span class="nx">hset</span> <span class="nb">msg</span> <span class="mi">1</span> <span class="o">&lt;</span><span class="nx">hello</span><span class="o">&gt;</span>
+<span class="nx">hset</span> <span class="nb">msg</span> <span class="mi">2</span> <span class="o">&lt;</span><span class="nx">world</span><span class="o">&gt;</span>
+<span class="nx">zadd</span> <span class="nx">due</span> <span class="o">&lt;</span><span class="nx">due_timestamp</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="nb">id</span><span class="o">&gt;</span>
+
+<span class="err">#</span> <span class="nx">receive</span> <span class="nb">msg</span>
+<span class="nx">zrangebyscore</span> <span class="nx">due</span> <span class="na">-inf</span> <span class="o">&lt;</span><span class="nx">current_timestamp</span><span class="o">&gt;</span> <span class="nx">LIMIT</span> <span class="mi">0</span> <span class="mi">1</span>
+<span class="nx">hget</span> <span class="nx">mmssages</span> <span class="o">&lt;</span><span class="nx">message_id</span><span class="o">&gt;</span>
+<span class="nx">hget</span> <span class="nb">msg</span> <span class="mi">1</span>
+
+<span class="err">#</span> <span class="nx">del</span> <span class="nb">msg</span>
+<span class="nx">zrem</span> <span class="nx">due</span> <span class="o">&lt;</span><span class="nx">message_id</span><span class="o">&gt;</span>
+<span class="nx">hdel</span> <span class="nx">messages</span> <span class="o">&lt;</span><span class="nx">message_id</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<h4 id="5">5.发布/订阅</h4>
+<blockquote>
+<p>pub/sub 是redis 内置的强大特性，e.g：可创建实时聊天，社交网络中的通知触发器</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 发布消息</span>
+<span class="n">publish</span> <span class="n">channel</span> <span class="n">message</span>
+
+<span class="cp"># 订阅</span>
+<span class="n">subscribe</span> <span class="n">channel</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-09 14:46:55</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
