@@ -1,0 +1,357 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>ApbModules - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/ops">../../../Dropbox/wiki/ops</a>
+    &nbsp;&#187;&nbsp;ApbModules
+    <span class="updated">Page Updated&nbsp;
+    2019-08-21 13:00
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="playbook">Playbook</h1>
+<h3 id="list">list</h3>
+<table>
+<thead>
+<tr>
+<th>handlers</th>
+<th>meta</th>
+<th>listen</th>
+<th>tags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>vars</strong></td>
+<td><strong>debug</strong></td>
+<td><strong>register</strong></td>
+<td><strong>prompts</strong></td>
+</tr>
+<tr>
+<td><strong>get_url</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="handlers">handlers</h3>
+<div class="hlcode"><pre><span class="c"># handlers中的任务通过tasks中任务进行调用，tasks中任务实际改变后，触发条件后调用handlers任务,任务满足state=changed通过tasks.notify 关键字调用handlers中的任务</span>
+</pre></div>
+
+
+<h3 id="meta">meta</h3>
+<div class="hlcode"><pre><span class="c"># 特殊任务，改变ansible内部运行方式，通过meta 可以直接执行改变ansible运行逻辑</span>
+</pre></div>
+
+
+<h3 id="listen">listen</h3>
+<div class="hlcode"><pre><span class="c"># 一次需要执行多个notify时候，通过关键字listen关联需要执行的handlers，可理解为「组」</span>
+</pre></div>
+
+
+<h3 id="tags-refernece">tags <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html">refernece</a></h3>
+<div class="hlcode"><pre><span class="cp"># 执行某一部分任务是，给task打上标签通过指定</span>
+<span class="err">$</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">--</span><span class="n">tags</span><span class="o">=</span><span class="n">mk2</span> <span class="n">testmk</span><span class="p">.</span><span class="n">yml</span> 
+<span class="cp"># 不执行--skip-tags来忽略</span>
+<span class="err">$</span> <span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">tags</span><span class="o">=</span><span class="n">mk2</span> <span class="n">testmk</span><span class="p">.</span><span class="n">yml</span>
+
+<span class="cp"># 特殊标签 tagged,untagged,all,always,never(2.5add)</span>
+<span class="n">always</span><span class="err">：没有被调用，也执行</span>
+<span class="n">tagged</span><span class="err">：只执行有标签的，</span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">tags</span> <span class="n">tagged</span><span class="err">即使</span><span class="n">always</span><span class="err">也被跳过</span>
+<span class="n">untagged</span><span class="err">：只执行没有标签的，会执行包含</span><span class="n">always</span><span class="err">的任务，</span><span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">tags</span> <span class="n">untagged</span> <span class="err">跳过所有没有标签的任务</span>
+</pre></div>
+
+
+<h3 handlers_meta_listen_tags="handlers,meta,listen,tags" id="eg">E.g</h3>
+<div class="hlcode"><pre><span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">mk</span> <span class="n">dir</span>
+    <span class="nl">file:</span> <span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">test1</span><span class="p">.</span><span class="n">log</span>
+          <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+    <span class="nl">notify:</span>
+      <span class="o">-</span> <span class="n">test</span> <span class="n">mk</span>
+      <span class="o">-</span> <span class="n">group1</span>  
+
+  <span class="o">-</span> <span class="n">meta</span><span class="o">:</span> <span class="n">flush_handlers</span>
+
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">mk</span> <span class="n">dir2</span>
+    <span class="nl">file:</span> <span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">test2</span><span class="p">.</span><span class="n">log</span>
+          <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+    <span class="nl">notify:</span>
+      <span class="o">-</span> <span class="n">test</span> <span class="n">mk2</span>
+    <span class="nl">tags:</span> <span class="n">mk2</span><span class="p">,</span><span class="n">always</span>
+
+  <span class="nl">handlers:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">test</span> <span class="n">mk</span>
+    <span class="nl">listen:</span> <span class="n">group1</span>
+    <span class="nl">file:</span> <span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">handlers1</span><span class="p">.</span><span class="n">log</span>
+          <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">test</span> <span class="n">mk2</span>
+    <span class="nl">file:</span> <span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">handlers2</span><span class="p">.</span><span class="n">log</span>
+          <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">test</span> <span class="n">mk3</span>
+    <span class="nl">listen:</span> <span class="n">group1</span>
+    <span class="nl">file:</span> <span class="n">path</span><span class="o">=/</span><span class="n">data</span><span class="o">/</span><span class="n">group1</span><span class="p">.</span><span class="n">log</span>
+          <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+</pre></div>
+
+
+<h3 id="vars-refernece">vars <a href="https://docs.ansible.com/ansible/latest/plugins/lookup/vars.html?highlight=vars">refernece</a></h3>
+<p>1.可通过 -m setup 查看</p>
+<div class="hlcode"><pre><span class="n">ansible</span> <span class="n">one</span> <span class="o">-</span><span class="n">m</span> <span class="n">setup</span> <span class="o">-</span><span class="n">a</span> <span class="err">&#39;</span><span class="n">filter</span><span class="o">=</span><span class="n">ansible_memory_mb</span><span class="err">&#39;</span> 
+<span class="n">ansible_distribution</span><span class="err">：系统</span>
+<span class="n">ansible_distribution_version</span><span class="err">：系统版本</span>
+</pre></div>
+
+
+<p>2.通过命令行传递变量 { --extra-vars | -e } 命令行优先级高于yml中的变量</p>
+<div class="hlcode"><pre><span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="n">vars_command</span><span class="p">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">vars</span> <span class="s">&quot;vars_command=test_vars_command&quot;</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="n">vars_command</span><span class="p">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">e</span> <span class="err">&#39;</span><span class="n">vars_command</span><span class="o">=</span><span class="s">&quot;tet&quot;</span> <span class="n">vars_command1</span><span class="o">=</span><span class="s">&quot;test&quot;</span><span class="err">&#39;</span>
+
+<span class="cp"># vars_command.yml</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+<span class="nl">remore_user:</span> <span class="n">root</span>
+<span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="s">&quot;vars_command&quot;</span>
+ <span class="nl">debug:</span>
+   <span class="nl">msg:</span> <span class="s">&quot;{{ vars_command }}&quot;</span>
+</pre></div>
+
+
+<p>3.变量引用</p>
+<div class="hlcode"><pre><span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">vars:</span>
+   <span class="nl">nginx:</span>
+    <span class="nl">conf80:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="mf">80.</span><span class="n">conf</span>
+    <span class="nl">conf8080:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="mf">8080.</span><span class="n">conf</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">nginx80</span>
+    <span class="nl">file:</span>
+     <span class="n">path</span><span class="o">=</span><span class="p">{{</span> <span class="n">nginx</span><span class="p">.</span><span class="n">conf80</span> <span class="p">}}</span>
+     <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">nginx8080</span>
+    <span class="nl">file:</span>
+     <span class="n">path</span><span class="o">=</span><span class="p">{{</span> <span class="n">nginx</span><span class="p">.</span><span class="n">conf8080</span> <span class="p">}}</span>
+     <span class="n">state</span><span class="o">=</span><span class="n">touch</span>
+</pre></div>
+
+
+<p>4.传入变量文件</p>
+<div class="hlcode"><pre><span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="n">varscmd</span><span class="p">.</span><span class="n">yml</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;@/data/vars/testvars&quot;</span>
+
+<span class="cp"># cat /data/vars/testvars</span>
+<span class="nl">testvar:</span> <span class="n">test_varfile</span>
+<span class="nl">countlist:</span>
+<span class="o">-</span> <span class="n">one</span>
+<span class="o">-</span> <span class="n">two</span>
+<span class="o">-</span> <span class="mi">4</span>
+
+<span class="cp"># varscmd.yml</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">task:</span>
+   <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">test</span>
+  <span class="nl">debug:</span>
+   <span class="nl">msg:</span> <span class="s">&quot;{{testvar}} {{countlist[0]}}&quot;</span>
+</pre></div>
+
+
+<p>5.主机变量</p>
+<div class="hlcode"><pre><span class="cp"># /etc/ansible/hosts</span>
+<span class="p">[</span><span class="n">one</span><span class="p">]</span>
+<span class="n">test1</span> <span class="n">ansible_host</span><span class="o">=</span><span class="mf">192.168.1.115</span>
+<span class="n">test2</span> <span class="n">ansible_host</span><span class="o">=</span><span class="mf">192.168.1.116</span>
+<span class="p">[</span><span class="n">one</span><span class="o">:</span><span class="n">vars</span><span class="p">]</span>
+<span class="n">var1</span><span class="o">=</span><span class="s">&quot;test1&quot;</span>
+<span class="n">var2</span><span class="o">=</span><span class="s">&quot;test2&quot;</span>
+
+<span class="cp"># 调用</span>
+<span class="n">ansible</span> <span class="n">test1</span> <span class="o">-</span><span class="n">m</span> <span class="n">shell</span> <span class="o">-</span><span class="n">a</span> <span class="err">&#39;</span><span class="n">echo</span> <span class="p">{{</span><span class="n">var1</span><span class="p">}}</span><span class="err">&#39;</span>
+</pre></div>
+
+
+<p>6.通过se_fact 自定义变量</p>
+<div class="hlcode"><pre><span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">echo</span> <span class="n">hello</span>
+    <span class="nl">shell:</span> <span class="s">&quot;echo hello world&quot;</span>
+    <span class="nl">register:</span> <span class="n">ehw</span>
+  <span class="o">-</span> <span class="n">set_fact</span><span class="o">:</span>
+  <span class="nl">t1var:</span> <span class="s">&quot;hello world&quot;</span>
+  <span class="nl">t2var:</span> <span class="s">&quot;{{ehw.stdout}}&quot;</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+  <span class="nl">msg:</span> <span class="s">&quot;{{t1var}} {{t2var[1]}}&quot;</span>
+</pre></div>
+
+
+<h3 id="debug">debug</h3>
+<blockquote>
+<p>调试</p>
+</blockquote>
+<div class="hlcode"><pre><span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">vars:</span>
+   <span class="nl">tlk:</span> <span class="n">test</span> <span class="n">debug</span> 
+  <span class="n">tasks</span><span class="o">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">debug</span> <span class="n">demo</span>
+    <span class="nl">debug:</span>
+     <span class="nl">var:</span> <span class="n">tlk</span>
+
+<span class="n">TASK</span> <span class="p">[</span><span class="n">debug</span> <span class="n">demo</span><span class="p">]</span> <span class="o">*********************************************************************************************</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.1.116</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+ <span class="s">&quot;tlk&quot;</span><span class="o">:</span> <span class="s">&quot;test debug&quot;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3 id="register">register</h3>
+<blockquote>
+<p>变量注册，对task任务执行后取返回值，将返回值放入变量中，通过对应变量引用其返回值</p>
+</blockquote>
+<div class="hlcode"><pre><span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">tasks:</span>    
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">echo</span> <span class="n">shell</span>
+    <span class="nl">shell:</span> <span class="s">&quot;echo register &gt; /var/testshell&quot;</span>
+    <span class="nl">register:</span> <span class="n">rgvar</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">shell</span> <span class="n">moduler</span> <span class="k">return</span> <span class="n">values</span>
+    <span class="nl">debug:</span>
+     <span class="nl">var:</span> <span class="n">rgvar</span>
+
+<span class="cp"># 需要获取特定值</span>
+<span class="cp"># debug:</span>
+<span class="cp"># msg: &quot;{{ rgvar.cmd }}&quot;</span>
+<span class="cp"># msg: &quot;{{ rgvar.changed }}&quot;</span>
+
+<span class="n">TASK</span> <span class="p">[</span><span class="n">shell</span> <span class="n">moduler</span> <span class="k">return</span> <span class="n">values</span><span class="p">]</span> <span class="o">****************************************************************************</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.1.116</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="s">&quot;rgvar&quot;</span><span class="o">:</span> <span class="p">{</span>
+  <span class="s">&quot;changed&quot;</span><span class="o">:</span> <span class="nb">true</span><span class="p">,</span>
+  <span class="s">&quot;cmd&quot;</span><span class="o">:</span> <span class="s">&quot;echo register &gt; /var/testshell&quot;</span><span class="p">,</span>
+  <span class="s">&quot;delta&quot;</span><span class="o">:</span> <span class="s">&quot;0:00:00.003009&quot;</span><span class="p">,</span>
+  <span class="s">&quot;end&quot;</span><span class="o">:</span> <span class="s">&quot;2019-07-12 12:06:28.202252&quot;</span><span class="p">,</span>
+  <span class="s">&quot;failed&quot;</span><span class="o">:</span> <span class="nb">false</span><span class="p">,</span>
+  <span class="s">&quot;rc&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="s">&quot;start&quot;</span><span class="o">:</span> <span class="s">&quot;2019-07-12 12:06:28.199243&quot;</span><span class="p">,</span>
+  <span class="s">&quot;stderr&quot;</span><span class="o">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+  <span class="s">&quot;stderr_lines&quot;</span><span class="o">:</span> <span class="p">[],</span>
+  <span class="s">&quot;stdout&quot;</span><span class="o">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+  <span class="s">&quot;stdout_lines&quot;</span><span class="o">:</span> <span class="p">[]</span>
+<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<h3 id="prompts-refernece">prompts <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks_prompts.html">refernece</a></h3>
+<blockquote>
+<p>提示用户输入msg，并写入变量</p>
+<p>private：no 变量非私有，yes 变量不可见</p>
+<p>encrypt：对用户输入的字符串hash 需要安装 passlib库：pip install passlib</p>
+<p>confirm：对密码两次输入验证</p>
+</blockquote>
+<div class="hlcode"><pre><span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">vars_prompt:</span>
+   <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="s">&quot;user_name&quot;</span>
+     <span class="nl">prompt:</span> <span class="s">&quot;Enter user name&quot;</span>
+     <span class="nl">private:</span> <span class="n">no</span>
+   <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="s">&quot;user_pd&quot;</span>
+     <span class="nl">prompt:</span> <span class="s">&quot;Enter user pd&quot;</span>
+     <span class="nl">encrypt:</span> <span class="s">&quot;sha512_crypt&quot;</span>
+     <span class="nl">confirm:</span> <span class="n">yes</span>
+  <span class="nl">tasks:</span>
+   <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">create_user</span>
+      <span class="nl">user:</span>
+     <span class="nl">name:</span> <span class="s">&quot;{{user_name}}&quot;</span>
+      <span class="nl">password:</span> <span class="s">&quot;{{user_pd}}&quot;</span>
+</pre></div>
+
+
+<h3 id="get_url">get_url</h3>
+<div class="hlcode"><pre><span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Download</span> <span class="n">foo</span><span class="p">.</span><span class="n">conf</span>
+  <span class="nl">get_url:</span>
+    <span class="nl">url:</span> <span class="n">http</span><span class="o">:</span><span class="c1">//example.com/path/file.conf</span>
+    <span class="nl">dest:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">foo</span><span class="p">.</span><span class="n">conf</span>
+    <span class="nl">mode:</span> <span class="mo">0440</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Download</span> <span class="n">file</span> <span class="n">and</span> <span class="n">force</span> <span class="n">basic</span> <span class="n">auth</span>
+  <span class="nl">get_url:</span>
+    <span class="nl">url:</span> <span class="n">http</span><span class="o">:</span><span class="c1">//example.com/path/file.conf</span>
+    <span class="nl">dest:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">foo</span><span class="p">.</span><span class="n">conf</span>
+    <span class="nl">force_basic_auth:</span> <span class="n">yes</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Download</span> <span class="n">file</span> <span class="n">with</span> <span class="n">custom</span> <span class="n">HTTP</span> <span class="n">headers</span>
+  <span class="nl">get_url:</span>
+    <span class="nl">url:</span> <span class="n">http</span><span class="o">:</span><span class="c1">//example.com/path/file.conf</span>
+    <span class="nl">dest:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">foo</span><span class="p">.</span><span class="n">conf</span>
+    <span class="nl">headers:</span> <span class="err">&#39;</span><span class="n">key</span><span class="o">:</span><span class="n">value</span><span class="p">,</span><span class="n">key</span><span class="o">:</span><span class="n">value</span><span class="err">&#39;</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Download</span> <span class="n">file</span> <span class="n">with</span> <span class="n">check</span> <span class="p">(</span><span class="n">sha256</span><span class="p">)</span>
+  <span class="nl">get_url:</span>
+    <span class="nl">url:</span> <span class="n">http</span><span class="o">:</span><span class="c1">//example.com/path/file.conf</span>
+    <span class="nl">dest:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">foo</span><span class="p">.</span><span class="n">conf</span>
+    <span class="nl">checksum:</span> <span class="n">sha256</span><span class="o">:</span><span class="n">b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Download</span> <span class="n">file</span> <span class="n">with</span> <span class="n">check</span> <span class="p">(</span><span class="n">md5</span><span class="p">)</span>
+  <span class="nl">get_url:</span>
+    <span class="nl">url:</span> <span class="n">http</span><span class="o">:</span><span class="c1">//example.com/path/file.conf</span>
+    <span class="nl">dest:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">foo</span><span class="p">.</span><span class="n">conf</span>
+    <span class="nl">checksum:</span> <span class="n">md5</span><span class="o">:</span><span class="mi">66</span><span class="n">dffb5228a211e61d6d7ef4a86f5758</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Download</span> <span class="n">file</span> <span class="n">from</span> <span class="n">a</span> <span class="n">file</span> <span class="n">path</span>
+  <span class="nl">get_url:</span>
+    <span class="nl">url:</span> <span class="n">file</span><span class="o">:</span><span class="c1">///tmp/afile.txt</span>
+    <span class="nl">dest:</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">afilecopy</span><span class="p">.</span><span class="n">txt</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-11 10:06:50</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
