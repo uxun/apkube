@@ -1,0 +1,552 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>OpenVPN - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#../../../Dropbox/wiki/net">../../../Dropbox/wiki/net</a>
+    &nbsp;&#187;&nbsp;OpenVPN
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="openvpn">OpenVPN</h2>
+<h3 id="1install">1.Install</h3>
+<p><a href="https://community.openvpn.net/openvpn">wiki</a></p>
+<div class="hlcode"><pre><span class="cp"># 1.Enable epel repository</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">epel</span><span class="o">-</span><span class="n">release</span>
+
+<span class="cp"># 2.yum install</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">openvpn</span> <span class="n">easy</span><span class="o">-</span><span class="n">rsa</span> <span class="n">iptables</span><span class="o">-</span><span class="n">services</span>
+</pre></div>
+
+
+<h3 id="2generate-openvpn-key-and-certificates">2.Generate OpenVPN key and certificates</h3>
+<div class="hlcode"><pre><span class="cp"># 1.创建密钥和key文件夹</span>
+<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">keys</span> <span class="o">&amp;&amp;</span> <span class="n">cp</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="mf">3.0</span><span class="o">/*</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span> <span class="o">&amp;&amp;</span> <span class="n">cp</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">openssl</span><span class="o">-</span><span class="mf">1.0</span><span class="p">.</span><span class="n">cnf</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">openssl</span><span class="p">.</span><span class="n">cnf</span>
+
+<span class="cp"># 2.create info </span>
+<span class="n">cp</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">doc</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">-</span><span class="mf">3.0.3</span><span class="o">/</span><span class="n">vars</span><span class="p">.</span><span class="n">example</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">vars</span>
+
+<span class="cp"># 3.add </span>
+<span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">vars</span>
+<span class="n">set_var</span> <span class="n">EASYRSA_REQ_COUNTRY</span>     <span class="s">&quot;CN&quot;</span>
+<span class="n">set_var</span> <span class="n">EASYRSA_REQ_PROVINCE</span>    <span class="s">&quot;GD&quot;</span>
+<span class="n">set_var</span> <span class="n">EASYRSA_REQ_CITY</span>        <span class="s">&quot;Shenzhen&quot;</span>
+<span class="n">set_var</span> <span class="n">EASYRSA_REQ_ORG</span>         <span class="s">&quot;Linux&quot;</span>
+<span class="n">set_var</span> <span class="n">EASYRSA_REQ_EMAIL</span>       <span class="s">&quot;Name@gmail.com&quot;</span>
+<span class="n">set_var</span> <span class="n">EASYRSA_REQ_OU</span>          <span class="s">&quot;ops&quot;</span>
+
+<span class="cp"># 4.chmod +x vars</span>
+</pre></div>
+
+
+<h3 id="initialization-and-build-ca">Initialization and Build CA</h3>
+<div class="hlcode"><pre><span class="cp"># 1.cd /etc/openvpn/easy-rsa</span>
+<span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">init</span><span class="o">-</span><span class="n">pki</span>
+<span class="nl">Note:</span> <span class="n">using</span> <span class="n">Easy</span><span class="o">-</span><span class="n">RSA</span> <span class="n">configuration</span> <span class="n">from</span><span class="o">:</span> <span class="p">.</span><span class="o">/</span><span class="n">vars</span>
+
+<span class="n">init</span><span class="o">-</span><span class="n">pki</span> <span class="n">complete</span><span class="p">;</span> <span class="n">you</span> <span class="n">may</span> <span class="n">now</span> <span class="n">create</span> <span class="n">a</span> <span class="n">CA</span> <span class="n">or</span> <span class="n">requests</span><span class="p">.</span>
+<span class="n">Your</span> <span class="n">newly</span> <span class="n">created</span> <span class="n">PKI</span> <span class="n">dir</span> <span class="n">is</span><span class="o">:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">pki</span>
+
+<span class="cp"># 2.build-ca</span>
+<span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">build</span><span class="o">-</span><span class="n">ca</span>
+
+<span class="nl">Note:</span> <span class="n">using</span> <span class="n">Easy</span><span class="o">-</span><span class="n">RSA</span> <span class="n">configuration</span> <span class="n">from</span><span class="o">:</span> <span class="p">.</span><span class="o">/</span><span class="n">vars</span>
+<span class="n">Generating</span> <span class="n">a</span> <span class="mi">2048</span> <span class="n">bit</span> <span class="n">RSA</span> <span class="n">private</span> <span class="n">key</span>
+<span class="p">............................................................................................</span><span class="o">+++</span>
+<span class="p">......................................................</span><span class="o">+++</span>
+<span class="n">writing</span> <span class="n">new</span> <span class="n">private</span> <span class="n">key</span> <span class="n">to</span> <span class="err">&#39;</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">private</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">key</span><span class="p">.</span><span class="n">UxfI5jhUjf</span><span class="err">&#39;</span>
+<span class="n">Enter</span> <span class="n">PEM</span> <span class="n">pass</span> <span class="n">phrase</span><span class="o">:</span>
+<span class="n">Verifying</span> <span class="o">-</span> <span class="n">Enter</span> <span class="n">PEM</span> <span class="n">pass</span> <span class="n">phrase</span><span class="o">:</span>  <span class="err">#</span><span class="n">passwd</span>
+<span class="o">-----</span>
+<span class="n">You</span> <span class="n">are</span> <span class="n">about</span> <span class="n">to</span> <span class="n">be</span> <span class="n">asked</span> <span class="n">to</span> <span class="n">enter</span> <span class="n">information</span> <span class="n">that</span> <span class="n">will</span> <span class="n">be</span> <span class="n">incorporated</span>
+<span class="n">into</span> <span class="n">your</span> <span class="n">certificate</span> <span class="n">request</span><span class="p">.</span>
+<span class="n">What</span> <span class="n">you</span> <span class="n">are</span> <span class="n">about</span> <span class="n">to</span> <span class="n">enter</span> <span class="n">is</span> <span class="n">what</span> <span class="n">is</span> <span class="n">called</span> <span class="n">a</span> <span class="n">Distinguished</span> <span class="n">Name</span> <span class="n">or</span> <span class="n">a</span> <span class="n">DN</span><span class="p">.</span>
+<span class="n">There</span> <span class="n">are</span> <span class="n">quite</span> <span class="n">a</span> <span class="n">few</span> <span class="n">fields</span> <span class="n">but</span> <span class="n">you</span> <span class="n">can</span> <span class="n">leave</span> <span class="n">some</span> <span class="n">blank</span>
+<span class="n">For</span> <span class="n">some</span> <span class="n">fields</span> <span class="n">there</span> <span class="n">will</span> <span class="n">be</span> <span class="n">a</span> <span class="k">default</span> <span class="n">value</span><span class="p">,</span>
+<span class="n">If</span> <span class="n">you</span> <span class="n">enter</span> <span class="sc">&#39;.&#39;</span><span class="p">,</span> <span class="n">the</span> <span class="n">field</span> <span class="n">will</span> <span class="n">be</span> <span class="n">left</span> <span class="n">blank</span><span class="p">.</span>
+<span class="o">-----</span>
+<span class="n">Common</span> <span class="n">Name</span> <span class="p">(</span><span class="n">eg</span><span class="o">:</span> <span class="n">your</span> <span class="n">user</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">or</span> <span class="n">server</span> <span class="n">name</span><span class="p">)</span> <span class="p">[</span><span class="n">Easy</span><span class="o">-</span><span class="n">RSA</span> <span class="n">CA</span><span class="p">]</span><span class="o">:</span> <span class="err">#</span> <span class="n">k</span>
+
+<span class="n">CA</span> <span class="n">creation</span> <span class="n">complete</span> <span class="n">and</span> <span class="n">you</span> <span class="n">may</span> <span class="n">now</span> <span class="n">import</span> <span class="n">and</span> <span class="n">sign</span> <span class="n">cert</span> <span class="n">requests</span><span class="p">.</span>
+<span class="n">Your</span> <span class="n">new</span> <span class="n">CA</span> <span class="n">certificate</span> <span class="n">file</span> <span class="k">for</span> <span class="n">publishing</span> <span class="n">is</span> <span class="n">at</span><span class="o">:</span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span>
+</pre></div>
+
+
+<h3 id="build-server-key">Build Server Key</h3>
+<div class="hlcode"><pre><span class="cp"># 1.build server key</span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">gen</span><span class="o">-</span><span class="n">req</span> <span class="n">uxun</span><span class="o">-</span><span class="n">server</span> <span class="n">nopass</span>
+
+<span class="cp"># 2.build server crt</span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">sign</span><span class="o">-</span><span class="n">req</span> <span class="n">server</span> <span class="n">uxun</span><span class="o">-</span><span class="n">server</span>
+  <span class="n">Confirm</span> <span class="n">request</span> <span class="n">details</span><span class="o">:</span> <span class="n">yes</span>
+
+<span class="cp"># 3.validation</span>
+<span class="err">$</span> <span class="n">openssl</span> <span class="n">verify</span> <span class="o">-</span><span class="n">CAfile</span> <span class="n">pki</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span> <span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">uxun</span><span class="o">-</span><span class="n">server</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">uxun</span><span class="o">-</span><span class="n">server</span><span class="p">.</span><span class="n">crt</span><span class="o">:</span> <span class="n">OK</span>
+</pre></div>
+
+
+<h3 id="build-client-key">Build Client Key</h3>
+<div class="hlcode"><pre><span class="cp"># 1.Build key</span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">gen</span><span class="o">-</span><span class="n">req</span> <span class="n">client01</span> <span class="n">nopass</span>
+
+<span class="cp"># 2.Build CRT</span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">sign</span><span class="o">-</span><span class="n">req</span> <span class="n">client</span> <span class="n">client01</span>
+<span class="n">Type</span> <span class="n">the</span> <span class="n">word</span> <span class="err">&#39;</span><span class="n">yes</span><span class="err">&#39;</span> <span class="n">to</span> <span class="k">continue</span><span class="p">,</span> <span class="n">or</span> <span class="n">any</span> <span class="n">other</span> <span class="n">input</span> <span class="n">to</span> <span class="n">abort</span><span class="p">.</span>
+  <span class="n">Confirm</span> <span class="n">request</span> <span class="n">details</span><span class="o">:</span> <span class="n">yes</span>
+<span class="n">Using</span> <span class="n">configuration</span> <span class="n">from</span> <span class="p">.</span><span class="o">/</span><span class="n">openssl</span><span class="o">-</span><span class="mf">1.0</span><span class="p">.</span><span class="n">cnf</span>
+<span class="n">Enter</span> <span class="n">pass</span> <span class="n">phrase</span> <span class="k">for</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">easy</span><span class="o">-</span><span class="n">rsa</span><span class="o">/</span><span class="n">pki</span><span class="o">/</span><span class="n">private</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">key</span><span class="o">:</span> <span class="err">#</span> <span class="n">you</span> <span class="n">ca</span><span class="p">.</span><span class="n">key</span> <span class="n">password</span>
+
+<span class="cp"># 3.Build Diffie-Hellman Key</span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">gen</span><span class="o">-</span><span class="n">dh</span>
+
+<span class="cp"># 4.validation</span>
+<span class="err">$</span> <span class="n">openssl</span> <span class="n">verify</span> <span class="o">-</span><span class="n">CAfile</span> <span class="n">pki</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span> <span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">client01</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">client01</span><span class="p">.</span><span class="n">crt</span><span class="o">:</span> <span class="n">OK</span>
+</pre></div>
+
+
+<h3 id="optional">Optional</h3>
+<div class="hlcode"><pre><span class="cp"># 移除用户</span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">revoke</span> <span class="n">someone</span>
+
+<span class="cp"># Generate the CRL Key </span>
+<span class="p">.</span><span class="o">/</span><span class="n">easyrsa</span> <span class="n">gen</span><span class="o">-</span><span class="n">crl</span>
+</pre></div>
+
+
+<h3 id="3start">3.Start</h3>
+<div class="hlcode"><pre><span class="cp"># cd /etc/openvpn/easy-rsa</span>
+<span class="cp"># Server</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">hakase</span><span class="o">-</span><span class="n">server</span><span class="p">.</span><span class="n">crt</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">private</span><span class="o">/</span><span class="n">hakase</span><span class="o">-</span><span class="n">server</span><span class="p">.</span><span class="n">key</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span>
+
+<span class="cp"># Client</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">client</span><span class="o">/</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">client01</span><span class="p">.</span><span class="n">crt</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">client</span><span class="o">/</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">private</span><span class="o">/</span><span class="n">client01</span><span class="p">.</span><span class="n">key</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">client</span><span class="o">/</span>
+
+<span class="cp"># DH</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">dh</span><span class="p">.</span><span class="n">pem</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span>
+<span class="n">cp</span> <span class="n">pki</span><span class="o">/</span><span class="n">crl</span><span class="p">.</span><span class="n">pem</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span>
+</pre></div>
+
+
+<h3 id="4configure-openvpn">4.Configure OpenVPN</h3>
+<div class="hlcode"><pre><span class="cp"># configure OpenVPN</span>
+<span class="n">cp</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">doc</span><span class="o">/</span><span class="err">$</span><span class="p">(</span><span class="n">openvpn</span><span class="o">-</span><span class="n">version</span><span class="p">)</span><span class="o">/</span><span class="n">sample</span><span class="o">/</span><span class="n">sample</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">files</span><span class="o">/</span><span class="n">server</span><span class="p">.</span><span class="n">conf</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span>
+
+<span class="cp"># vim /etc/openvpn/server.conf 取消注释</span>
+<span class="cp"># OpenVPN Port, Protocol and the Tun</span>
+<span class="n">port</span> <span class="mi">1194</span>
+<span class="n">proto</span> <span class="n">udp</span>
+<span class="n">dev</span> <span class="n">tun</span>
+
+<span class="n">ca</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">cert</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span><span class="n">hakase</span><span class="o">-</span><span class="n">server</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">key</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span><span class="n">hakase</span><span class="o">-</span><span class="n">server</span><span class="p">.</span><span class="n">key</span>  <span class="err">#</span> <span class="n">This</span> <span class="n">file</span> <span class="n">should</span> <span class="n">be</span> <span class="n">kept</span> <span class="n">secret</span>
+
+<span class="cp">#DH and CRL key</span>
+<span class="n">dh</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="o">/</span><span class="n">dh</span><span class="p">.</span><span class="n">pem</span>
+<span class="cp">#crl-verify /etc/openvpn/server/crl.pem</span>
+
+<span class="n">push</span> <span class="s">&quot;redirect-gateway def1 bypass-dhcp&quot;</span>
+<span class="n">push</span> <span class="s">&quot;dhcp-option DNS 202.96.134.133&quot;</span>
+<span class="n">push</span> <span class="s">&quot;dhcp-option DNS 114.114.114.114&quot;</span>
+
+<span class="cp">#Enable multiple client to connect with same Certificate key</span>
+<span class="n">duplicate</span><span class="o">-</span><span class="n">cn</span>
+
+<span class="cp"># TLS Security</span>
+<span class="n">cipher</span> <span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CBC</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">version</span><span class="o">-</span><span class="n">min</span> <span class="mf">1.2</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">cipher</span> <span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">GCM</span><span class="o">-</span><span class="n">SHA384</span><span class="o">:</span><span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CBC</span><span class="o">-</span><span class="n">SHA256</span><span class="o">:</span><span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">128</span><span class="o">-</span><span class="n">GCM</span><span class="o">-</span><span class="n">SHA256</span><span class="o">:</span><span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">128</span><span class="o">-</span><span class="n">CBC</span><span class="o">-</span><span class="n">SHA256</span>
+<span class="n">auth</span> <span class="n">SHA512</span>
+<span class="n">auth</span><span class="o">-</span><span class="n">nocache</span>
+
+<span class="cp"># Other Configuration</span>
+<span class="n">keepalive</span> <span class="mi">20</span> <span class="mi">60</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">key</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">tun</span>
+
+<span class="cp"># 对于旧客户端的兼容压缩处理</span>
+<span class="n">comp</span><span class="o">-</span><span class="n">lzo</span> <span class="n">yes</span>
+<span class="n">daemon</span>
+<span class="n">user</span> <span class="n">nobody</span>
+<span class="n">group</span> <span class="n">nobody</span>
+
+<span class="cp"># OpenVPN Log</span>
+<span class="n">log</span><span class="o">-</span><span class="n">append</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">openvpn</span><span class="p">.</span><span class="n">log</span>
+<span class="n">verb</span> <span class="mi">3</span>
+</pre></div>
+
+
+<h3 id="5-stop-firewalld">5. Stop firewalld</h3>
+<div class="hlcode"><pre><span class="cp"># 启用端口转发</span>
+<span class="n">echo</span> <span class="err">&#39;</span><span class="n">net</span><span class="p">.</span><span class="n">ipv4</span><span class="p">.</span><span class="n">ip_forward</span> <span class="o">=</span> <span class="mi">1</span><span class="err">&#39;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysctl</span><span class="p">.</span><span class="n">conf</span>
+<span class="n">sysctl</span> <span class="o">-</span><span class="n">p</span>
+
+<span class="cp"># disable firewalld and selinux</span>
+<span class="n">systemctl</span> <span class="n">mask</span> <span class="n">firewalld</span>
+<span class="n">systemctl</span> <span class="n">stop</span> <span class="n">firewalld</span>
+
+<span class="cp"># configure routing adn iptables</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">iptables</span>
+<span class="n">systemctl</span> <span class="n">start</span> <span class="n">iptables</span>
+<span class="n">iptables</span> <span class="o">-</span><span class="n">F</span>
+
+<span class="cp"># Add iptables-rule to forward a routing to our openvpn subnet</span>
+<span class="cp"># iptables -t nat -A POSTROUTING -s 192.168.200.0/24 -o eth0 -j MASQUERADE</span>
+<span class="n">iptables</span> <span class="o">-</span><span class="n">t</span> <span class="n">nat</span> <span class="o">-</span><span class="n">A</span> <span class="n">POSTROUTING</span> <span class="o">-</span><span class="n">s</span> <span class="mf">10.8.0.0</span><span class="o">/</span><span class="mi">24</span> <span class="o">-</span><span class="n">o</span> <span class="n">eth0</span> <span class="o">-</span><span class="n">j</span> <span class="n">MASQUERADE</span>
+<span class="n">iptables</span> <span class="o">-</span><span class="n">t</span> <span class="n">nat</span> <span class="o">-</span><span class="n">A</span> <span class="n">POSTROUTING</span> <span class="o">-</span><span class="n">s</span> <span class="mf">10.8.0.0</span><span class="o">/</span><span class="mi">24</span> <span class="o">-</span><span class="n">j</span> <span class="n">MASQUERADE</span>
+<span class="n">iptables</span><span class="o">-</span><span class="n">save</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">sysconfig</span><span class="o">/</span><span class="n">iptablesvpn</span>
+
+<span class="cp"># start</span>
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">openvpn</span><span class="err">@</span><span class="n">server</span>
+</pre></div>
+
+
+<h3 id="6client">6.Client</h3>
+<div class="hlcode"><pre><span class="cp"># 1. cd /etc/openvpn/client &amp;&amp; vim client01.ovpn</span>
+<span class="n">client</span>
+<span class="n">dev</span> <span class="n">tun</span>
+<span class="n">proto</span> <span class="n">udp</span>
+
+<span class="n">remote</span> <span class="n">YOU_PUB_IP</span> <span class="mi">1194</span>
+
+<span class="n">ca</span> <span class="n">ca</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">cert</span> <span class="n">client01</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">key</span> <span class="n">client01</span><span class="p">.</span><span class="n">key</span>
+
+<span class="n">cipher</span> <span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CBC</span>
+<span class="n">auth</span> <span class="n">SHA512</span>
+<span class="n">auth</span><span class="o">-</span><span class="n">nocache</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">version</span><span class="o">-</span><span class="n">min</span> <span class="mf">1.2</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">cipher</span> <span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">GCM</span><span class="o">-</span><span class="n">SHA384</span><span class="o">:</span><span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CBC</span><span class="o">-</span><span class="n">SHA256</span><span class="o">:</span><span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">128</span><span class="o">-</span><span class="n">GCM</span><span class="o">-</span><span class="n">SHA256</span><span class="o">:</span><span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">128</span><span class="o">-</span><span class="n">CBC</span><span class="o">-</span><span class="n">SHA256</span>
+
+<span class="n">resolv</span><span class="o">-</span><span class="n">retry</span> <span class="n">infinite</span>
+<span class="n">compress</span> <span class="n">lzo</span>
+<span class="n">nobind</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">key</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">tun</span>
+<span class="n">mute</span><span class="o">-</span><span class="n">replay</span><span class="o">-</span><span class="n">warnings</span>
+<span class="n">verb</span> <span class="mi">3</span>
+
+<span class="cp"># key tar  </span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">czvf</span> <span class="n">client01</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span> <span class="n">client</span><span class="o">/*</span>
+</pre></div>
+
+
+<h3 id="duo-mfa">Duo MFA</h3>
+<blockquote>
+<p>Duo two-factor authentication for OpenVPN.</p>
+<p>https://duo.com/docs/openvpn</p>
+</blockquote>
+<p><strong>注意事项</strong></p>
+<div class="hlcode"><pre><span class="c"># 1.注册 Duo https://signup.duo.com/  用于admin登录控制面板 和 api接口的获取</span>
+<span class="c"># 2.key值获取 Dashboard -&gt; Applications -&gt; Protect an Application(OpenVPN)</span>
+<span class="c"># 3.新建用户 Dashboard &gt; Users &gt; lmb01(新建用户) &gt; Add Phones </span>
+</pre></div>
+
+
+<p><strong>install duo_openvpn</strong></p>
+<p>https://github.com/duosecurity/duo_openvpn/releases</p>
+<p><strong>Server端配置</strong></p>
+<div class="hlcode"><pre><span class="cp"># 1.download duo_openvpn</span>
+<span class="n">wget</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/duosecurity/duo_openvpn/archive/2.2.tar.gz</span>
+
+<span class="cp"># 2.install </span>
+<span class="err">$</span> <span class="n">tar</span> <span class="n">zxf</span> <span class="n">duosecurity</span><span class="o">-</span><span class="n">duo_openvpn</span><span class="o">-</span><span class="mf">2.2</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="err">$</span> <span class="n">cd</span> <span class="n">duosecurity</span><span class="o">-</span><span class="n">duo_openvpn</span><span class="o">-</span><span class="mf">2.2</span>
+<span class="err">$</span> <span class="n">make</span> <span class="o">&amp;&amp;</span> <span class="n">make</span> <span class="n">install</span>
+
+<span class="cp"># 3.configuration Server.conf</span>
+<span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">server</span><span class="p">.</span><span class="n">conf</span>
+
+<span class="cp"># 4.配置插件，登入获取key </span>
+<span class="cp"># e.g plugin /opt/duo/duo_openvpn.so &#39;IKEY SKEY HOST&#39;</span>
+<span class="n">plugin</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">duo</span><span class="o">/</span><span class="n">duo_openvpn</span><span class="p">.</span><span class="n">so</span> <span class="err">&#39;</span><span class="n">DIGTOUAO35Y7QIB41IYP</span> <span class="n">DmfFPvk7k9pyXc7zXYyKZqFtXQyCDOhtVDRsJUuI</span> <span class="n">api</span><span class="o">-</span><span class="mf">40250946.</span><span class="n">duosecurity</span><span class="p">.</span><span class="n">com</span><span class="err">&#39;</span>
+<span class="n">reneg</span><span class="o">-</span><span class="n">sec</span> <span class="mi">0</span>
+</pre></div>
+
+
+<p><strong>Client端配置</strong></p>
+<div class="hlcode"><pre><span class="cp"># 1.configuration config.ovpn</span>
+<span class="cp"># add</span>
+<span class="n">auth</span><span class="o">-</span><span class="n">user</span><span class="o">-</span><span class="n">pass</span>
+<span class="n">reneg</span><span class="o">-</span><span class="n">sec</span> <span class="mi">0</span>
+</pre></div>
+
+
+<h3 id="7extension">7.Extension</h3>
+<blockquote>
+<p>待完成测试</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># yum install firewalld</span>
+<span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">permanent</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">service</span><span class="o">=</span><span class="n">openvpn</span>
+<span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">permanent</span> <span class="o">--</span><span class="n">zone</span><span class="o">=</span><span class="n">trusted</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">interface</span><span class="o">=</span><span class="n">tun0</span>
+<span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">permanent</span> <span class="o">--</span><span class="n">zone</span><span class="o">=</span><span class="n">trusted</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">masquerade</span>
+
+<span class="n">SERVERIP</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">ip</span> <span class="n">route</span> <span class="n">get</span> <span class="mf">192.168.1.178</span> <span class="o">|</span> <span class="n">awk</span> <span class="err">&#39;</span><span class="n">NR</span><span class="o">==</span><span class="mi">1</span> <span class="p">{</span><span class="n">print</span> <span class="err">$</span><span class="p">(</span><span class="n">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">)}</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">permanent</span> <span class="o">--</span><span class="n">direct</span> <span class="o">--</span><span class="n">passthrough</span> <span class="n">ipv4</span> <span class="o">-</span><span class="n">t</span> <span class="n">nat</span> <span class="o">-</span><span class="n">A</span> <span class="n">POSTROUTING</span> <span class="o">-</span><span class="n">s</span>  <span class="mf">10.8.0.0</span><span class="o">/</span><span class="mi">24</span> <span class="o">-</span><span class="n">o</span> <span class="err">$</span><span class="n">SERVERIP</span> <span class="o">-</span><span class="n">j</span> <span class="n">MASQUERADE</span>
+
+<span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">reload</span>
+
+<span class="cp"># test</span>
+<span class="n">SERVERIP</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">ip</span> <span class="n">route</span> <span class="n">get</span> <span class="mf">192.168.1.178</span> <span class="o">|</span> <span class="n">awk</span> <span class="err">&#39;</span><span class="n">NR</span><span class="o">==</span><span class="mi">1</span> <span class="p">{</span><span class="n">print</span> <span class="err">$</span><span class="p">(</span><span class="n">NF</span><span class="o">-</span><span class="mi">2</span><span class="p">)}</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="n">firewall</span><span class="o">-</span><span class="n">cmd</span> <span class="o">--</span><span class="n">permanent</span> <span class="o">--</span><span class="n">direct</span> <span class="o">--</span><span class="n">passthrough</span> <span class="n">ipv4</span> <span class="o">-</span><span class="n">t</span> <span class="n">nat</span> <span class="o">-</span><span class="n">A</span> <span class="n">POSTROUTING</span> <span class="o">-</span><span class="n">s</span>  <span class="mf">192.168.4.0</span><span class="o">/</span><span class="mi">24</span> <span class="o">-</span><span class="n">o</span> <span class="err">$</span><span class="n">SERVERIP</span> <span class="o">-</span><span class="n">j</span> <span class="n">MASQUERADE</span>
+</pre></div>
+
+
+<h3 id="8refernece">8.Refernece</h3>
+<blockquote>
+<p>install ：https://www.quickservers.com/en/how-to-install-openvpn-on-centos.php</p>
+</blockquote>
+<h3 id="9google-authenticator-pam-module">9.Google Authenticator pam module</h3>
+<p><a href="https://velenux.wordpress.com/2019/03/12/openvpn-with-google-2-factor-authentication-on-centos-7/">REFERNECE</a></p>
+<blockquote>
+<p>创建密钥</p>
+</blockquote>
+<div class="hlcode"><pre><span class="c"># cd /etc/openvpn</span>
+<span class="c"># ./easy-rsa/easyrsa init-pki</span>
+<span class="c"># ./easy-rsa/easyrsa build-ca</span>
+<span class="c"># ./easy-rsa/easyrsa gen-dh &gt;/dev/null 2&gt;&amp;1 &amp;</span>
+<span class="c"># openvpn --genkey --secret pki/ta.key</span>
+<span class="c"># ./easy-rsa/easyrsa build-server-full lmb177 nopass</span>
+<span class="c"># ./easy-rsa/easyrsa gen-crl</span>
+</pre></div>
+
+
+<h3 id="91-install-pam-module">9.1 install pam module</h3>
+<blockquote>
+<p>编译安装google-authenticator-libpam</p>
+</blockquote>
+<div class="hlcode"><pre><span class="c"># LC_ALL=C yum -y groupinstall &quot;Development Tools&quot;</span>
+<span class="c"># yum -y install pam-devel</span>
+<span class="c"># mkdir /usr/src</span>
+<span class="c"># cd /usr/src</span>
+<span class="c"># git clone https://github.com/google/google-authenticator-libpam</span>
+<span class="c"># cd google-authenticator-libpam</span>
+<span class="c"># ./bootstrap.sh</span>
+<span class="c"># ./configure</span>
+<span class="c"># make &amp;&amp; make install</span>
+</pre></div>
+
+
+<h3 id="92-google-pam-configure">9.2 google pam configure</h3>
+<blockquote>
+<p>配置模块配置文件</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># vim /etc/pam.d/openvpn</span>
+<span class="cp"># google auth</span>
+<span class="n">auth</span>        <span class="n">required</span>    <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">security</span><span class="o">/</span><span class="n">pam_google_authenticator</span><span class="p">.</span><span class="n">so</span>  <span class="n">forward_pass</span>
+<span class="n">account</span>     <span class="n">required</span>    <span class="n">pam_nologin</span><span class="p">.</span><span class="n">so</span>
+<span class="n">account</span>     <span class="n">include</span>     <span class="n">system</span><span class="o">-</span><span class="n">auth</span> <span class="n">use_first_pass</span>
+<span class="n">password</span>    <span class="n">include</span>     <span class="n">system</span><span class="o">-</span><span class="n">auth</span>
+<span class="n">session</span>     <span class="n">include</span>     <span class="n">system</span><span class="o">-</span><span class="n">auth</span>
+</pre></div>
+
+
+<h3 id="93-openvpn-server-configuration">9.3 OpenVPN Server configuration</h3>
+<blockquote>
+<p>Server 端配置文件</p>
+</blockquote>
+<p>vim /etc/openvpn/server.conf</p>
+<div class="hlcode"><pre><span class="cp"># 2FA</span>
+<span class="n">plugin</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib64</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">plugins</span><span class="o">/</span><span class="n">openvpn</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">auth</span><span class="o">-</span><span class="n">pam</span><span class="p">.</span><span class="n">so</span> <span class="n">openvpn</span>
+
+<span class="cp"># tcp</span>
+<span class="n">port</span> <span class="mi">1194</span>
+<span class="n">proto</span> <span class="n">tcp</span>
+<span class="n">dev</span> <span class="n">tun</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">key</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">tun</span>
+<span class="n">keepalive</span> <span class="mi">10</span> <span class="mi">900</span>
+<span class="n">comp</span><span class="o">-</span><span class="n">lzo</span>
+<span class="n">reneg</span><span class="o">-</span><span class="n">sec</span> <span class="mi">10800</span>
+
+<span class="cp"># log</span>
+<span class="n">verb</span> <span class="mi">3</span>
+<span class="n">mute</span> <span class="mi">10</span>
+<span class="n">log</span><span class="o">-</span><span class="n">append</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">openvpn</span><span class="p">.</span><span class="n">log</span>
+<span class="n">status</span> <span class="n">openvpn</span><span class="o">-</span><span class="n">status</span><span class="p">.</span><span class="n">log</span>
+
+<span class="cp"># crypto</span>
+<span class="n">cipher</span> <span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CFB8</span>
+<span class="n">auth</span> <span class="n">SHA512</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">auth</span> <span class="n">pki</span><span class="o">/</span><span class="n">ta</span><span class="p">.</span><span class="n">key</span> <span class="mi">0</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">cipher</span> <span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CBC</span><span class="o">-</span><span class="n">SHA</span>
+
+<span class="cp"># certs</span>
+<span class="n">ca</span> <span class="n">pki</span><span class="o">/</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">cert</span> <span class="n">pki</span><span class="o">/</span><span class="n">issued</span><span class="o">/</span><span class="n">lmb177</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">key</span> <span class="n">pki</span><span class="o">/</span><span class="n">private</span><span class="o">/</span><span class="n">lmb177</span><span class="p">.</span><span class="n">key</span>
+<span class="n">dh</span> <span class="n">pki</span><span class="o">/</span><span class="n">dh</span><span class="p">.</span><span class="n">pem</span>
+<span class="n">crl</span><span class="o">-</span><span class="n">verify</span> <span class="n">pki</span><span class="o">/</span><span class="n">crl</span><span class="p">.</span><span class="n">pem</span>
+
+<span class="cp"># networking</span>
+<span class="n">server</span> <span class="mf">10.1.1.0</span> <span class="mf">255.255.255.0</span>
+<span class="n">push</span> <span class="s">&quot;route 192.168.0.0 255.255.255.0&quot;</span>
+<span class="n">push</span> <span class="s">&quot;route 172.20.10.0 255.255.255.0&quot;</span>
+<span class="n">push</span> <span class="s">&quot;redirect-gateway def1 bypass-dhcp&quot;</span>
+<span class="n">push</span> <span class="s">&quot;dhcp-option DNS 10.0.0.1&quot;</span>
+<span class="n">push</span> <span class="s">&quot;dhcp-option DNS 202.96.134.133&quot;</span>
+<span class="n">push</span> <span class="s">&quot;dhcp-option DNS 114.114.114.114&quot;</span>
+
+<span class="cp"># clients</span>
+<span class="n">ifconfig</span><span class="o">-</span><span class="n">pool</span><span class="o">-</span><span class="n">persist</span> <span class="n">ipp</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">client</span><span class="o">-</span><span class="n">config</span><span class="o">-</span><span class="n">dir</span> <span class="n">ccd</span>
+<span class="n">max</span><span class="o">-</span><span class="n">clients</span> <span class="mi">100</span>
+</pre></div>
+
+
+<h3 id="94-openvpn-client-configuration">9.4 OpenVPN Client configuration</h3>
+<blockquote>
+<p>1.Client 端模板</p>
+<p>2.通过脚本create_vpn_client.sh生成/etc/openvpn/clients/${CLIENT}/sshpass和authenticator_code</p>
+<p>3.登录密码sshpass + google pam num</p>
+</blockquote>
+<p>Client 模板 vim /etc/openvpn/template_client.conf</p>
+<div class="hlcode"><pre><span class="cp"># logging on separate file if required</span>
+<span class="cp"># log-append /var/log/openvpn-PLATFORM_NAME-CLIENT_NAME.log</span>
+<span class="n">client</span>
+
+<span class="cp"># vpn concentrator</span>
+<span class="n">remote</span> <span class="n">CONNECT_IP</span> <span class="mi">1194</span>
+
+<span class="cp"># certificates, with path relative to the config file</span>
+<span class="n">ca</span> <span class="n">PLATFORM_NAME</span><span class="p">.</span><span class="n">ca</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">cert</span> <span class="n">CLIENT_NAME</span><span class="p">.</span><span class="n">crt</span>
+<span class="n">key</span> <span class="n">CLIENT_NAME</span><span class="p">.</span><span class="n">key</span>
+<span class="n">auth</span><span class="o">-</span><span class="n">user</span><span class="o">-</span><span class="n">pass</span>
+<span class="n">auth</span><span class="o">-</span><span class="n">nocache</span>
+
+<span class="cp"># generic stuff</span>
+<span class="n">dev</span> <span class="n">tun</span>
+<span class="n">proto</span> <span class="n">tcp</span>
+<span class="n">nobind</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">key</span>
+<span class="n">persist</span><span class="o">-</span><span class="n">tun</span>
+<span class="n">nobind</span>
+<span class="n">comp</span><span class="o">-</span><span class="n">lzo</span>
+<span class="n">verb</span> <span class="mi">3</span>
+<span class="n">mute</span> <span class="mi">10</span>
+<span class="n">reneg</span><span class="o">-</span><span class="n">sec</span> <span class="mi">10800</span>
+
+<span class="cp"># crypto</span>
+<span class="n">cipher</span> <span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CFB8</span>
+<span class="n">tls</span><span class="o">-</span><span class="n">auth</span> <span class="n">PLATFORM_NAME</span><span class="p">.</span><span class="n">ta</span><span class="p">.</span><span class="n">key</span> <span class="mi">1</span> 
+<span class="n">tls</span><span class="o">-</span><span class="n">cipher</span> <span class="n">TLS</span><span class="o">-</span><span class="n">DHE</span><span class="o">-</span><span class="n">RSA</span><span class="o">-</span><span class="n">WITH</span><span class="o">-</span><span class="n">AES</span><span class="o">-</span><span class="mi">256</span><span class="o">-</span><span class="n">CBC</span><span class="o">-</span><span class="n">SHA</span>
+<span class="n">remote</span><span class="o">-</span><span class="n">cert</span><span class="o">-</span><span class="n">tls</span> <span class="n">server</span>
+<span class="n">auth</span> <span class="n">SHA512</span>
+<span class="n">script</span><span class="o">-</span><span class="n">security</span> <span class="mi">2</span>
+</pre></div>
+
+
+<h3 id="create-user-script">Create user script</h3>
+<blockquote>
+<p>配置文件修改项目</p>
+<p>1.修改VPN_SERVERIP<br />
+CONNECT_IP="192.168.1.177"</p>
+<p>2.修改创建SERVER端的ca<br />
+# ./easy-rsa/easyrsa build-server-full lmb177</p>
+<p>3.修改client端name <br />
+NAME_CLIENT="client0001"</p>
+</blockquote>
+<p>/etc/openvpn/create_vpn_client.sh</p>
+<div class="hlcode"><pre>CONNECT_IP=&quot;192.168.1.177&quot;
+SERVER_CA=&quot;lmb177&quot;
+NAME_CLIENT=&quot;client0001&quot;
+DIR_CLIENT=&quot;/etc/openvpn/clients/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>&quot;
+
+# create the certificate and key
+cd &quot;/etc/openvpn&quot;
+/etc/openvpn/easy-rsa/easyrsa build-client-full &quot;<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>&quot; nopass
+
+# create a directory to save all the files
+mkdir -p &quot;<span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>&quot;
+
+# copy certificate, key, tls auth and CA
+cp -v &quot;/etc/openvpn/pki/ca.crt&quot; &quot;<span class="nv">$DIR_CLIENT</span>/<span class="nv">$SERVER_CA.ca.crt</span>&quot;
+cp -v &quot;/etc/openvpn/pki/ta.key&quot; &quot;<span class="nv">$DIR_CLIENT</span>/<span class="nv">$SERVER_CA.ta.key</span>&quot;
+cp -v &quot;/etc/openvpn/pki/issued/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>.crt&quot; &quot;<span class="nv">$DIR_CLIENT</span>/&quot;
+cp -v &quot;/etc/openvpn/pki/private/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>.key&quot; &quot;<span class="nv">$DIR_CLIENT</span>/&quot;
+
+# copy and customize the client configuration
+cp -v &quot;/etc/openvpn/template_client.conf&quot; &quot;<span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>.ovpn&quot;
+sed -i &quot;s#CLIENT_NAME#<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>#g&quot; &quot;<span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>.ovpn&quot;
+sed -i &quot;s#PLATFORM_NAME#<span class="cp">${</span><span class="n">SERVER_CA</span><span class="cp">}</span>#g&quot; &quot;<span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>.ovpn&quot;
+sed -i &quot;s#CONNECT_IP#<span class="cp">${</span><span class="n">CONNECT_IP</span><span class="cp">}</span>#g&quot; &quot;<span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>/<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>.ovpn&quot;
+
+# create a new local user
+PASS=$(head -n 4096 /dev/urandom | tr -dc a-zA-Z0-9 | cut -b 1-20)
+useradd -m &quot;<span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>&quot;
+echo &quot;<span class="nv">$PASS</span>&quot; | passwd --stdin <span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span>
+echo &quot;<span class="nv">$PASS</span>&quot; &gt; <span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>/sshpass.txt
+
+# run the google authenticator as the local user and save the code
+su <span class="cp">${</span><span class="n">NAME_CLIENT</span><span class="cp">}</span> -c &quot;/usr/local/bin/google-authenticator -C -t -f -D -r 3 -Q UTF8 -R 30 -w3&quot; &gt; <span class="cp">${</span><span class="n">DIR_CLIENT</span><span class="cp">}</span>/authenticator_code.txt
+</pre></div>
+
+
+<h3 id="test">Test</h3>
+<blockquote>
+<p>其他机器测试</p>
+<p>Server端nat配置规则</p>
+<p>iptables -t nat -A POSTROUTING -s 10.1.1.0/24 -j MASQUERADE</p>
+<p>systemctl start openvpn@server</p>
+</blockquote>
+<div class="hlcode"><pre><span class="n">cd</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">openvpn</span><span class="o">/</span><span class="n">clients</span><span class="o">/</span><span class="n">client0002</span> 
+<span class="n">openvpn</span> <span class="o">--</span><span class="n">config</span> <span class="n">client0002</span><span class="p">.</span><span class="n">ovpn</span>
+
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">alpha</span><span class="o">-</span><span class="n">vpn</span><span class="o">-</span><span class="n">google</span><span class="o">-</span><span class="mi">177</span> <span class="n">client0002</span><span class="p">]</span><span class="err">#</span> <span class="n">openvpn</span> <span class="o">--</span><span class="n">config</span> <span class="n">client0002</span><span class="p">.</span><span class="n">ovpn</span>
+<span class="n">Fri</span> <span class="n">Jun</span> <span class="mi">21</span> <span class="mi">17</span><span class="o">:</span><span class="mi">22</span><span class="o">:</span><span class="mi">17</span> <span class="mi">2019</span> <span class="n">OpenVPN</span> <span class="mf">2.4.7</span> <span class="n">x86_64</span><span class="o">-</span><span class="n">redhat</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">gnu</span> <span class="p">[</span><span class="n">Fedora</span> <span class="n">EPEL</span> <span class="n">patched</span><span class="p">]</span> <span class="p">[</span><span class="n">SSL</span> <span class="p">(</span><span class="n">OpenSSL</span><span class="p">)]</span> <span class="p">[</span><span class="n">LZO</span><span class="p">]</span> <span class="p">[</span><span class="n">LZ4</span><span class="p">]</span> <span class="p">[</span><span class="n">EPOLL</span><span class="p">]</span> <span class="p">[</span><span class="n">PKCS11</span><span class="p">]</span> <span class="p">[</span><span class="n">MH</span><span class="o">/</span><span class="n">PKTINFO</span><span class="p">]</span> <span class="p">[</span><span class="n">AEAD</span><span class="p">]</span> <span class="n">built</span> <span class="n">on</span> <span class="n">Feb</span> <span class="mi">20</span> <span class="mi">2019</span>
+<span class="n">Fri</span> <span class="n">Jun</span> <span class="mi">21</span> <span class="mi">17</span><span class="o">:</span><span class="mi">22</span><span class="o">:</span><span class="mi">17</span> <span class="mi">2019</span> <span class="n">library</span> <span class="n">versions</span><span class="o">:</span> <span class="n">OpenSSL</span> <span class="mf">1.0.2</span><span class="n">k</span><span class="o">-</span><span class="n">fips</span>  <span class="mi">26</span> <span class="n">Jan</span> <span class="mi">2017</span><span class="p">,</span> <span class="n">LZO</span> <span class="mf">2.06</span>
+<span class="n">Enter</span> <span class="n">Auth</span> <span class="n">Username</span><span class="o">:</span> <span class="n">client002</span>
+<span class="n">Enter</span> <span class="n">Auth</span> <span class="n">Password</span><span class="o">:</span> <span class="n">sshpass</span><span class="o">+</span><span class="n">google</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-13 17:35:04</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
