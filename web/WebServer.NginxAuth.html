@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>WebAuth - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#web">web</a>
+    &nbsp;&#187;&nbsp;WebAuth
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="web-authentication">Web Authentication</h2>
+<p><strong>1.password tools</strong></p>
+<div class="hlcode"><pre><span class="n">yum</span> <span class="n">install</span> <span class="n">httpd</span><span class="o">-</span><span class="n">tools</span>               <span class="err">#适用</span><span class="n">centos</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">apache2</span><span class="o">-</span><span class="n">utils</span>    <span class="err">#适用</span><span class="n">ubuntu</span>
+</pre></div>
+
+
+<p><strong>2.生成用户和密码</strong></p>
+<div class="hlcode"><pre><span class="cp"># user </span>
+<span class="err">$</span> <span class="n">htpasswd</span> <span class="o">-</span><span class="n">c</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">htpasswd</span><span class="p">.</span><span class="n">users</span> <span class="n">sammy</span>
+<span class="err">$</span> <span class="n">htpasswd</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">htpasswd</span><span class="p">.</span><span class="n">users</span> <span class="n">another_user</span>
+
+<span class="cp"># modify password</span>
+<span class="err">$</span> <span class="n">htpasswd</span> <span class="o">-</span><span class="n">b</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">htpasswd</span><span class="p">.</span><span class="n">users</span> <span class="n">kibana</span> <span class="s">&quot;69WshXsGZcLWEDopj?mg&quot;</span>
+
+<span class="cp"># new user</span>
+<span class="err">$</span> <span class="n">htpasswd</span> <span class="o">-</span><span class="n">bc</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">htpasswd</span><span class="p">.</span><span class="n">users</span> <span class="n">kibana</span> <span class="s">&quot;69WshXsGZcLWEDopj?mg&quot;</span>
+
+<span class="cp"># Del user</span>
+<span class="err">$</span> <span class="n">htpasswd</span> <span class="o">-</span><span class="n">D</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">htpasswd</span><span class="p">.</span><span class="n">users</span> <span class="n">kibana</span>
+</pre></div>
+
+
+<p><strong>3.Nginx basic_auth</strong></p>
+<div class="hlcode"><pre><span class="n">server</span> <span class="p">{</span>
+    <span class="n">listen</span> <span class="mi">80</span><span class="p">;</span>
+
+    <span class="n">server_name</span> <span class="n">logstash</span><span class="p">.</span><span class="n">uxun</span><span class="p">.</span><span class="n">com</span><span class="p">;</span>
+
+    <span class="n">auth_basic</span> <span class="s">&quot;Restricted Access&quot;</span><span class="p">;</span>
+    <span class="n">auth_basic_user_file</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">htpasswd</span><span class="p">.</span><span class="n">users</span><span class="p">;</span>
+
+    <span class="n">allow</span> <span class="mf">2.2.2.2</span><span class="o">/</span><span class="mi">32</span><span class="p">;</span>
+<span class="cp">#    deny all;</span>
+
+    <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>
+        <span class="n">proxy_pass</span> <span class="n">http</span><span class="o">:</span><span class="c1">//192.168.1.240:5601;</span>
+        <span class="n">proxy_http_version</span> <span class="mf">1.1</span><span class="p">;</span>
+        <span class="n">proxy_set_header</span> <span class="n">Upgrade</span> <span class="err">$</span><span class="n">http_upgrade</span><span class="p">;</span>
+        <span class="n">proxy_set_header</span> <span class="n">Connection</span> <span class="err">&#39;</span><span class="n">upgrade</span><span class="err">&#39;</span><span class="p">;</span>
+        <span class="n">proxy_set_header</span> <span class="n">Host</span> <span class="err">$</span><span class="n">host</span><span class="p">;</span>
+        <span class="n">proxy_cache_bypass</span> <span class="err">$</span><span class="n">http_upgrade</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><a href="https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/">REFERNECE</a></p>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-17 21:39:17</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
