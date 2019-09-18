@@ -23,7 +23,7 @@
     <a href="/wiki/#ops">ops</a>
     &nbsp;&#187;&nbsp;ApbModules
     <span class="updated">Page Updated&nbsp;
-    2019-08-21 13:00
+    
     </span>
   </div>
 </div>
@@ -49,7 +49,7 @@
 </tr>
 <tr>
 <td><strong>get_url</strong></td>
-<td></td>
+<td><strong>include_vars</strong></td>
 <td></td>
 <td></td>
 </tr>
@@ -334,6 +334,54 @@
     <span class="nl">url:</span> <span class="n">file</span><span class="o">:</span><span class="c1">///tmp/afile.txt</span>
     <span class="nl">dest:</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">afilecopy</span><span class="p">.</span><span class="n">txt</span>
 </pre></div>
+
+
+<h3 id="include_vars">include_vars</h3>
+<blockquote>
+<p>动态获取最新变量文件内容</p>
+<p>file: 加载变量文件</p>
+<p>dir: 加载所有目录下的变量文件 </p>
+<p>version &gt;2.4 的ansible: include_vars的返回值为ansible_included_var_files</p>
+</blockquote>
+<div class="hlcode"><pre><span class="gd">--- </span>
+<span class="gd">- hosts: one</span>
+  remote_user: root
+  gather_facts: no
+<span class="gd">- name: Load a variable file based on the OS type, or a default if not found. Using free-form to specify the file.</span>
+  include_vars: &quot;{{ item }}&quot;
+  with_first_found:
+    - &quot;{{ ansible_distribution }}.yaml&quot;
+    - &quot;{{ ansible_os_family }}.yaml&quot;
+    - default.yaml
+
+# 变量赋值
+tasks:
+<span class="gd">- include_vars:</span>
+   file: /data/testfile
+   name: test_var
+<span class="gd">- debug:</span>
+   msg: &quot;{{test_var.testfile}}&quot;
+
+# extensions 参数为一个列表满足为true
+tasks:
+<span class="gd">- include_vars:</span>
+   dir: /data/test/
+   depth: 1 # 递归的文件夹test/{a,b} 1表示,a,b文件夹下的不会加载，默认0，表示所有
+   extensions: [file,conf,yml,json]
+   files_matching: &quot;^http*&quot;  # 正则匹配http开头的变量文件
+   ignore_files: [&quot;^tcp*&quot;,hello.yml] # 不匹配哪些变量文件
+   name: testdir_var
+<span class="gd">- debug:</span>
+   msg: &quot;{{testdir_var}}&quot;
+
+# version &gt;2.4 的ansible: include_vars的返回值为ansible_included_var_files
+tasks:
+<span class="gd">- include_vars:</span>
+   dir: /data/testfile
+  register: file_var
+<span class="gd">- debug:</span>
+   msg: &quot;{{file_var.ansible_included_var_files}}&quot;
+</pre></div>
   
 </div>
     </div>
@@ -346,7 +394,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-09-17 21:39:17</p>
+        <p>Page Updated 2019-09-18 22:14:15</p>
       </div> <!-- end footer-right -->
     </div>
 
