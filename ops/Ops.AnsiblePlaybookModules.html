@@ -29,7 +29,7 @@
 </div>
 <div class="clearfix"></div>
 <div id="content">
-  <h1 id="playbook">Playbook</h1>
+  <h1 id="ansible-playbook-modules">Ansible Playbook Modules</h1>
 <h3 id="list">list</h3>
 <table>
 <thead>
@@ -50,8 +50,8 @@
 <tr>
 <td><strong>get_url</strong></td>
 <td><strong>include_vars</strong></td>
-<td></td>
-<td></td>
+<td><strong>include</strong> |<strong>include_tasks</strong></td>
+<td><strong>import_tasks</strong></td>
 </tr>
 </tbody>
 </table>
@@ -382,6 +382,94 @@ tasks:
 <span class="gd">- debug:</span>
    msg: &quot;{{file_var.ansible_included_var_files}}&quot;
 </pre></div>
+
+
+<h3 id="include">include</h3>
+<blockquote>
+<p>将被include_tasks 替代</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 引用其他任务模块</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">include</span><span class="o">:</span> <span class="n">test</span><span class="p">.</span><span class="n">yml</span>
+
+<span class="cp"># tag 参数将执行t2 test1.yml</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">playbook</span> <span class="o">--</span><span class="n">tags</span><span class="o">=</span><span class="n">t2</span> <span class="n">testfile</span><span class="p">.</span><span class="n">yml</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">include</span><span class="o">:</span> <span class="n">test</span><span class="p">.</span><span class="n">yml</span>
+    <span class="nl">tags:</span> <span class="n">t1</span>
+  <span class="o">-</span> <span class="n">include</span><span class="o">:</span> <span class="n">test1</span><span class="p">.</span><span class="n">yml</span>
+    <span class="nl">tags:</span> <span class="n">t2</span>
+</pre></div>
+
+
+<h3 id="include_tasks">include_tasks</h3>
+<blockquote>
+<p>ansible version &gt; 2.7 include_tasks 模块添加了file参数和apply参数</p>
+<p>include_tasks 中的tags 只对任务本身</p>
+<p>动态：运行时候展开(实时处理)，可以使用任何变量替换。</p>
+<p>使用when 关键字时候，只对include_tasks任务做判断，包含任务不做判断处理</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># ansible-playbook loop1.yml --tags t0</span>
+<span class="cp"># loop1.yml</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+      <span class="nl">msg:</span> <span class="s">&quot;test task1&quot;</span>
+  <span class="o">-</span> <span class="n">include_tasks</span><span class="o">:</span>
+      <span class="nl">file:</span> <span class="n">in</span><span class="p">.</span><span class="n">yml</span>
+    <span class="nl">tags:</span> <span class="n">t0</span>  <span class="err">#</span> <span class="err">只能执行</span><span class="n">include_tasks</span><span class="err">这个任务，无法执行</span><span class="n">in</span><span class="p">.</span><span class="n">yml</span><span class="err">中的任务</span>
+    
+<span class="cp"># 执行in.yml中的文件需要使用apply参数</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+      <span class="nl">msg:</span> <span class="s">&quot;test task1&quot;</span>
+  <span class="o">-</span> <span class="n">include_tasks</span><span class="o">:</span>
+      <span class="nl">file:</span> <span class="n">in</span><span class="p">.</span><span class="n">yml</span>
+      <span class="nl">apply:</span>
+       <span class="nl">tags:</span> <span class="n">t0</span>
+    <span class="nl">tags:</span> <span class="n">always</span>
+</pre></div>
+
+
+<h3 id="import_tasks">import_tasks</h3>
+<blockquote>
+<p>使用 <a href="https://docs.ansible.com/ansible/2.4/import_tasks_module.html#options">free-form</a> 方式引用</p>
+<p>静态：加载时展开(预处理)，不能使用动态的变量替换(变量要被定义在vars中，vars_files中)，不支持其他方式传入。</p>
+<p>使用when 关键字时候，when对应的条件会被include 的文件中的每一个任务，每个任务的将进行条件判断。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">all</span>
+  <span class="nl">tasks:</span>
+    <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+        <span class="nl">msg:</span> <span class="n">task1</span>
+
+    <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Include</span> <span class="n">task</span> <span class="n">list</span> <span class="n">in</span> <span class="n">play</span>
+      <span class="nl">import_tasks:</span> <span class="n">stuff</span><span class="p">.</span><span class="n">yaml</span>
+
+    <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+        <span class="nl">msg:</span> <span class="n">task10</span>
+
+  <span class="nl">hosts:</span> <span class="n">all</span>
+  <span class="nl">tasks:</span>
+    <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+        <span class="nl">msg:</span> <span class="n">task1</span>
+
+    <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">Apply</span> <span class="n">conditional</span> <span class="n">to</span> <span class="n">all</span> <span class="n">imported</span> <span class="n">tasks</span>
+      <span class="nl">import_tasks:</span> <span class="n">stuff</span><span class="p">.</span><span class="n">yaml</span>
+      <span class="nl">when:</span> <span class="n">hostvar</span> <span class="n">is</span> <span class="n">defined</span>
+</pre></div>
   
 </div>
     </div>
@@ -394,7 +482,7 @@ tasks:
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-09-18 22:14:15</p>
+        <p>Page Updated 2019-09-19 16:47:12</p>
       </div> <!-- end footer-right -->
     </div>
 

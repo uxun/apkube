@@ -52,7 +52,7 @@
 <tr>
 <td><strong>with_file</strong></td>
 <td><strong>with_fileglo</strong></td>
-<td></td>
+<td><strong>loop</strong></td>
 </tr>
 </tbody>
 </table>
@@ -180,6 +180,18 @@
 <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span> 
 <span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">ap</span><span class="o">-</span><span class="n">k8s</span><span class="o">-</span><span class="mi">116</span> <span class="o">~</span><span class="p">]</span><span class="err">#</span> <span class="n">ls</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span>
 <span class="mi">4</span><span class="o">/</span> <span class="mi">5</span><span class="o">/</span> <span class="mi">6</span><span class="o">/</span>
+
+<span class="cp"># use loop </span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">vars:</span>
+   <span class="nl">dir1:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+   <span class="nl">dir2:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{item.0}}--{{item.1}}&quot;</span>
+    <span class="nl">loop:</span> <span class="s">&quot;{{dir1 | product(dir2)| list}}&quot;</span>
 </pre></div>
 
 
@@ -214,6 +226,15 @@
     <span class="nl">with_sequence:</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span> <span class="n">end</span><span class="o">=</span><span class="mi">3</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span>
     <span class="err">#</span> <span class="n">with_sequence</span><span class="o">:</span> <span class="n">count</span><span class="o">=</span><span class="mi">3</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;number is %0.2f&quot;</span> <span class="o">%</span><span class="mf">0.2f</span><span class="o">:</span><span class="err">保留两位小数点的浮点数</span>
     <span class="err">#</span> <span class="n">with_sequence</span><span class="o">:</span> <span class="n">start</span><span class="o">=</span><span class="mi">6</span> <span class="n">end</span><span class="o">=</span><span class="mi">2</span> <span class="n">stride</span><span class="o">=-</span><span class="mi">2</span> <span class="err">数字</span><span class="mi">6</span><span class="err">开始，每次递减</span><span class="mi">2</span><span class="err">，到</span><span class="mi">2</span><span class="err">结束</span>
+
+<span class="cp"># loop </span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{item}}&quot;</span>
+    <span class="nl">loop:</span> <span class="s">&quot;{{range(0,10,2)|list}}&quot;</span>
 </pre></div>
 
 
@@ -228,6 +249,16 @@
   <span class="o">-</span> <span class="mi">1</span>
   <span class="o">-</span> <span class="mi">2</span>
   <span class="o">-</span> <span class="mi">3</span>
+
+<span class="cp"># use loop</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">vars:</span>
+   <span class="nl">file1:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{file1|random}}&quot;</span>
 </pre></div>
 
 
@@ -254,6 +285,26 @@
      <span class="nl">msg:</span> <span class="s">&quot;{{item}}&quot;</span>
     <span class="nl">with_dict:</span> <span class="s">&quot;{{users}}&quot;</span>
     <span class="err">#</span> <span class="n">msg</span><span class="o">:</span> <span class="s">&quot;User {{item.key}} is {{item.value.name}},Gender: {{item.value.gender}},Tel:{{item.value.telephone}}&quot;</span>
+
+<span class="cp"># use loop</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">vars:</span>
+   <span class="nl">tests:</span>
+    <span class="nl">d:</span> <span class="n">no</span>
+    <span class="nl">f:</span> <span class="n">done</span>
+    <span class="nl">a:</span> <span class="n">hello</span>
+    <span class="nl">b:</span> <span class="n">world</span>
+    <span class="nl">e:</span> <span class="mi">666</span>
+    <span class="nl">z:</span> <span class="n">test</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{item.key}}--{{item.value}}&quot;</span>
+    <span class="nl">loop:</span> <span class="s">&quot;{{tests | dict2items}}&quot;</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{item.0}}--{{item.1}}&quot;</span>
+    <span class="nl">loop:</span> <span class="s">&quot;{{tests | dictsort}}&quot;</span>
 </pre></div>
 
 
@@ -288,6 +339,169 @@
     <span class="nl">with_fileglob:</span>
     <span class="o">-</span> <span class="o">/</span><span class="n">data</span><span class="o">/*</span>
 </pre></div>
+
+
+<h3 id="loop">loop</h3>
+<blockquote>
+<p>lookup('插件名',数据)</p>
+</blockquote>
+<p>[official] ansible &gt; 2.6 推荐 loop + filter 方式操作循环</p>
+<p>与with_indexed_items处理结果一样</p>
+<div class="hlcode"><pre><span class="cp"># 用lookup插件处理列表</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span> 
+     <span class="n">msg</span><span class="o">:</span> <span class="s">&quot;index is {{item.0}}, value is {{item.1}}&quot;</span>
+    <span class="nl">loop:</span> <span class="s">&quot;{{lookup(&#39;indexed_items&#39;,[&#39;a&#39;,&#39;b&#39;,&#39;c&#39;])}}&quot;</span>
+</pre></div>
+
+
+<p>插件使用</p>
+<div class="hlcode"><pre><span class="cp"># 可用插件</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">doc</span> <span class="o">-</span><span class="n">t</span> <span class="n">lookup</span> <span class="o">-</span><span class="n">l</span>
+
+<span class="cp"># 详细用法</span>
+<span class="n">ansible</span><span class="o">-</span><span class="n">doc</span> <span class="o">-</span><span class="n">t</span> <span class="n">lookup</span> <span class="n">dict</span>
+</pre></div>
+
+
+<p><strong>e.g</strong></p>
+<div class="hlcode"><pre><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">debug</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">msg</span><span class="p-Indicator">:</span> <span class="s">&quot;{{lookup(&#39;file&#39;,&#39;/data/testfiel&#39;,errors=&#39;ignore&#39;)}}&quot;</span>
+</pre></div>
+
+
+<p><strong>json_query</strong></p>
+<div class="hlcode"><pre><span class="cp"># https:</span><span class="c1">//docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#json-query-filter</span>
+
+<span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="s">&quot;Display all cluster names&quot;</span>
+  <span class="nl">debug:</span>
+    <span class="nl">var:</span> <span class="n">item</span>
+  <span class="nl">loop:</span> <span class="s">&quot;{{ domain_definition | json_query(&#39;domain.cluster[*].name&#39;) }}&quot;</span>
+</pre></div>
+
+
+<h3 id="loop_control"><strong>loop_control</strong></h3>
+<blockquote>
+<p>控制循环的行为</p>
+</blockquote>
+<p><strong>pause</strong></p>
+<div class="hlcode"><pre><span class="cp"># 控制每次循环后的暂停时间</span>
+<span class="o">---</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span> 
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{itme}}&quot;</span>
+    <span class="nl">loop:</span>
+    <span class="o">-</span> <span class="mi">1</span>
+    <span class="o">-</span> <span class="mi">2</span>
+    <span class="o">-</span> <span class="mi">3</span>
+    <span class="nl">loop_control:</span>
+     <span class="nl">pause:</span> <span class="mi">10</span>
+</pre></div>
+
+
+<p><strong>label</strong></p>
+<div class="hlcode"><pre><span class="cp"># 简化只需要的输出</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">vars:</span>
+   <span class="nl">tests:</span>
+    <span class="nl">d:</span> <span class="n">no</span>
+    <span class="nl">f:</span> <span class="n">done</span>
+    <span class="nl">a:</span> <span class="n">hello</span>
+    <span class="nl">b:</span> <span class="n">world</span>
+    <span class="nl">e:</span> <span class="mi">666</span>
+    <span class="nl">z:</span> <span class="n">test</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+     <span class="nl">msg:</span> <span class="s">&quot;{{item.key}}--{{item.value}}&quot;</span>
+    <span class="nl">loop:</span> <span class="s">&quot;{{tests | dict2items}}&quot;</span>
+    <span class="nl">loop_control:</span>
+     <span class="nl">label:</span> <span class="s">&quot;{{item.key}}&quot;</span>
+
+<span class="n">TASK</span> <span class="p">[</span><span class="n">debug</span><span class="p">]</span> <span class="o">**************************************************************************************************</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;a--hello&quot;</span>
+<span class="p">}</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;b--world&quot;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><strong>loop_var</strong></p>
+<blockquote>
+<p>循环嵌套</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># main.yml</span>
+<span class="o">-</span> <span class="n">hosts</span><span class="o">:</span> <span class="n">one</span>
+  <span class="nl">remote_user:</span> <span class="n">root</span>
+  <span class="nl">gather_facts:</span> <span class="n">no</span>
+  <span class="nl">tasks:</span>
+  <span class="o">-</span> <span class="n">include_tasks</span><span class="o">:</span> <span class="n">inner</span><span class="p">.</span><span class="n">yml</span>
+    <span class="nl">loop:</span>
+     <span class="o">-</span> <span class="mi">1</span>
+     <span class="o">-</span> <span class="mi">2</span>
+     <span class="o">-</span> <span class="mi">3</span>
+    <span class="nl">loop_control:</span>
+     <span class="nl">loop_var:</span> <span class="n">outer_item</span>
+
+<span class="cp"># inner.yml</span>
+<span class="o">-</span> <span class="n">debug</span><span class="o">:</span>
+    <span class="nl">msg:</span> <span class="s">&quot;outer item={{ outer_item }} inner item={{ item }}&quot;</span>
+  <span class="nl">loop:</span>
+    <span class="o">-</span> <span class="n">a</span>
+    <span class="o">-</span> <span class="n">b</span>
+    <span class="o">-</span> <span class="n">c</span>
+
+<span class="n">TASK</span> <span class="p">[</span><span class="n">include_tasks</span><span class="p">]</span> <span class="o">******************************************************************************************</span>
+<span class="nl">included:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">inner</span><span class="p">.</span><span class="n">yml</span> <span class="k">for</span> <span class="mf">192.168.0.23</span>
+<span class="nl">included:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">inner</span><span class="p">.</span><span class="n">yml</span> <span class="k">for</span> <span class="mf">192.168.0.23</span>
+<span class="nl">included:</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">ansible</span><span class="o">/</span><span class="n">inner</span><span class="p">.</span><span class="n">yml</span> <span class="k">for</span> <span class="mf">192.168.0.23</span>
+
+<span class="n">TASK</span> <span class="p">[</span><span class="n">debug</span><span class="p">]</span> <span class="o">**************************************************************************************************</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;outer item=1 inner item=a&quot;</span>
+<span class="p">}</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;outer item=1 inner item=b&quot;</span>
+<span class="p">}</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">c</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;outer item=1 inner item=c&quot;</span>
+<span class="p">}</span>
+
+<span class="n">TASK</span> <span class="p">[</span><span class="n">debug</span><span class="p">]</span> <span class="o">**************************************************************************************************</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;outer item=2 inner item=a&quot;</span>
+<span class="p">}</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;outer item=2 inner item=b&quot;</span>
+<span class="p">}</span>
+<span class="nl">ok:</span> <span class="p">[</span><span class="mf">192.168.0.23</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">c</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="s">&quot;msg&quot;</span><span class="o">:</span> <span class="s">&quot;outer item=2 inner item=c&quot;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><strong>内置特殊变量</strong></p>
+<div class="hlcode"><pre><span class="n">loop</span><span class="p">.</span><span class="n">index</span>   <span class="err">当前循环操作为整个循环的第几次循环，序号从</span><span class="mi">1</span><span class="err">开始</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">index0</span>   <span class="err">当前循环操作为整个循环的第几次循环，序号从</span><span class="mi">0</span><span class="err">开始</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">revindex</span>  <span class="err">当前循环操作距离整个循环结束还有几次，序号到</span><span class="mi">1</span><span class="err">结束</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">revindex0</span> <span class="err">当前循环操作距离整个循环结束还有几次，序号到</span><span class="mi">0</span><span class="err">结束</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">first</span>    <span class="err">当操作可迭代对象中的第一个元素时，此变量的值为</span><span class="nb">true</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">last</span>    <span class="err">当操作可迭代对象中的最后一个元素时，此变量的值为</span><span class="nb">true</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">length</span>   <span class="err">可迭代对象的长度</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">depth</span>   <span class="err">当使用递归的循环时，当前迭代所在的递归中的层级，层级序号从</span><span class="mi">1</span><span class="err">开始</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">depth0</span>   <span class="err">当使用递归的循环时，当前迭代所在的递归中的层级，层级序号从</span><span class="mi">0</span><span class="err">开始</span>
+<span class="n">loop</span><span class="p">.</span><span class="n">cycle</span><span class="p">()</span>  <span class="err">这是一个辅助函数，通过这个函数我们可以在指定的一些值中进行轮询取值，具体参考之后的示例</span>
+</pre></div>
   
 </div>
     </div>
@@ -300,7 +514,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-09-18 22:14:15</p>
+        <p>Page Updated 2019-09-19 16:47:12</p>
       </div> <!-- end footer-right -->
     </div>
 
