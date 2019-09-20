@@ -1,0 +1,545 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>ModSecurity - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#web">web</a>
+    &nbsp;&#187;&nbsp;ModSecurity
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="openresty-modsecurity">Openresty Modsecurity</h1>
+<p>ModSecurity是一个入侵侦测与防护引擎，它主要是用于Web应用程序，所以也被称为Web应用程序防火墙(WAF)。它可以作为Web服务器的模块或是单独的应用程序来运作。ModSecurity的功能是增强Web Application 的安全性和保护Web application以避免遭受来自已知与未知的攻击。</p>
+<h4 id="refernece">REFERNECE</h4>
+<p><a href="https://www.hi-linux.com/posts/45920.html">了解下</a></p>
+<p><a href="https://l0gs.xf0rk.space/2018/12/21/step-into-modsecurity/">WAF Concept</a></p>
+<p><a href="https://github.com/SpiderLabs/ModSecurity/tree/nginx_refactoring">ModSecurity</a> [official]</p>
+<h2 id="deploy">Deploy</h2>
+<h3 id="1update-depend">1.Update depend</h3>
+<div class="hlcode"><pre><span class="cp"># git version &gt;1.7.12</span>
+<span class="n">yum</span> <span class="n">remove</span> <span class="n">git</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">epel</span><span class="o">-</span><span class="n">release</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">https</span><span class="o">:</span><span class="c1">//centos6.iuscommunity.org/ius-release.rpm</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">git2u</span>
+<span class="cp"># Centos7---&gt; https:</span><span class="c1">//centos7.iuscommunity.org/ius-release.rpm </span>
+<span class="cp"># wget https:</span><span class="c1">//centos6.iuscommunity.org/ius-release.rpm </span>
+<span class="cp"># yum localinstall ius-release.rpm</span>
+</pre></div>
+
+
+<h3 id="2-modsecurity-lib">2.编译安装 Modsecurity Lib</h3>
+<blockquote>
+<p>编译通过ModSecurity-Nginx Connector加载的动态模块</p>
+</blockquote>
+<p><a href="https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-6x">REFERNECE</a></p>
+<p><strong>CentOS 6.5 </strong></p>
+<div class="hlcode"><pre><span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">wget</span> <span class="n">perl</span> <span class="n">cmake</span> <span class="n">libcxx</span>
+<span class="cp"># Add a newer version of GCC that can make c++-11</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">devtoolset</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">gcc</span><span class="o">-</span><span class="n">c</span><span class="o">++</span> <span class="n">devtoolset</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">binutils</span>
+<span class="n">PATH</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">rh</span><span class="o">/</span><span class="n">devtoolset</span><span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">:</span><span class="err">$</span><span class="n">PATH</span>
+<span class="cp"># scl enable devtoolset-2 bash</span>
+<span class="cp"># source /opt/rh/devtoolset-2/enable8</span>
+
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span>
+<span class="cp">#Install bison</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">bison</span><span class="o">-</span><span class="mf">3.0.4</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">bison</span><span class="o">-</span><span class="mf">3.0.4</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span>
+<span class="cp"># Install autoconf</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">autoconf</span><span class="o">-</span><span class="mf">2.69</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">autoconf</span><span class="o">-</span><span class="mf">2.69</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span>
+<span class="cp"># Install libtool</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//ftp.gnu.org/gnu/libtool/libtool-2.4.5.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">libtool</span><span class="o">-</span><span class="mf">2.4.5</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">libtool</span><span class="o">-</span><span class="mf">2.4.5</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span>
+<span class="cp"># Install automake</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//ftp.gnu.org/gnu/automake/automake-1.15.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">automake</span><span class="o">-</span><span class="mf">1.15</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">automake</span><span class="o">-</span><span class="mf">1.15</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span> 
+<span class="cp"># Insteall PCRE-devel</span>
+<span class="n">wget</span> <span class="n">ftp</span><span class="o">:</span><span class="c1">//ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.38.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">pcre</span><span class="o">-</span><span class="mf">8.38</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">pcre</span><span class="o">-</span><span class="mf">8.38</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span>
+<span class="cp"># Install YAJL2</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//github.com/lloyd/yajl/tarball/2.1.0 -O yajl-2.1.0.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">yajl</span><span class="o">-</span><span class="mf">2.1.0</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">lloyd</span><span class="o">-</span><span class="n">yajl</span><span class="o">-</span><span class="mi">66</span><span class="n">cb08c</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span>
+<span class="cp"># Install Curl</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//curl.haxx.se/download/curl-7.46.0.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">curl</span><span class="o">-</span><span class="mf">7.46.0</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span> 
+<span class="n">cd</span> <span class="n">curl</span><span class="o">-</span><span class="mf">7.46.0</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">prefix</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">curl</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="cp"># Little hack because make doesn&#39;t respect --with-curl currently</span>
+<span class="n">cp</span> <span class="o">-</span><span class="n">R</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">curl</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">curl</span><span class="o">/</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">include</span><span class="o">/</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span>
+<span class="cp"># Install GeoIP</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">GeoIP</span> <span class="n">GeoIP</span><span class="o">-</span><span class="n">devel</span> <span class="n">GeoIP</span><span class="o">-</span><span class="n">data</span> <span class="o">-</span><span class="n">y</span> 
+<span class="cp"># update </span>
+<span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">devel</span> <span class="n">doxygen</span> <span class="n">zlib</span><span class="o">-</span><span class="n">devel</span> <span class="n">flex</span> <span class="n">expat</span><span class="o">-</span><span class="n">devel</span> <span class="n">lmdb</span> <span class="n">lmdb</span><span class="o">-</span><span class="n">devel</span> <span class="n">nss</span>
+<span class="cp"># download ModSecurity</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/csanders-git/ModSecurity.git</span>
+<span class="n">cd</span> <span class="n">ModSecurity</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">v3</span><span class="o">/</span><span class="n">master</span> <span class="n">origin</span><span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">master</span>
+<span class="n">sh</span> <span class="n">build</span><span class="p">.</span><span class="n">sh</span>
+<span class="n">git</span> <span class="n">submodule</span> <span class="n">init</span>
+<span class="n">git</span> <span class="n">submodule</span> <span class="n">update</span>
+<span class="cp"># 更换lmdb.m4 https:</span><span class="c1">//github.com/SpiderLabs/ModSecurity/issues/1182</span>
+<span class="n">wget</span> <span class="n">https</span><span class="o">:</span><span class="c1">//raw.githubusercontent.com/SpiderLabs/ModSecurity/4c8aa54099643b79074fc68576e1fbae09dd7355/build/lmdb.m4 -O /usr/local/src/ModSecurity/build/lmdb.m4</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">yajl</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">lloyd</span><span class="o">-</span><span class="n">yajl</span><span class="o">-</span><span class="mi">66</span><span class="n">cb08c</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">yajl</span><span class="o">-</span><span class="mf">2.1.0</span><span class="o">/</span> <span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">curl</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">curl</span><span class="o">/</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+</pre></div>
+
+
+<p><strong>Centos 7</strong></p>
+<div class="hlcode"><pre><span class="cp"># libModSecurity</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">gcc</span><span class="o">-</span><span class="n">c</span><span class="o">++</span> <span class="n">flex</span> <span class="n">bison</span> <span class="n">yajl</span> <span class="n">yajl</span><span class="o">-</span><span class="n">devel</span> <span class="n">curl</span><span class="o">-</span><span class="n">devel</span> <span class="n">curl</span> <span class="n">GeoIP</span><span class="o">-</span><span class="n">devel</span> <span class="n">doxygen</span> <span class="n">zlib</span><span class="o">-</span><span class="n">devel</span> <span class="n">automake</span> <span class="n">autoconf</span> <span class="n">libtool</span> <span class="n">git</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">devel</span> <span class="n">pcre</span><span class="o">-</span><span class="n">devel</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/SpiderLabs/ModSecurity</span>
+<span class="n">cd</span> <span class="n">ModSecurity</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">v3</span><span class="o">/</span><span class="n">master</span> <span class="n">origin</span><span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">master</span>
+<span class="n">sh</span> <span class="n">build</span><span class="p">.</span><span class="n">sh</span>
+<span class="n">git</span> <span class="n">submodule</span> <span class="n">init</span>
+<span class="n">git</span> <span class="n">submodule</span> <span class="n">update</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">https</span><span class="o">:</span><span class="c1">//archives.fedoraproject.org/pub/archive/fedora/linux/updates/23/x86_64/b/bison-3.0.4-3.fc23.x86_64.rpm</span>
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+<span class="n">mv</span> <span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span><span class="o">-</span><span class="n">recommended</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span>
+<span class="n">mv</span> <span class="n">unicode</span><span class="p">.</span><span class="n">mapping</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span>
+
+<span class="cp"># nginx connector</span>
+<span class="cp"># ensure env vars are set</span>
+<span class="n">export</span> <span class="n">MODSECURITY_INC</span><span class="o">=</span><span class="s">&quot;/opt/ModSecurity/headers/&quot;</span>
+<span class="n">export</span> <span class="n">MODSECURITY_LIB</span><span class="o">=</span><span class="s">&quot;/opt/ModSecurity/src/.libs/&quot;</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/SpiderLabs/ModSecurity-nginx</span>
+<span class="n">wget</span> <span class="n">http</span><span class="o">:</span><span class="c1">//nginx.org/download/nginx-1.9.2.tar.gz</span>
+<span class="n">tar</span> <span class="o">-</span><span class="n">xvzf</span> <span class="n">nginx</span><span class="o">-</span><span class="mf">1.9.2</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="mf">1.9.2</span>
+<span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cp</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">nginx_original_bkp</span>
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">module</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">ModSecurity</span><span class="o">-</span><span class="n">nginx</span> 
+<span class="n">make</span>
+<span class="n">make</span> <span class="n">install</span>
+
+<span class="cp"># https:</span><span class="c1">//github.com/SpiderLabs/owasp-modsecurity-crs/archive/v3.1.1.tar.gz</span>
+<span class="cp"># download owasp version &gt; v.3.1</span>
+</pre></div>
+
+
+<h3 id="3modsecurity-nginx">3.编译modsecurity-nginx</h3>
+<div class="hlcode"><pre><span class="cp"># 下载 modsecurity-nginx 模块</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/SpiderLabs/ModSecurity-nginx.git</span>
+
+<span class="n">wget</span> <span class="o">-</span><span class="n">P</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/openresty/openresty/releases/download/v1.11.2.1/openresty-1.11.2.1.tar.gz</span>
+
+<span class="n">tar</span> <span class="n">xf</span> <span class="n">openresty</span><span class="o">-</span><span class="mf">1.11.2.1</span><span class="p">.</span><span class="n">tar</span><span class="p">.</span><span class="n">gz</span>
+<span class="n">cd</span> <span class="n">openresty</span><span class="o">-</span><span class="mf">1.11.2.1</span>
+
+<span class="p">.</span><span class="o">/</span><span class="n">configure</span> <span class="o">--</span><span class="n">prefix</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span> \
+<span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">luajit</span> \
+<span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">http_ssl_module</span> \
+<span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">http_stub_status_module</span> \
+<span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">http_drizzle_module</span> \
+<span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">http_iconv_module</span> \
+<span class="o">--</span><span class="n">http</span><span class="o">-</span><span class="n">client</span><span class="o">-</span><span class="n">body</span><span class="o">-</span><span class="n">temp</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">client</span> \
+<span class="o">--</span><span class="n">http</span><span class="o">-</span><span class="n">proxy</span><span class="o">-</span><span class="n">temp</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">proxy</span> \
+<span class="o">--</span><span class="n">http</span><span class="o">-</span><span class="n">fastcgi</span><span class="o">-</span><span class="n">temp</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">fcgi</span> \
+<span class="o">--</span><span class="n">http</span><span class="o">-</span><span class="n">uwsgi</span><span class="o">-</span><span class="n">temp</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">uwsgi</span> \
+<span class="o">--</span><span class="n">http</span><span class="o">-</span><span class="n">scgi</span><span class="o">-</span><span class="n">temp</span><span class="o">-</span><span class="n">path</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">cache</span><span class="o">/</span><span class="n">scgi</span> \
+<span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">http_realip_module</span> \
+<span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">module</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">nginx</span><span class="o">-</span><span class="n">module</span><span class="o">-</span><span class="n">vts</span><span class="o">-</span><span class="mf">0.1.18</span> \
+<span class="o">--</span><span class="n">add</span><span class="o">-</span><span class="n">module</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">ModSecurity</span><span class="o">-</span><span class="n">nginx</span>
+
+<span class="n">make</span> <span class="o">&amp;&amp;</span> <span class="n">make</span> <span class="n">install</span>
+</pre></div>
+
+
+<h3 id="4owasp-crs">4.配置OWASP CRS</h3>
+<p>OWASP是一个安全社区，开发和维护着一套免费的应用程序保护规则，这就是所谓OWASP的ModSecurity的核心规则集(即CRS)。ModSecurity之所以强大就在于OWASP提供的规则，我们可以根据自己的需求选择不同的规则，也可以通过ModSecurity手工创建安全过滤器、定义攻击并实现主动的安全输入验证。</p>
+<p><strong>CRS 支持两种运行模式，CRS 默认采用的为异常评分模式</strong></p>
+<ul>
+<li>
+<p>异常评分模式，每条防御规则都有相应的风险评分，若匹配成功，则直接累加对应的风险值，当所有规则都匹配完成后比较入站、出站的风险值，若比设定的风险阈值还高，则默认返回 403；</p>
+</li>
+<li>
+<p>检测拦截模式，若请求匹配到了防御规则，则依据所配置的行为进行响应，同时将忽略其后所有的防御规则，该模式节约资源、性能；</p>
+</li>
+</ul>
+<p>在异常评分模式中，CRS 包含 规则等级（Paranoia）、异常阈值（Anomaly） 两个量化值，随着规则等级越来越高，其所启用的安全防御规则就越来越多，同时误报也会越来越多，规则等级分为以下几类，规则等级高于 PL2 在审计日志中会输出规则等级标签</p>
+<div class="hlcode"><pre><span class="o">-</span> <span class="mi">1</span><span class="err">（</span><span class="n">PL1</span><span class="err">），默认风险等级，启用了大部分防御规则，误报较少</span>
+<span class="o">-</span> <span class="mi">2</span><span class="err">（</span><span class="n">PL2</span><span class="err">），比</span> <span class="n">PL1</span> <span class="err">启用更多防御规则，例如基于正则的</span> <span class="n">SQL</span> <span class="err">注入和</span> <span class="n">XSS</span><span class="err">，比</span> <span class="n">PL1</span> <span class="err">误报多</span>
+<span class="o">-</span> <span class="mi">3</span><span class="err">（</span><span class="n">PL3</span><span class="err">），比</span> <span class="n">PL2</span> <span class="err">启用更多防御规则，面向经验丰富用户，满足较高安全性场景</span>
+<span class="o">-</span> <span class="mi">4</span><span class="err">（</span><span class="n">PL4</span><span class="err">），最严格的风险等级，会产生一定数量的误报</span>
+</pre></div>
+
+
+<p>基于异常告警模式，每条检测规则都包含一定的风险值，不同危害风险值不同，如下所示，可根据业务场景自主调整</p>
+<div class="hlcode"><pre><span class="o">-</span> <span class="n">CRITICAL</span><span class="err">，致命，风险值为</span> <span class="mi">5</span>
+<span class="o">-</span> <span class="n">ERROR</span><span class="err">，错误，风险值为</span> <span class="mi">4</span>
+<span class="o">-</span> <span class="n">WARNING</span><span class="err">，警告，风险值为</span> <span class="mi">3</span>
+<span class="o">-</span> <span class="n">NOTICE</span><span class="err">，通知，风险值为</span> <span class="mi">2</span>
+</pre></div>
+
+
+<p>根据对 CRS 防御规则的熟知程度慢慢深入，相关异常阈值和规则等级设置可参考下表所示，即异常告警阈值慢慢降低，规则等级慢慢严格</p>
+<table>
+<thead>
+<tr>
+<th align="center">阶段编号</th>
+<th align="left">阶段名称</th>
+<th align="center">异常阈值</th>
+<th align="center">规则等级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="left">初始阶段</td>
+<td align="center">高</td>
+<td align="center">低</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">实验阶段</td>
+<td align="center">高</td>
+<td align="center">高</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">标准阶段</td>
+<td align="center">低</td>
+<td align="center">低</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">高安全性阶段</td>
+<td align="center">低</td>
+<td align="center">高</td>
+</tr>
+</tbody>
+</table>
+<div class="hlcode"><pre><span class="cp"># download OWASP</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/SpiderLabs/owasp-modsecurity-crs.git</span>
+
+<span class="cp"># modify crs-setup.conf 配置文件</span>
+<span class="n">cp</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">owasp</span><span class="o">-</span><span class="n">modsecurity</span><span class="o">-</span><span class="n">crs</span><span class="o">/</span><span class="n">crs</span><span class="o">-</span><span class="n">setup</span><span class="p">.</span><span class="n">conf</span><span class="p">.</span><span class="n">example</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">owasp</span><span class="o">-</span><span class="n">modsecurity</span><span class="o">-</span><span class="n">crs</span><span class="o">/</span><span class="n">crs</span><span class="o">-</span><span class="n">setup</span><span class="p">.</span><span class="n">conf</span>
+
+<span class="cp"># 若 CRS 要切换成检测拦截模式，需将 crs-setup.conf 中异常评分模式配置注释，同时开启检测拦截模式配置，</span>
+<span class="n">sed</span> <span class="o">-</span><span class="n">ie</span> <span class="err">&#39;</span><span class="n">s</span><span class="o">/</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:1,log,auditlog,pass&quot;</span><span class="o">/</span><span class="err">#</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:1,log,auditlog,pass&quot;</span><span class="o">/</span><span class="n">g</span><span class="err">&#39;</span> <span class="n">crs</span><span class="o">-</span><span class="n">setup</span><span class="p">.</span><span class="n">conf</span>
+<span class="n">sed</span> <span class="o">-</span><span class="n">ie</span> <span class="err">&#39;</span><span class="n">s</span><span class="o">/</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:2,log,auditlog,pass&quot;</span><span class="o">/</span><span class="err">#</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:2,log,auditlog,pass&quot;</span><span class="o">/</span><span class="n">g</span><span class="err">&#39;</span> <span class="n">crs</span><span class="o">-</span><span class="n">setup</span><span class="p">.</span><span class="n">conf</span>
+<span class="n">sed</span> <span class="o">-</span><span class="n">ie</span> <span class="err">&#39;</span><span class="n">s</span><span class="o">/</span><span class="err">#</span><span class="p">.</span><span class="o">*</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:1,log,auditlog,deny,status:403&quot;</span><span class="o">/</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:1,log,auditlog,deny,status:403&quot;</span><span class="o">/</span><span class="n">g</span><span class="err">&#39;</span> <span class="n">crs</span><span class="o">-</span><span class="n">setup</span><span class="p">.</span><span class="n">conf</span>
+<span class="n">sed</span> <span class="o">-</span><span class="n">ie</span> <span class="err">&#39;</span><span class="n">s</span><span class="o">/</span><span class="err">#</span> <span class="n">SecDefaultAction</span> <span class="s">&quot;phase:2,log,auditlog,deny,status:403&quot;</span><span class="o">/</span><span class="n">SecDefaultAction</span> <span class="s">&quot;phase:2,log,auditlog,deny,status:403&quot;</span><span class="o">/</span><span class="n">g</span><span class="err">&#39;</span> <span class="n">crs</span><span class="o">-</span><span class="n">setup</span><span class="p">.</span><span class="n">conf</span>
+
+<span class="cp"># 下载modsecurity配置 </span>
+<span class="n">wget</span> <span class="o">-</span><span class="n">P</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span> <span class="n">https</span><span class="o">:</span><span class="c1">//raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/unicode.mapping</span>
+
+<span class="n">wget</span> <span class="o">-</span><span class="n">P</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span> <span class="n">https</span><span class="o">:</span><span class="c1">//raw.githubusercontent.com/SpiderLabs/ModSecurity/v3/master/modsecurity.conf-recommended</span>
+
+<span class="n">mv</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span><span class="o">-</span><span class="n">recommended</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span>
+
+<span class="cp"># 新建modese_rules_includes.conf 文件，内容为owasp规则。根据实际需求加入对应的漏洞的防护规则即可。</span>
+<span class="n">echo</span> <span class="s">&quot;include owasp-modsecurity-crs/crs-setup.conf&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span>
+<span class="k">for</span> <span class="n">i</span> <span class="n">in</span> <span class="err">`</span><span class="n">ls</span> <span class="n">owasp</span><span class="o">-</span><span class="n">modsecurity</span><span class="o">-</span><span class="n">crs</span><span class="o">/</span><span class="n">rules</span><span class="o">/*</span><span class="p">.</span><span class="n">conf</span><span class="err">`</span><span class="p">;</span><span class="k">do</span> <span class="n">echo</span> <span class="s">&quot;include $i&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span><span class="p">;</span><span class="n">done</span>
+
+<span class="cp"># 默认为观察模式，只记录日志，修改为 On</span>
+<span class="n">vim</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">openresty</span><span class="o">-</span><span class="n">ms</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">/</span><span class="n">modsecurity</span><span class="p">.</span><span class="n">conf</span>
+<span class="cp">#SecRuleEngine DetectionOnly</span>
+<span class="n">SecRuleEngine</span> <span class="n">On</span>
+</pre></div>
+
+
+<h3 id="crs">CRS 规则</h3>
+<p>SecRule是ModSecurity主要的指令，用于分析数据并根据结果执行动作，通常规则的格式如下：</p>
+<p><code>SecRule VARIABLES OPERATOR [ACTIONS]</code></p>
+<ul>
+<li>
+<p>第一部分，VARIABLES描述哪个变量被检查</p>
+</li>
+<li>
+<p>第二部分，OPERATOR描述如何进行检查，关于操作的规则具体如下：<br />
+    一种很简单的情况下，你可能会用一个正则表达式作为规则的第二个参数，我们已经在上面举过这样的例子，如果你这样做，ModSecurity假设你会使用rx（正则表达式）操作符，你也可以很明确的通过使用@来指定你想要的操作符，紧跟之后的是操作符的名字，在规则第二个参数的开始。<br />
+    SecRule ARGS "@rx dirty" </p>
+</li>
+<li>
+<p>第三部分可选的，ACTIONS，描述当操作进行成功的匹配一个变量时具体怎么做。<br />
+    规则中的动作  第三个参数，ACTIONS可以忽略，因为有个辅助功能，即指定的默认动作列表。如果这个参数没有被省略，当规则匹配时，这个参数指定的动作会联合默认的动作列表创建一个实际的动作列表被执行。</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">规则文件</th>
+<th align="left">规则说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">REQUEST-900-EXCLUSION-RULES-BEFORE-CRS</td>
+<td align="left">定制化个人防护规则，调整规则防护场景</td>
+</tr>
+<tr>
+<td align="left">REQUEST-901-INITIALIZATION</td>
+<td align="left">CRS 配置初始化</td>
+</tr>
+<tr>
+<td align="left">REQUEST-910-IP-REPUTATION</td>
+<td align="left">IP 信誉库</td>
+</tr>
+<tr>
+<td align="left">REQUEST-911-METHOD-ENFORCEMENT</td>
+<td align="left">HTTP 请求方法检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-912-DOS-PROTECTION</td>
+<td align="left">拒绝服务规则</td>
+</tr>
+<tr>
+<td align="left">REQUEST-913-SCANNER-DETECTION</td>
+<td align="left">扫描器检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-920-PROTOCOL-ENFORCEMENT</td>
+<td align="left">URL Scheme 协议检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-921-PROTOCOL-ATTACK</td>
+<td align="left">HTTP 协议攻击检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-930-APPLICATION-ATTACK-LFI</td>
+<td align="left">LFI 本地文件包含漏洞检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-931-APPLICATION-ATTACK-RFI</td>
+<td align="left">RFI 远程文件包含检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-932-APPLICATION-ATTACK-RCE</td>
+<td align="left">RCE 远程命令执行检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-933-APPLICATION-ATTACK-PHP</td>
+<td align="left">PHP 攻击检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-941-APPLICATION-ATTACK-XSS</td>
+<td align="left">XSS 攻击检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-942-APPLICATION-ATTACK-SQLI</td>
+<td align="left">SQL 注入攻击检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION</td>
+<td align="left">会话固定攻击检测</td>
+</tr>
+<tr>
+<td align="left">REQUEST-949-BLOCKING-EVALUATION</td>
+<td align="left">基于风险值检测入站请求</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-950-DATA-LEAKAGES</td>
+<td align="left">数据泄漏检测</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-951-DATA-LEAKAGES-SQL</td>
+<td align="left">SQL 数据泄漏检测</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-952-DATA-LEAKAGES-JAVA</td>
+<td align="left">JAVA 数据泄漏</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-953-DATA-LEAKAGES-PHP</td>
+<td align="left">PHP 数据泄漏</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-954-DATA-LEAKAGES-IIS</td>
+<td align="left">IIS 数据泄漏</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-959-BLOCKING-EVALUATION</td>
+<td align="left">基于风险值检测出站请求</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-980-CORRELATION</td>
+<td align="left">入站、出站风险值关联</td>
+</tr>
+<tr>
+<td align="left">RESPONSE-999-EXCLUSION-RULES-AFTER-CRS</td>
+<td align="left">定制化个人防护规则，重载、更新、移除检测规则</td>
+</tr>
+</tbody>
+</table>
+<h3 id="custom-rules">Custom rules</h3>
+<blockquote>
+<p>1.REQUEST_FILENAME: 使用REQUEST_FILENAME变量检查请求路径"/phpmyadmin"，如果/phpmyadmin出现在此路径中的任何位置，phase:1第一阶段立即阻止deny它。</p>
+<p>2.路径可能为小写或者大写组合使用t:lowercase,t:normalisePath转换。</p>
+<p>3.触发规则后设置的msg，tag：用于分组</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># include owasp-modsecurity-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf</span>
+<span class="cp"># 访问url/phpmyadmin deny </span>
+<span class="cp"># vim owasp-modsecurity-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf </span>
+<span class="cp"># add new rules</span>
+<span class="n">SecRule</span>  <span class="n">REQUEST_FILENAME</span> <span class="s">&quot;/phpmyadmin&quot;</span> <span class="s">&quot;id:10000,phase:1,deny,log,t:lowercase,t:normalisePath,\</span>
+<span class="s">  msg:&#39;Blocking access to %{MATCHED_VAR}.&#39;,tag:&#39;Blacklist Rules&#39;&quot;</span>
+</pre></div>
+
+
+<h3 id="modsecurity">ModSecurity 常用配置</h3>
+<blockquote>
+<p>用并行匹配运算符（<code>@pm</code>）检查四个白名单方法。这比正则表达式快，而且更具可读性<br />
+<code>@gt</code>：匹配任何大于1的总和<br />
+<code>@ge</code>：匹配长度<br />
+<code>@streq</code>：</p>
+</blockquote>
+<div class="hlcode"><pre><span class="mf">1.</span><span class="n">SecRuleEngine</span><span class="err">：是否接受来自</span><span class="n">ModSecurity</span><span class="o">-</span><span class="n">CRS</span><span class="err">目录下的所有规则的安全规则引擎。因此，我们可以根据需求设置不同的规则。要设置不同的规则有以下几种。</span><span class="n">SecRuleEngine</span> <span class="n">On</span><span class="err">：将在服务器上激活</span><span class="n">ModSecurity</span><span class="err">防火墙，它会检测并阻止该服务器上的任何恶意攻击。</span><span class="n">SecRuleEngine</span> <span class="n">Detection</span> <span class="n">Only</span><span class="err">：如果设置这个规则它只会检测到所有的攻击，并根据攻击产生错误，但它不会在服务器上阻止任何东西。</span><span class="n">SecRuleEngine</span> <span class="n">Off</span><span class="o">:</span><span class="err">这将在服务器上上停用</span><span class="n">ModSecurity</span><span class="err">的防火墙。</span>
+
+<span class="mf">2.</span><span class="n">SecRequestBodyAccess</span><span class="err">：它会告诉</span><span class="n">ModSecurity</span><span class="err">是否会检查请求，它起着非常重要的作用。它只有两个参数</span><span class="n">ON</span><span class="err">或</span><span class="n">OFF</span><span class="err">。</span>
+
+<span class="mf">3.</span><span class="n">SecResponseBodyAccess</span><span class="err">：如果此参数设置为</span><span class="n">ON</span><span class="err">，然后</span><span class="n">ModeSecurity</span><span class="err">可以分析服务器响应，并做适当处理。它也有只有两个参数</span><span class="n">ON</span><span class="err">和</span><span class="n">Off</span><span class="err">，我们可以根据求要进行设置。</span>
+
+<span class="mf">4.</span><span class="n">SecDataDir</span><span class="err">：定义</span><span class="n">ModSecurity</span><span class="err">的工作目录，该目录将作为</span><span class="n">ModSecurity</span><span class="err">的临时目录使用。</span>
+<span class="mf">5.</span><span class="err">禁用特定规则</span> <span class="n">SecRuleUpdateTargetById</span> <span class="mi">932160</span> <span class="o">!</span><span class="n">ARGS</span><span class="o">:</span><span class="n">password</span>
+</pre></div>
+
+
+<h3 id="openresty">Openresty 配置</h3>
+<blockquote>
+<p>对应location启用</p>
+</blockquote>
+<div class="hlcode"><pre><span class="n">server</span> <span class="p">{</span>
+  <span class="n">listen</span>       <span class="mi">80</span><span class="p">;</span>
+  <span class="n">server_name</span>  <span class="n">example</span><span class="p">.</span><span class="n">com</span><span class="p">;</span>
+
+  <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>
+    <span class="n">modsecurity</span> <span class="n">on</span><span class="p">;</span>
+    <span class="n">modsecurity_rules_file</span> <span class="n">modsec_rules_includes</span><span class="p">.</span><span class="n">conf</span><span class="p">;</span>
+    <span class="n">root</span>   <span class="n">html</span><span class="p">;</span>
+    <span class="n">index</span>  <span class="n">index</span><span class="p">.</span><span class="n">html</span> <span class="n">index</span><span class="p">.</span><span class="n">htm</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>test</p>
+<div class="hlcode"><pre><span class="nx">http</span><span class="p">:</span><span class="c1">//192.168.1.110/index.html?search=&lt;scritp&gt;alert(%27xss%27);&lt;/script&gt;</span>
+</pre></div>
+
+
+<h3 id="_1">规则统计自定义</h3>
+<p>owasp-modsecurity-crs-id <a href="https://www.netnea.com/cms/core-rule-set-inventory/">规则详解</a></p>
+<h3 id="analyzing-the-alert-messages-refernece">Analyzing the alert messages <a href="https://www.netnea.com/cms/nginx-tutorial-7_including-owasp-modsecurity-core-rule-set/">REFERNECE</a></h3>
+<p>vim .nginx-modsec.alias<br />
+source .nginx-modsec.alias</p>
+<div class="hlcode"><pre><span class="err">$</span><span class="o">&gt;</span> <span class="n">cat</span> <span class="o">~/</span><span class="p">.</span><span class="n">nginx</span><span class="o">-</span><span class="n">modsec</span><span class="p">.</span><span class="n">alias</span>
+<span class="p">...</span>
+<span class="n">alias</span> <span class="n">meldata</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[data [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">melfile</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[file [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">melhostname</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[hostname [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">melid</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[id [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">melidmsg</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[id [^]]*\].*\[msg [^]]*\]&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/\].*\[/] [/&quot;</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/\[msg //&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span>  <span class="o">-</span><span class="n">f2</span><span class="o">-</span> <span class="o">|</span> <span class="n">tr</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;\]</span><span class="se">\&quot;</span><span class="s">&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/(Total .*/(Total ...) .../&quot;</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/Incoming and Outgoing Score: [0-9]* [0-9]*/Incoming and Outgoing Score: .../&quot;</span><span class="err">&#39;</span>
+<span class="n">alias</span> <span class="n">melip</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[client [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">b9</span><span class="o">-</span><span class="err">&#39;</span>
+<span class="n">alias</span> <span class="n">melline</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[line [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">melmatch</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot; at [^\ ]*\. \[file&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/\. \[file//&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">b5</span><span class="o">-</span><span class="err">&#39;</span>
+<span class="n">alias</span> <span class="n">melmsg</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[msg [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2 | sed -e &quot;</span><span class="n">s</span><span class="o">/</span><span class="p">(</span><span class="n">Total</span> <span class="p">.</span><span class="err">*/</span><span class="p">(</span><span class="n">Total</span> <span class="p">...)</span> <span class="p">...</span><span class="o">/</span><span class="s">&quot;&#39;</span>
+<span class="n">alias</span> <span class="n">melsummary</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="o">-</span><span class="n">E</span> <span class="s">&quot; (at|against) .*\[file.*\[id </span><span class="se">\&quot;</span><span class="s">[0-9]+.*\[msg </span><span class="se">\&quot;</span><span class="s">[^</span><span class="se">\&quot;</span><span class="s">]+&quot;</span> <span class="o">|</span> <span class="n">tr</span> <span class="o">-</span><span class="n">d</span> <span class="err">\</span><span class="s">&quot; | sed -e &quot;</span><span class="n">s</span><span class="o">/</span> <span class="n">at</span> <span class="n">the</span> <span class="n">end</span> <span class="n">of</span> <span class="n">input</span> <span class="n">at</span><span class="o">/</span> <span class="n">at</span><span class="o">/</span><span class="s">&quot; -e &quot;</span><span class="n">s</span><span class="o">/</span> <span class="n">required</span><span class="p">.</span> <span class="o">/</span><span class="p">.</span> <span class="o">/</span><span class="s">&quot; -e &quot;</span><span class="n">s</span><span class="o">/</span><span class="err">\</span><span class="p">[</span><span class="n">rev</span> <span class="p">.</span><span class="o">*</span><span class="err">\</span><span class="p">[</span><span class="n">msg</span><span class="o">/</span><span class="p">[</span><span class="n">msg</span><span class="o">/</span><span class="s">&quot; -e &quot;</span><span class="n">s</span><span class="o">/</span><span class="err">\</span><span class="p">.</span> <span class="o">/</span> <span class="o">/</span><span class="s">&quot; -e &quot;</span><span class="n">s</span><span class="o">/</span><span class="p">(</span><span class="n">Total</span> <span class="p">.</span><span class="err">*/</span><span class="p">(</span><span class="n">Total</span> <span class="p">...)</span> <span class="p">...</span><span class="o">/</span><span class="s">&quot; | tr -d \] | cut -d\  -f3,9,11- | sed -e &quot;</span><span class="n">s</span><span class="o">/^</span><span class="err">\</span><span class="p">([</span><span class="o">^</span> <span class="p">]</span><span class="o">*</span><span class="err">\</span><span class="p">)</span> <span class="err">\</span><span class="p">([</span><span class="o">^</span> <span class="p">]</span><span class="o">*</span><span class="err">\</span><span class="p">)</span><span class="o">/</span><span class="err">\</span><span class="mi">2</span> <span class="err">\</span><span class="mi">1</span><span class="o">/</span><span class="s">&quot; | awk &quot;</span><span class="p">{</span> <span class="n">printf</span> <span class="err">\</span><span class="s">&quot;%+6s %-35s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s</span><span class="se">\n\&quot;</span><span class="s">, \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12, \$13, \$14, \$15, \$16, \$17, \$18, \$19, \$20 }&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/\ *$//&quot;</span><span class="err">&#39;</span>
+<span class="n">alias</span> <span class="n">meltags</span><span class="o">=</span><span class="err">&#39;</span><span class="n">tr</span> <span class="s">&quot;]&quot;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">|</span> <span class="n">tr</span> <span class="s">&quot;[&quot;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">|</span> <span class="n">grep</span> <span class="s">&quot;tag </span><span class="se">\&quot;</span><span class="s">&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">b6</span><span class="o">-</span> <span class="o">|</span> <span class="n">tr</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="err">&#39;</span>
+<span class="n">alias</span> <span class="n">meltimestamp</span><span class="o">=</span><span class="err">&#39;</span><span class="n">cut</span> <span class="o">-</span><span class="n">b2</span><span class="o">-</span><span class="mi">25</span><span class="err">&#39;</span>
+<span class="n">alias</span> <span class="n">melunique_id</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[unique_id [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">meluri</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[uri [^]]*&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span><span class="s">&quot; -f2&#39;</span>
+<span class="n">alias</span> <span class="n">melidmsg</span><span class="o">=</span><span class="err">&#39;</span><span class="n">grep</span> <span class="o">-</span><span class="n">o</span> <span class="s">&quot;\[id [^]]*\].*\[msg [^]]*\]&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/\].*\[/] [/&quot;</span> \
+<span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/\[msg //&quot;</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">d</span><span class="err">\</span>  <span class="o">-</span><span class="n">f2</span><span class="o">-</span> <span class="o">|</span> <span class="n">tr</span> <span class="o">-</span><span class="n">d</span> <span class="s">&quot;\]</span><span class="se">\&quot;</span><span class="s">&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/(Total .*/(Total ...) .../&quot;</span> \
+<span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/Incoming and Outgoing Score: [0-9]* [0-9]*/Incoming and Outgoing Score: .../&quot;</span><span class="err">&#39;</span>
+<span class="p">...</span>
+<span class="err">$</span><span class="o">&gt;</span> <span class="n">source</span> <span class="o">~/</span><span class="p">.</span><span class="n">nginx</span><span class="o">-</span><span class="n">modsec</span><span class="p">.</span><span class="n">alias</span> 
+</pre></div>
+
+
+<p><strong>use</strong></p>
+<div class="hlcode"><pre><span class="cp"># 错误ID次数</span>
+<span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">modsec_audit</span><span class="p">.</span><span class="n">log</span> <span class="o">|</span> <span class="n">melid</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">|</span> <span class="n">uniq</span> <span class="o">-</span><span class="n">c</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">rn</span>
+    <span class="mi">346</span> <span class="mi">920440</span>
+    <span class="mi">180</span> <span class="mi">980130</span>
+    <span class="mi">180</span> <span class="mi">949110</span>
+
+<span class="cp"># print msg </span>
+<span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">modsec_audit</span><span class="p">.</span><span class="n">log</span> <span class="o">|</span> <span class="n">melid</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">|</span> <span class="n">uniq</span> <span class="o">-</span><span class="n">c</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">rn</span> <span class="o">|</span> <span class="k">while</span> <span class="n">read</span> <span class="n">STR</span><span class="p">;</span> <span class="k">do</span> <span class="n">echo</span> <span class="o">-</span><span class="n">n</span> <span class="s">&quot;$STR &quot;</span><span class="p">;</span> <span class="n">ID</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">echo</span> <span class="s">&quot;$STR&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s">&quot;s/.*\ //&quot;</span><span class="p">);</span> <span class="n">grep</span> <span class="err">$</span><span class="n">ID</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">modsec_audit</span><span class="p">.</span><span class="n">log</span> <span class="o">|</span> <span class="n">head</span> <span class="o">-</span><span class="mi">1</span> <span class="o">|</span> <span class="n">melmsg</span><span class="p">;</span> <span class="n">done</span>
+<span class="mi">346</span> <span class="mi">920440</span> <span class="n">URL</span> <span class="n">file</span> <span class="n">extension</span> <span class="n">is</span> <span class="k">restricted</span> <span class="n">by</span> <span class="n">policy</span>
+<span class="mi">180</span> <span class="mi">980130</span> <span class="n">Inbound</span> <span class="n">Anomaly</span> <span class="n">Score</span> <span class="n">Exceeded</span> <span class="p">(</span><span class="n">Total</span> <span class="p">...)</span> <span class="p">...</span>
+<span class="mi">180</span> <span class="mi">949110</span> <span class="n">Inbound</span> <span class="n">Anomaly</span> <span class="n">Score</span> <span class="n">Exceeded</span> <span class="p">(</span><span class="n">Total</span> <span class="p">...)</span> <span class="p">...</span>
+<span class="mi">10</span> <span class="mi">953120</span> <span class="n">PHP</span> <span class="n">source</span> <span class="n">code</span> <span class="n">leakage</span>
+<span class="mi">7</span> <span class="mi">930130</span> <span class="n">Restricted</span> <span class="n">File</span> <span class="n">Access</span> <span class="n">Attempt</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-20 11:56:16</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
