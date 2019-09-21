@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Harbor - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#os">os</a>
+    &nbsp;&#187;&nbsp;Harbor
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="harbor">Harbor</h1>
+<h3 id="1download-packages">1.Download packages</h3>
+<p>download <a href="https://github.com/docker/compose/releases">docker-compose</a></p>
+<div class="hlcode"><pre><span class="n">wget</span> <span class="n">https</span><span class="o">:</span><span class="c1">//github.com/docker/compose/releases/download/1.18.0/docker-compose-Linux-x86_64</span>
+
+<span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">x86_64</span>
+<span class="n">mv</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">x86_64</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+</pre></div>
+
+
+<p>download <a href="https://github.com/goharbor/harbor/releases">harbor</a></p>
+<blockquote>
+<p>Download Binaries ：offline 离线安装</p>
+</blockquote>
+<div class="hlcode"><pre><span class="n">wget</span> <span class="n">https</span><span class="o">:</span><span class="c1">//storage.googleapis.com/harbor-releases/harbor-offline-installer-v1.5.2.tgz</span>
+</pre></div>
+
+
+<h3 id="2deploy">2.Deploy</h3>
+<p><a href="https://docs.docker.com/storage/storagedriver/overlayfs-driver/#configure-docker-with-the-overlay-or-overlay2-storage-driver">overlay2区别</a></p>
+<div class="hlcode"><pre><span class="nt">cd</span> <span class="o">/</span><span class="nt">data</span><span class="o">/</span><span class="nt">harbor</span>
+<span class="o">./</span><span class="nt">prepare</span>
+<span class="o">./</span><span class="nt">install</span><span class="nc">.sh</span> 
+
+<span class="err">#</span> <span class="err">停止</span>
+<span class="nt">harbor</span><span class="o">]</span><span class="err">#</span> <span class="nt">docker-compose</span> <span class="nt">stop</span>
+<span class="err">#</span> <span class="err">停止删除容器</span>
+<span class="nt">harbor</span><span class="o">]</span><span class="err">#</span> <span class="nt">docker-compose</span> <span class="nt">down</span> <span class="nt">-v</span>
+
+<span class="err">#</span> <span class="err">修改配置</span>
+<span class="nt">harbor</span><span class="o">]</span><span class="err">#</span> <span class="nt">vim</span> <span class="nt">harbor</span><span class="nc">.cfg</span>
+<span class="err">#</span> <span class="o">./</span><span class="nt">prepare</span><span class="err">更新配置到</span><span class="nt">docker-compose</span><span class="nc">.yml</span>
+<span class="nt">harbor</span><span class="o">]</span><span class="err">#</span> <span class="o">./</span><span class="nt">prepare</span>
+<span class="err">#</span> <span class="err">启动</span>
+<span class="nt">harbor</span><span class="o">]</span><span class="err">#</span> <span class="nt">docker-compose</span> <span class="nt">up</span> <span class="nt">-d</span>
+
+<span class="nt">-------------------------------------------------------------------------------------</span>
+<span class="nt">Error</span><span class="err">：</span>
+<span class="nt">Error</span> <span class="nt">response</span> <span class="nt">from</span> <span class="nt">daemon</span><span class="o">:</span> <span class="nt">Get</span> <span class="nt">https</span><span class="o">://</span><span class="nt">192</span><span class="nc">.168.1.245</span><span class="nd">:8880</span><span class="o">/</span><span class="nt">v1</span><span class="o">/</span><span class="nt">users</span><span class="o">/:</span> <span class="nt">http</span><span class="o">:</span> <span class="nt">server</span> <span class="nt">gave</span> <span class="nt">HTTP</span> <span class="nt">response</span> <span class="nt">to</span> <span class="nt">HTTPS</span> <span class="nt">client</span>
+
+<span class="err">#</span> <span class="err">添加如下项目</span>
+<span class="err">#</span> <span class="nt">docker</span> <span class="nt">1</span><span class="nc">.12.x</span><span class="err">需要在这里修改</span><span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">sysconfig</span><span class="o">/</span><span class="nt">docker</span>
+<span class="nt">OPTIONS</span><span class="o">=</span><span class="s1">&#39;--selinux-enabled --log-driver=journald --signature-verification=false --insecure-registry 192.168.1.245:8880&#39;</span>
+
+
+<span class="err">#</span> <span class="nt">docker</span> <span class="nt">17</span><span class="nc">.x.x</span> <span class="err">修改</span><span class="nt">i</span>
+<span class="nt">cat</span> <span class="o">/</span><span class="nt">etc</span><span class="o">/</span><span class="nt">docker</span><span class="o">/</span><span class="nt">daemon</span><span class="nc">.json</span>
+<span class="p">{</span>
+ <span class="s2">&quot;storage-driver&quot;</span><span class="o">:</span> <span class="s2">&quot;overlay2&quot;</span><span class="o">,</span>
+  <span class="s2">&quot;storage-opts&quot;</span><span class="o">:</span> <span class="cp">[</span>
+    <span class="s2">&quot;overlay2.override_kernel_check=true&quot;</span>
+  <span class="cp">]</span><span class="o">,</span>
+ <span class="s2">&quot;log-driver&quot;</span><span class="o">:</span> <span class="s2">&quot;journald&quot;</span><span class="o">,</span>
+ <span class="s2">&quot;insecure-registries&quot;</span><span class="o">:</span><span class="cp">[</span><span class="s2">&quot;192.168.1.245:8880&quot;</span><span class="cp">]</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><strong>Login</strong></p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">docker</span> <span class="n">login</span> <span class="o">-</span><span class="n">u</span> <span class="n">admin</span> <span class="mf">192.168.1.245</span><span class="o">:</span><span class="mi">8880</span>
+
+<span class="cp">#配置Proxy</span>
+<span class="err">$</span> <span class="n">mkdir</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">docker</span><span class="p">.</span><span class="n">service</span><span class="p">.</span><span class="n">d</span> <span class="o">&amp;&amp;</span> \
+<span class="n">echo</span> <span class="err">&#39;</span><span class="p">[</span><span class="n">Service</span><span class="p">]</span><span class="err">&#39;</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">docker</span><span class="p">.</span><span class="n">service</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">http</span><span class="o">-</span><span class="n">proxy</span><span class="p">.</span><span class="n">conf</span> <span class="o">&amp;&amp;</span> \
+<span class="n">echo</span> <span class="err">&#39;</span><span class="n">Environment</span><span class="o">=</span><span class="s">&quot;HTTP_PROXY=http://192.168.20.245:8888&quot;</span> <span class="s">&quot;HTTPS_PROXY=http://192.168.20.245:8888&quot;</span> <span class="s">&quot;NO_PROXY=localhost,127.0.0.1,192.168.1.245&quot;</span><span class="err">&#39;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">systemd</span><span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">docker</span><span class="p">.</span><span class="n">service</span><span class="p">.</span><span class="n">d</span><span class="o">/</span><span class="n">http</span><span class="o">-</span><span class="n">proxy</span><span class="p">.</span><span class="n">conf</span>
+
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">daemon</span><span class="o">-</span><span class="n">reload</span><span class="p">;</span><span class="n">systemctl</span> <span class="n">restart</span> <span class="n">docker</span><span class="p">;</span><span class="n">systemctl</span> <span class="n">status</span> <span class="n">docker</span>
+</pre></div>
+
+
+<h3 id="3">3.升级</h3>
+<p><a href="https://github.com/gjmzj/kubeasz/blob/master/docs/guide/harbor.md">REFERNECE</a></p>
+<div class="hlcode"><pre><span class="cp"># 进入harbor解压缩后的目录，停止harbor</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">harbor</span>
+<span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">down</span>
+
+<span class="cp"># 备份这个目录</span>
+<span class="n">cd</span> <span class="p">..</span>
+<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">backup</span> <span class="o">&amp;&amp;</span> <span class="n">mv</span> <span class="n">harbor</span> <span class="o">/</span><span class="n">backup</span><span class="o">/</span><span class="n">harbor</span>
+
+<span class="cp"># 下载更新的离线安装包，并解压</span>
+<span class="n">tar</span> <span class="n">zxvf</span> <span class="n">harbor</span><span class="o">-</span><span class="n">offline</span><span class="o">-</span><span class="n">installer</span><span class="o">-</span><span class="n">v1</span><span class="mf">.2.2</span><span class="p">.</span><span class="n">tgz</span>  <span class="o">-</span><span class="n">C</span> <span class="o">/</span><span class="n">data</span>
+
+<span class="cp"># 使用官方数据库迁移工具，备份数据库，修改数据库连接用户和密码，创建数据库备份目录</span>
+<span class="cp"># 迁移工具使用docker镜像，镜像tag由待升级到目标harbor版本决定，这里由 1.1.2升级到1.2.2，所以使用 tag 1.2</span>
+<span class="n">docker</span> <span class="n">pull</span> <span class="n">vmware</span><span class="o">/</span><span class="n">harbor</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">migrator</span><span class="o">:</span><span class="mf">1.2</span>
+<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">backup</span><span class="o">/</span><span class="n">db</span><span class="o">-</span><span class="mf">1.1.2</span>
+<span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">it</span> <span class="o">--</span><span class="n">rm</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_USR</span><span class="o">=</span><span class="n">root</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_PWD</span><span class="o">=</span><span class="n">xxxx</span> <span class="o">-</span><span class="n">v</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">database</span><span class="o">:/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">mysql</span> <span class="o">-</span><span class="n">v</span> <span class="o">/</span><span class="n">backup</span><span class="o">/</span><span class="n">db</span><span class="o">-</span><span class="mf">1.1.2</span><span class="o">:/</span><span class="n">harbor</span><span class="o">-</span><span class="n">migration</span><span class="o">/</span><span class="n">backup</span> <span class="n">vmware</span><span class="o">/</span><span class="n">harbor</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">migrator</span><span class="o">:</span><span class="mf">1.2</span> <span class="n">backup</span>
+
+<span class="cp"># 因为新老版本数据库结构不一样，需要数据库migration</span>
+<span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">it</span> <span class="o">--</span><span class="n">rm</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_USR</span><span class="o">=</span><span class="n">root</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_PWD</span><span class="o">=</span><span class="n">xxxx</span> <span class="o">-</span><span class="n">v</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">database</span><span class="o">:/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">mysql</span> <span class="n">vmware</span><span class="o">/</span><span class="n">harbor</span><span class="o">-</span><span class="n">db</span><span class="o">-</span><span class="n">migrator</span><span class="o">:</span><span class="mf">1.2</span> <span class="n">up</span> <span class="n">head</span>
+
+<span class="cp"># 修改新版本 harbor.cfg配置，需要保持与老版本相关配置项保持一致，然后执行安装即可</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">harbor</span>
+<span class="n">vi</span> <span class="n">harbor</span><span class="p">.</span><span class="n">cfg</span>
+<span class="p">.</span><span class="o">/</span><span class="n">install</span><span class="p">.</span><span class="n">sh</span>
+</pre></div>
+
+
+<h3 id="k8s-harbor-configuration">k8s harbor configuration</h3>
+<p>Master1 生成harbor 证书</p>
+<p>(1)创建harbor 证书签名请求 harbor-csr.json</p>
+<div class="hlcode"><pre><span class="p">{</span>
+    <span class="s2">&quot;CN&quot;</span><span class="o">:</span> <span class="s2">&quot;harbor&quot;</span><span class="o">,</span>
+    <span class="s2">&quot;hosts&quot;</span><span class="o">:</span> <span class="cp">[</span>
+    <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;192.168.1.245&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lmb245&quot;</span>
+     <span class="cp">]</span><span class="o">,</span>
+    <span class="s2">&quot;key&quot;</span><span class="o">:</span> <span class="err">{</span>
+        <span class="s2">&quot;algo&quot;</span><span class="o">:</span> <span class="s2">&quot;rsa&quot;</span><span class="o">,</span>
+        <span class="s2">&quot;size&quot;</span><span class="o">:</span> <span class="m">2048</span>
+    <span class="p">}</span><span class="o">,</span>
+    <span class="s2">&quot;names&quot;</span><span class="o">:</span> <span class="cp">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;CN&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ST&quot;</span><span class="p">:</span> <span class="s2">&quot;Shenzhen&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;L&quot;</span><span class="p">:</span> <span class="s2">&quot;LMB&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;O&quot;</span><span class="p">:</span> <span class="s2">&quot;k8s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;OU&quot;</span><span class="p">:</span> <span class="s2">&quot;System&quot;</span>
+        <span class="p">}</span>
+    <span class="cp">]</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>(2)生成证书和私钥</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">cd</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">k8s</span><span class="o">/</span><span class="n">cfssl</span><span class="o">/</span><span class="n">ssl</span>
+<span class="err">$</span> <span class="n">cfssl</span> <span class="n">gencert</span> <span class="o">--</span><span class="n">ca</span> <span class="n">ca</span><span class="p">.</span><span class="n">pem</span> <span class="o">--</span><span class="n">ca</span><span class="o">-</span><span class="n">key</span> <span class="n">ca</span><span class="o">-</span><span class="n">key</span><span class="p">.</span><span class="n">pem</span> <span class="o">--</span><span class="n">config</span> <span class="n">ca</span><span class="o">-</span><span class="n">config</span><span class="p">.</span><span class="n">json</span> <span class="o">--</span><span class="n">profile</span> <span class="n">kubernetes</span> <span class="n">harbor</span><span class="o">-</span><span class="n">csr</span><span class="p">.</span><span class="n">json</span> <span class="o">|</span> <span class="n">cfssljson</span> <span class="o">--</span><span class="n">bare</span> <span class="n">harbor</span>
+</pre></div>
+
+
+<p>(3)将证书拷贝到harbor服务器</p>
+<div class="hlcode"><pre><span class="err">$</span> <span class="n">ssh</span> <span class="n">harbor</span>
+<span class="n">scp</span> <span class="mf">192.168.1.25</span><span class="o">:/</span><span class="n">etc</span><span class="o">/</span><span class="n">kubernetes</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="p">{</span><span class="n">ca</span><span class="p">.</span><span class="n">pem</span><span class="p">,</span><span class="n">harbor</span><span class="p">.</span><span class="n">pem</span><span class="p">,</span><span class="n">harbor</span><span class="o">-</span><span class="n">key</span><span class="p">.</span><span class="n">pem</span><span class="p">}</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">kubernetes</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span>
+</pre></div>
+
+
+<p>需要配置修改（harbor.cfg）</p>
+<div class="hlcode"><pre><span class="n">hostname</span> <span class="o">=</span> <span class="mf">192.168.1.245</span><span class="o">:</span><span class="mi">8880</span>
+
+<span class="n">ui_url_protocol</span> <span class="o">=</span> <span class="n">http</span>
+
+<span class="n">max_job_workers</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">customize_crt</span> <span class="o">=</span> <span class="n">on</span>
+
+<span class="n">ssl_cert</span> <span class="o">=</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">kubernetes</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="n">harbor</span><span class="p">.</span><span class="n">pem</span>
+<span class="n">ssl_cert_key</span> <span class="o">=</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">kubernetes</span><span class="o">/</span><span class="n">ssl</span><span class="o">/</span><span class="n">harbor</span><span class="o">-</span><span class="n">key</span><span class="p">.</span><span class="n">pem</span>
+
+<span class="n">harbor_admin_password</span> <span class="o">=</span> <span class="n">Harbor2018</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-21 20:45:45</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
