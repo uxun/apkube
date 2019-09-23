@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Prometheus.Concept - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#cncf">cncf</a>
+    &nbsp;&#187;&nbsp;Prometheus.Concept
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="prometheusconcept">Prometheus.Concept</h2>
+<h3 id="what-is-prometheus">What is Prometheus?</h3>
+<p>Prometheus 由SoundCloud 开发的基于时序数据库开源监控告警系统，Google BorgMon监控系统的开源版本。Golang 开发，2016加入 CNCF。</p>
+<p><strong>特点：</strong></p>
+<ol>
+<li>多维度数据查询，tag关联组合，PromQL查询方式</li>
+<li>支持本地存储，千万数据存储/秒，支持remote storage</li>
+<li>基于HTTP的pull采集，push方式推送</li>
+<li>动态发现机制</li>
+<li>容器化部署</li>
+</ol>
+<p><strong>1.Metrics</strong></p>
+<blockquote>
+<p>指标获取方式：pull or push</p>
+</blockquote>
+<p><strong>Pull</strong></p>
+<p>自动拉取监控指标数据，易扩展，降低藕合。采集端无需感知监控系统的存在，增强了系统的可控性。</p>
+<p><strong>Push</strong></p>
+<p>Prometheus提供了PushGateway的支持，监控指标主动推送到PushGateway，prometheus定时去拉</p>
+<p><strong>2.Configuration</strong></p>
+<blockquote>
+<p>两种方式获取监控对象</p>
+</blockquote>
+<ol>
+<li>通过配置文件进行静态配置</li>
+<li>通过consul，zookeeper，kubernetes动态发现</li>
+</ol>
+<p><strong>3.Storage</strong></p>
+<blockquote>
+<p>两种存储方式</p>
+</blockquote>
+<ol>
+<li>
+<p>localhost</p>
+<p>建议SSD，数据保存一个月</p>
+</li>
+<li>
+<p>remote storage</p>
+<p>remote write 和 remote read 接口实现，支持OpenTSDB，InfluxDB，Elasticsearch</p>
+</li>
+</ol>
+<p><strong>4.AlertManager</strong></p>
+<blockquote>
+<p>独立于Prometheus组件</p>
+</blockquote>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-23 22:47:07</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
