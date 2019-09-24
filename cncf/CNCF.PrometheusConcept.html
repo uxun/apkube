@@ -29,7 +29,7 @@
 </div>
 <div class="clearfix"></div>
 <div id="content">
-  <h2 id="prometheusconcept">Prometheus.Concept</h2>
+  <h1 id="prometheusconcept">Prometheus.Concept</h1>
 <h3 id="what-is-prometheus">What is Prometheus?</h3>
 <p>Prometheus 由SoundCloud 开发的基于时序数据库开源监控告警系统，Google BorgMon监控系统的开源版本。Golang 开发，2016加入 CNCF。</p>
 <p><strong>特点：</strong></p>
@@ -74,6 +74,140 @@
 <blockquote>
 <p>独立于Prometheus组件</p>
 </blockquote>
+<p>设定预警规程，触发后，推送告警信息到AlertManager，可通过邮件，webhook，slack或者钉钉。</p>
+<p>通过Gossip ，可在多个AlertManager直接同步告警msg。</p>
+<h2 id="metric">Metric</h2>
+<h3 id="prom">Prom格式</h3>
+<p>监控指标定义统一格式：</p>
+<div class="hlcode"><pre><span class="o">&lt;</span><span class="n">metric</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">{</span><span class="o">&lt;</span><span class="n">lable</span> <span class="n">name</span><span class="o">&gt;=&lt;</span><span class="n">label</span> <span class="n">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="p">...}</span>
+</pre></div>
+
+
+<p>1.指标名称 <metric name></p>
+<p>​   指标内容：HTTP请求总量http_request_total</p>
+<p>2.标签<label></p>
+<p>​   <lable name>=<lable value> 用于过滤和聚合，</p>
+<p>​   e.g: {status="200", method="PUT"}，开头也可以是"__"，Prometheus 系统内部使用。</p>
+<h3 id="prom_1">Prom分类</h3>
+<p>prometheus指标分为四个类型</p>
+<blockquote>
+<p>Counter(计数器)，Gauge(仪表盘)，Histogram(直方图)，Summary(摘要)</p>
+</blockquote>
+<p>1.Counter</p>
+<p>​   只增不减， 通常结合rate()方法获取指标某个时间段的变化率</p>
+<p>2.Gauge</p>
+<p>​   实时变化，可增可减，用量，监控数据基本都是Gauge类型</p>
+<p>3.Histogram 和 Summary 用于凸显数据的分布情况，两种指标可以互相转化</p>
+<p>​   监控样本数据需要满足以下条件</p>
+<div class="hlcode"><pre><span class="c"># 指标必须提供 sum 和 count 方法，表示总和和总量；</span>
+<span class="c"># Summary 类型符合 &quot;指标名称{quantile=分位点}&quot;格式</span>
+<span class="c"># Histogram 类型符合 &quot;指标名称_bucket{le=分位点}&quot; 格式</span>
+<span class="c"># 两类型 quantile 和 le 必须从小到大排序</span>
+</pre></div>
+
+
+<p><strong>Summary e.g:</strong></p>
+<blockquote>
+<p>分数位：0&lt;= x &lt;=1，分数位在n个观察值中按量x*n 排序的观测值。0.9分数位，表示90%位置上的数。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># Prometheus Server中 WAL写入磁盘的同步时间</span>
+<span class="n">Prometheu_tsdb_wal_fsync_duration_seconds</span><span class="p">{</span><span class="n">quantile</span><span class="o">=</span><span class="s">&quot;0.5&quot;</span><span class="p">}</span> <span class="mf">0.012345692</span>
+<span class="n">Prometheu_tsdb_wal_fsync_duration_seconds</span><span class="p">{</span><span class="n">quantile</span><span class="o">=</span><span class="s">&quot;0.9&quot;</span><span class="p">}</span> <span class="mf">0.014436922</span>
+
+<span class="cp"># 50%的同步时间低于0.012345692，90%的同步时间低于0.014436922</span>
+</pre></div>
+
+
+<p><strong>Histogram e.g:</strong></p>
+<blockquote>
+<p>区间的样本个数，通过{le=''}指定这个范围内的样本数。</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 表示本地存储序列保存的chunk数量指标</span>
+<span class="n">Prometheus_local_storage_series_chunks_persisted</span><span class="p">{</span><span class="n">le</span><span class="o">=</span><span class="s">&quot;1.6394e+06&quot;</span><span class="p">}</span> <span class="mi">260</span>
+<span class="n">Prometheus_local_storage_series_chunks_persisted</span><span class="p">{</span><span class="n">le</span><span class="o">=</span><span class="s">&quot;6.5536e+06&quot;</span><span class="p">}</span> <span class="mi">780</span>
+
+<span class="cp"># 小于1.6394e+06个chunks有260个，小于6.5536e+06个chunks有780个</span>
+</pre></div>
+
+
+<h3 id="prom_2">Prom数据样本</h3>
+<p>样本数据已时间序列保存，三部分组成：指标，样本值，时间戳</p>
+<div class="hlcode"><pre>series
+  <span class="o">^</span>
+  │   . . . . . . . . . . . . . . . . .   . .   <span class="p">{</span>__name__<span class="o">=</span><span class="s">&quot;request_total&quot;</span><span class="p">,</span>method<span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">}</span>
+  │     . . . . . . . . . . . . . . . . . . .   . . . .
+  │     . . . . . . . . . .   . . . . . . . .    
+  │     . . . . . . . . . . . . . . . .   . .  
+  v
+    <span class="o">&lt;------------------</span> time <span class="o">----------------&gt;</span> 
+<span class="c1"># 纵轴：指标序列，横轴：时间。</span>
+<span class="c1"># 每一行代表由一个指标组成的时间序列，每个点代表一个监控值。</span>
+<span class="c1"># 时序数据先保存内存中，后批量刷新到磁盘。</span>
+</pre></div>
+
+
+<h2 id="_1">数据采集</h2>
+<blockquote>
+<p>Prometheus 对每个采集点分配一个线程，定时采集。</p>
+<p># HELP: 帮助信息<br />
+# TYPE:  metric类型</p>
+</blockquote>
+<p>两种方式： Pull 和 Push</p>
+<p>1.Push </p>
+<div class="hlcode"><pre><span class="c"># Push实时性优于 Pull，agent本地不保存数据，master需要维护agent状态</span>
+<span class="c"># agent 决定上报的周期和内容</span>
+<span class="c"># 每个agent需要配置master 地址</span>
+</pre></div>
+
+
+<p>2.Pull</p>
+<div class="hlcode"><pre><span class="c"># Pull通常进行周期性采集(default: 30s)，agent本身需要一定的数据存储，master只负责数据拉取，masger可以为无状态。</span>
+<span class="c"># master 控制采集内容和频率</span>
+<span class="c"># 批量配置或者自动发现来获取所有采集点，可以充分与agent解藕，不用知晓master存在。</span>
+</pre></div>
+
+
+<p><strong>服务发现</strong></p>
+<blockquote>
+<p>静态配置文件 和 动态发现</p>
+</blockquote>
+<div class="hlcode"><pre><span class="cp"># 静态文件，采集192.168.1.12:9999 端口指标数据</span>
+<span class="s">&quot;tragets&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s">&quot;192.168.1.12:9999&quot;</span><span class="p">]</span> 
+
+<span class="cp"># 动态发现，适用于云</span>
+</pre></div>
+
+
+<h2 id="_2">数据处理</h2>
+<p>数据操作</p>
+<blockquote>
+<p>relabel, replace, keep, drop</p>
+</blockquote>
+<p>replace: 重新定义标签</p>
+<p>keep: 保留需要的数据 (无用数据影响系统吞吐量，浪费空间)</p>
+<p>drop: 丢弃匹配的标签数据</p>
+<div class="hlcode"><pre><span class="cp"># Hash 取模</span>
+<span class="nl">scrape_configs:</span>
+ <span class="o">-</span> <span class="n">job_name</span><span class="o">:</span> <span class="n">some_job</span>
+   <span class="nl">relabel_configs:</span>
+   <span class="o">-</span> <span class="n">source_labels</span><span class="o">:</span> <span class="p">[</span><span class="n">__address__</span><span class="p">]</span>
+     <span class="nl">modulus:</span> <span class="mi">4</span>   <span class="err">#</span> <span class="mi">4</span><span class="err">个采集点</span>
+     <span class="nl">targeet_label:</span> <span class="n">__tmp_hash</span>
+     <span class="nl">action:</span> <span class="n">hasmod</span>
+   <span class="o">-</span> <span class="n">source_labels</span><span class="o">:</span> <span class="p">[</span><span class="n">__tmp_hash</span><span class="p">]</span>
+     <span class="nl">regex:</span> <span class="o">^</span><span class="mi">1</span><span class="err">$</span>   <span class="err">#</span> <span class="err">匹配第</span><span class="mi">2</span><span class="err">个节点</span>
+     <span class="nl">action:</span> <span class="n">keep</span>
+</pre></div>
+
+
+<h2 id="_3">数据存储</h2>
+<p>localhost and remote storage</p>
+<p>时序数据特点</p>
+<ol>
+<li>相邻数据点时间戳的差值相对固定，即使变化，也在一个很小范围内浮动</li>
+<li>相邻数据点的值的变化幅度很小，甚至无变化</li>
+<li>对热数据的查询频率远远超出对非热点数据的查询频率，并且数据距离现在越近，热度越高</li>
+</ol>
   
 </div>
     </div>
@@ -86,7 +220,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-09-23 22:47:07</p>
+        <p>Page Updated 2019-09-24 23:22:20</p>
       </div> <!-- end footer-right -->
     </div>
 
