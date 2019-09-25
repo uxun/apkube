@@ -29,9 +29,27 @@
 </div>
 <div class="clearfix"></div>
 <div id="content">
-  <h1 id="prometheusconcept">Prometheus.Concept</h1>
-<h3 id="what-is-prometheus">What is Prometheus?</h3>
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#prometheusconcept">Prometheus.Concept</a><ul>
+<li><a href="#what-is-prometheus">What is Prometheus?</a></li>
+<li><a href="#metric">Metric</a><ul>
+<li><a href="#prom">Prom格式</a></li>
+<li><a href="#prom_1">Prom分类</a></li>
+<li><a href="#prom_2">Prom数据样本</a></li>
+</ul>
+</li>
+<li><a href="#_1">数据采集</a></li>
+<li><a href="#_2">数据处理</a></li>
+<li><a href="#_3">数据存储</a></li>
+<li><a href="#alert">Alert</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="prometheusconcept">Prometheus.Concept</h1>
+<h2 id="what-is-prometheus">What is Prometheus?</h2>
 <p>Prometheus 由SoundCloud 开发的基于时序数据库开源监控告警系统，Google BorgMon监控系统的开源版本。Golang 开发，2016加入 CNCF。</p>
+<p>只针对性能和可用性监控，不具备日志监控。</p>
 <p><strong>特点：</strong></p>
 <ol>
 <li>多维度数据查询，tag关联组合，PromQL查询方式</li>
@@ -76,6 +94,10 @@
 </blockquote>
 <p>设定预警规程，触发后，推送告警信息到AlertManager，可通过邮件，webhook，slack或者钉钉。</p>
 <p>通过Gossip ，可在多个AlertManager直接同步告警msg。</p>
+<p><strong>5.HA plan</strong></p>
+<ol>
+<li>Thanos (Improbable的prom高可用解决方案) </li>
+</ol>
 <h2 id="metric">Metric</h2>
 <h3 id="prom">Prom格式</h3>
 <p>监控指标定义统一格式：</p>
@@ -202,12 +224,49 @@
 
 <h2 id="_3">数据存储</h2>
 <p>localhost and remote storage</p>
-<p>时序数据特点</p>
+<p><strong>时序数据特点</strong></p>
 <ol>
 <li>相邻数据点时间戳的差值相对固定，即使变化，也在一个很小范围内浮动</li>
 <li>相邻数据点的值的变化幅度很小，甚至无变化</li>
 <li>对热数据的查询频率远远超出对非热点数据的查询频率，并且数据距离现在越近，热度越高</li>
 </ol>
+<p><strong>一种压缩算法</strong></p>
+<blockquote>
+<p>Gorilla 将16字节样本数据压缩到1.37字节，通过chunk保存</p>
+</blockquote>
+<p>原理：</p>
+<div class="hlcode"><pre><span class="err">对时间戳采用两次去差值的方式，加入</span><span class="n">t0</span><span class="o">=</span><span class="mi">10</span><span class="o">:</span><span class="mo">00</span><span class="o">:</span><span class="mo">00</span><span class="p">,</span><span class="n">t1</span><span class="o">=</span><span class="mi">10</span><span class="o">:</span><span class="mo">01</span><span class="o">:</span><span class="mo">02</span><span class="err">和</span><span class="n">t2</span><span class="o">=</span><span class="mi">10</span><span class="o">:</span><span class="mo">02</span><span class="o">:</span><span class="mo">02</span> <span class="err">三个时间点。第一次压缩，</span><span class="n">t1</span><span class="o">-</span><span class="n">t0</span><span class="o">=</span><span class="mi">62</span><span class="p">,</span><span class="n">t2</span><span class="o">-</span><span class="n">t1</span><span class="o">=</span><span class="mi">60</span><span class="p">;</span> <span class="err">第二次压缩时，</span><span class="mi">60</span><span class="o">-</span><span class="mi">62</span><span class="o">=-</span><span class="mi">2</span><span class="err">。采用差值的方式来大幅度降低存储空间，采样的频率通常也是固定的，这呀差值几乎都为</span><span class="mi">0</span><span class="err">。对于指标值，则对相邻指标进行异或</span><span class="p">(</span><span class="n">XOR</span><span class="p">)</span><span class="err">操作，如果前后两个采用值相等，二者异或的结果为</span><span class="mi">0</span><span class="err">，则只需保存一个</span><span class="mi">0</span><span class="err">，而且监控数据通常变化不大，异或结果将会很小，便于保存。</span>
+</pre></div>
+
+
+<p>v3版优点</p>
+<blockquote>
+<p>meta.json 元数据，index记录索引，每个block是一个目录</p>
+</blockquote>
+<ol>
+<li>每个文件块最大支持512MB，避免SSD写放大</li>
+<li>一段时间一个文件，避免时序流失</li>
+<li>时间排序，可以将内存数据和磁盘数据合并，避免OOM</li>
+<li>引入WAL，wal目录记录监控数据的WAL</li>
+</ol>
+<p><strong>Remote Storage</strong></p>
+<p>adpter实现接口，将数据转化数据库各自协议</p>
+<p><img alt="" src="https://prometheus.io/docs/prometheus/latest/images/remote_integrations.png" /></p>
+<h2 id="alert">Alert</h2>
+<p>promtheus本身不会对告警进行处理，需要借助另一个组件AlertManager。</p>
+<p><a href="https://github.com/prometheus/alertmanager#high-availability">AlertManager</a>分两部分：router and receiver </p>
+<blockquote>
+<p>告警信息经过路由树，然后分配对应的接收器中</p>
+</blockquote>
+<p><img alt="" src="https://github.com/prometheus/alertmanager/raw/master/doc/arch.svg?sanitize=true" /></p>
+<p><strong>work flow</strong></p>
+<p>prom 调用 alertmanager 接口，alertmanager保存到各自provider里，provider提供一个订阅接口(subscribe)，这样Dispatcher组件可以获取告警数据。</p>
+<p>Gossip(解决多个AlertManager重复发送报警问题)，是一种最终一致性协议，负责两处信息同步：</p>
+<div class="hlcode"><pre><span class="mf">1.</span><span class="err">保证每个</span><span class="n">AlertManager</span><span class="err">之间静默配置一致，保证每个</span><span class="n">AlertManager</span><span class="err">都能报警。</span>
+<span class="mf">2.</span><span class="err">告警在每个</span><span class="n">AlertManager</span><span class="err">之间同步，相同告警去重</span><span class="p">(</span><span class="n">Dedup</span><span class="p">)</span><span class="err">。</span>
+<span class="err">问题：告警同时发出，没等到</span><span class="n">Gossip</span><span class="err">同步？</span>
+    <span class="err">加入</span><span class="p">(</span><span class="n">Wait</span><span class="p">)</span><span class="err">机制，每个节点的</span><span class="n">Wait</span><span class="err">时间调整到不同的时间，</span><span class="n">e</span><span class="p">.</span><span class="n">g</span> <span class="n">node1</span><span class="o">:</span><span class="mi">0</span><span class="n">s</span><span class="p">,</span><span class="n">node2</span><span class="o">:</span><span class="mi">5</span><span class="n">s</span>
+</pre></div>
   
 </div>
     </div>
@@ -220,7 +279,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-09-24 23:22:20</p>
+        <p>Page Updated 2019-09-25 22:39:26</p>
       </div> <!-- end footer-right -->
     </div>
 
