@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
     <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
-    <title>Prometheus.Concept - Uxun's WIKI</title>
+    <title>Prom.Concept - Uxun's WIKI</title>
     <meta name="keywords" content=""/>
     <meta name="description" content=""/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -21,7 +21,7 @@
     <a href="/wiki/">Uxun's WIKI</a>
     &nbsp;&#187;&nbsp;
     <a href="/wiki/#cncf">cncf</a>
-    &nbsp;&#187;&nbsp;Prometheus.Concept
+    &nbsp;&#187;&nbsp;Prom.Concept
     <span class="updated">Page Updated&nbsp;
     
     </span>
@@ -40,7 +40,11 @@
 </li>
 <li><a href="#_1">数据采集</a></li>
 <li><a href="#_2">数据处理</a></li>
-<li><a href="#_3">数据存储</a></li>
+<li><a href="#_3">数据存储</a><ul>
+<li><a href="#localhost">localhost</a></li>
+<li><a href="#remote-storage">remote storage</a></li>
+</ul>
+</li>
 <li><a href="#alert">Alert</a></li>
 </ul>
 </li>
@@ -223,7 +227,28 @@
 
 
 <h2 id="_3">数据存储</h2>
-<p>localhost and remote storage</p>
+<p><strong>localhost and remote storage</strong></p>
+<h3 id="localhost">localhost</h3>
+<p>Prometheus 的本地存储称为Prometheus TSDB，TSDB的核心(block和WAL)</p>
+<p><strong>block</strong></p>
+<blockquote>
+<p>block包含，chunks，index，meta.json，tombstones</p>
+</blockquote>
+<p>TSDB将存储的监控数据按照时间分隔成block，默认最小block保存2h监控数据。按照设置的步长倍数递增，步长为3，则：2h,6h,18h,将3个2h的block合并成一个6h的block，每个block都有一个全局唯一名称ULID</p>
+<ol>
+<li>chunks：保存压缩后的数据，大小为512MB，超过则截断多个chunk保持，数字编号命名</li>
+<li>index：查询索引，记录chunk中时序的偏移位置(TOC表，符号表(Symbol Table)，时序列表(Series)，标签索引表(Label Index Table)，Postings表)</li>
+<li>meta.json：block的元数据信息</li>
+<li>tombstone：对一部份数据块进行删除(TSDB删除block数据块时候是对整个目录delete)</li>
+</ol>
+<p><strong>WAL</strong></p>
+<blockquote>
+<p>Write-ahead logging 预写日志：关系型数据库中利用日志来实行事物性和持久性的一种技术</p>
+</blockquote>
+<p>进行某个操作之前将事情记录下来，以便之后对数据进行回滚，重试等操作并保证数据的可靠性。</p>
+<h3 id="remote-storage">remote storage</h3>
+<p>对接远端存储及Adapter，首先需要进行压测，确保远端存储和Adapter都可以承受Prom的数据写入。单个Prom每秒可以采集1000万个指标项目。错误日志中出现Remote storage queue full，代表Adapter或者远端存储无法写入，并且开始丢弃部分监控数据。</p>
+<p>推荐M3DB 对时序数据存储方面有良好的性能</p>
 <p><strong>时序数据特点</strong></p>
 <ol>
 <li>相邻数据点时间戳的差值相对固定，即使变化，也在一个很小范围内浮动</li>
@@ -279,7 +304,7 @@
         </p>
       </div> <!-- end footer-left -->
       <div class="footer-right">
-        <p>Page Updated 2019-09-25 22:39:26</p>
+        <p>Page Updated 2019-09-28 21:55:11</p>
       </div> <!-- end footer-right -->
     </div>
 

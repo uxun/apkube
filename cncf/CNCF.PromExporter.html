@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Prom.Exporter - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#cncf">cncf</a>
+    &nbsp;&#187;&nbsp;Prom.Exporter
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h1 id="promexporter">Prom.Exporter</h1>
+<p>exporter 采集监控数据通过prom 监控规范对外提供数据的组件。通过监控对象提供的监控相关接口获取监控数据。通过以下方式对外提供：</p>
+<ol>
+<li>HTTP/HTTPS</li>
+<li>TCP: MySQL exporter 通过开放的监控相关表获取监控指标</li>
+<li>The local file: Node exporter 通过读取proc文件</li>
+<li>标准协议方式</li>
+</ol>
+<p>官方提供了各种语言的依赖</p>
+<p><strong>Node_Exporter</strong></p>
+<p>从proc文件系统中获取指标数据</p>
+<div class="hlcode"><pre><span class="err">#</span> <span class="err">读取</span><span class="o">/</span><span class="nx">proc</span><span class="o">/</span><span class="nx">meminfo</span>
+<span class="nx">file</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="nx">procFilePath</span><span class="p">(</span><span class="s">&quot;meminfo&quot;</span><span class="p">))</span>
+</pre></div>
+
+
+<p><strong>Redis_Exporter</strong></p>
+<p>3.x + 版本原生支持集群部署，通过设置环境变量REDIS_ADDR 和REDIS_PASSWORD 连接Redis来获取监控数据，多个Redis节点，通过REDIS_FILE指定一个文件，该文件定义多个Redis节点。</p>
+<p>通过Redis原生的INFO ALL 命令获取Redis的所有指标</p>
+<div class="hlcode"><pre><span class="err">#</span> <span class="err">通过</span><span class="nx">doRedisCmd发送INFO</span> <span class="nx">ALL命令</span>
+<span class="nx">infoAll</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">redis</span><span class="p">.</span><span class="nx">String</span><span class="p">(</span><span class="nx">doRedisCmd</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="s">&quot;INFO&quot;</span><span class="p">,</span> <span class="s">&quot;ALL&quot;</span><span class="p">))</span>
+</pre></div>
+
+
+<p><strong>Mysql_Exporter</strong></p>
+<p>官方建议使用5.5 +，通过设置环境变量DATA_SOURCE_NAME指定MySQL地址，读取MySQL的性能数据，读取表需要用户权限(进程表，库，主从位置，表)。</p>
+<div class="hlcode"><pre><span class="c1">#</span>
+<span class="k">CREATE</span> <span class="n">USER</span> <span class="s1">&#39;exporter&#39;</span><span class="o">@</span><span class="s1">&#39;localhost&#39;</span> <span class="n">IDENTIFIED</span> <span class="k">BY</span> <span class="s1">&#39;passwd&#39;</span> <span class="k">WITH</span> <span class="n">MAX_USER_CONECTIONS</span> <span class="mi">3</span><span class="p">;</span>
+<span class="n">CRANT</span> <span class="n">PROCESS</span><span class="p">,</span><span class="n">REPLICATION</span> <span class="n">CLIENT</span><span class="p">,</span><span class="k">SELECT</span> <span class="k">ON</span> <span class="o">*</span><span class="p">.</span><span class="o">*</span> <span class="k">TO</span> <span class="s1">&#39;exporter&#39;</span><span class="o">@</span><span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+</pre></div>
+
+
+<p>系统信息存放infomation_schema，性能信息存放performance_schema(5.7 默认开启 performance_schema=ON)</p>
+<h2 id="go-client_golang">GO (client_golang)</h2>
+<p>exporter中通常有多个协程共同修改某个指标，如何保证数据一致性？</p>
+<p>client_goland中引入原子变量，记录指标变化</p>
+<div class="hlcode"><pre><span class="err">#</span> <span class="err">变量累加操作</span> <span class="nx">Add</span><span class="p">()</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">g</span> <span class="o">*</span><span class="nx">gauge</span><span class="p">)</span> <span class="nx">Add</span><span class="p">(</span><span class="nx">val</span> <span class="kt">float64</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">{</span>
+    <span class="nx">oldBits</span> <span class="o">:=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nx">LoadUint64</span><span class="p">(</span><span class="o">%</span><span class="nx">g</span><span class="p">.</span><span class="nx">valBits</span><span class="p">)</span>
+    <span class="nx">newBits</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nx">Float64bits</span><span class="p">(</span><span class="nx">math</span><span class="p">.</span><span class="nx">Float64frombits</span><span class="p">(</span><span class="nx">oldBits</span><span class="p">)</span> <span class="o">+</span> <span class="nx">val</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nx">CompareAndSwapUint64</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">g</span><span class="p">.</span><span class="nx">valBits</span><span class="p">,</span> <span class="nx">oldBits</span><span class="p">,</span> <span class="nx">newBits</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-28 21:55:11</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
