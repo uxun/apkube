@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/colorful.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>NFS - Uxun's WIKI</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  </head>
+
+  <body>
+    <div id="container" class="typo">
+      
+<div id="header">
+  <div id="post-nav">
+    <a href="/wiki/">Uxun's WIKI</a>
+    &nbsp;&#187;&nbsp;
+    <a href="/wiki/#storage">storage</a>
+    &nbsp;&#187;&nbsp;NFS
+    <span class="updated">Page Updated&nbsp;
+    
+    </span>
+  </div>
+</div>
+<div class="clearfix"></div>
+<div id="content">
+  <h2 id="nfs">NFS</h2>
+<p><strong>QuickDo</strong></p>
+<div class="hlcode"><pre><span class="cp"># server </span>
+<span class="cp"># add</span>
+<span class="err">$</span> <span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">exports</span>
+<span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">data</span> <span class="mf">192.168.1.17</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">,</span><span class="n">async</span><span class="p">)</span>
+<span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">data12_backup</span> <span class="mf">192.168.1.12</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">,</span><span class="n">async</span><span class="p">)</span>
+<span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">mysqlbackup</span><span class="o">/</span><span class="mi">78</span> <span class="mf">192.168.1.78</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">,</span><span class="n">async</span><span class="p">)</span>
+
+<span class="err">$</span> <span class="n">systemctl</span> <span class="n">restart</span> <span class="n">nfs</span><span class="o">-</span><span class="n">server</span>
+
+<span class="cp"># client</span>
+<span class="err">$</span> <span class="n">mount</span> <span class="mf">192.168.1.49</span><span class="o">:/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">mysqlbackup</span><span class="o">/</span><span class="mi">78</span> <span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">mysqlbackup</span>
+<span class="err">$</span> <span class="n">vim</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">fstab</span>
+<span class="mf">192.168.1.49</span><span class="o">:/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">mysqlbackup</span><span class="o">/</span><span class="mi">78</span>  <span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">mysqlbackup</span> <span class="n">nfs</span> <span class="n">defaults</span> <span class="mi">0</span> <span class="mi">0</span>
+</pre></div>
+
+
+<h3 id="deploy">Deploy</h3>
+<p>NFS 允许系统将目录和文件共享给网络上的其他系统。通过 NFS，用户和应用程序可以访问远程系统上的文件，就象它们是本地文件一样。</p>
+<div class="hlcode"><pre><span class="c"># Ubuntu 16.04</span>
+apt install nfs-kernel-server
+
+<span class="c"># Centos</span>
+yum install nfs-utils
+</pre></div>
+
+
+<h3 id="server-configuration">Server Configuration</h3>
+<p>配置文件<code>/etc/exports</code>格式如下：</p>
+<div class="hlcode"><pre><span class="n">NFS</span><span class="err">共享目录路径</span> <span class="err">客户机</span><span class="n">IP</span><span class="err">或者名称</span><span class="p">(</span><span class="err">参数</span><span class="mi">1</span><span class="p">,</span><span class="err">参数</span><span class="mi">2</span><span class="p">,...,</span><span class="err">参数</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+
+
+<p><strong>E.g</strong></p>
+<div class="hlcode"><pre><span class="o">/</span><span class="n">home</span> <span class="o">*</span><span class="p">(</span><span class="n">ro</span><span class="p">,</span><span class="n">sync</span><span class="p">,</span><span class="n">insecure</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">)</span>
+<span class="o">/</span><span class="n">share</span> <span class="mf">192.168.1</span><span class="p">.</span><span class="o">*</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">sync</span><span class="p">,</span><span class="n">insecure</span><span class="p">,</span><span class="n">no_subtree_check</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">)</span>
+
+<span class="cp"># e.g</span>
+<span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">data</span> <span class="mf">192.168.1.17</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">,</span><span class="n">async</span><span class="p">)</span>
+<span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">data12_backup</span> <span class="mf">192.168.1.12</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">,</span><span class="n">async</span><span class="p">)</span>
+<span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">mysqlbackup</span><span class="o">/</span><span class="mi">78</span> <span class="mf">192.168.1.78</span><span class="p">(</span><span class="n">rw</span><span class="p">,</span><span class="n">no_root_squash</span><span class="p">,</span><span class="n">async</span><span class="p">)</span>
+</pre></div>
+
+
+<table>
+<thead>
+<tr>
+<th align="left">参数</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">ro</td>
+<td align="left">只读访问</td>
+</tr>
+<tr>
+<td align="left">rw</td>
+<td align="left">读写访问</td>
+</tr>
+<tr>
+<td align="left">sync</td>
+<td align="left">所有数据在请求时写入共享</td>
+</tr>
+<tr>
+<td align="left">async</td>
+<td align="left">nfs在写入数据前可以响应请求</td>
+</tr>
+<tr>
+<td align="left">secure</td>
+<td align="left">nfs通过1024以下的安全TCP/IP端口发送</td>
+</tr>
+<tr>
+<td align="left">insecure</td>
+<td align="left">nfs通过1024以上的端口发送</td>
+</tr>
+<tr>
+<td align="left">wdelay</td>
+<td align="left">如果多个用户要写入nfs目录，则归组写入（默认）</td>
+</tr>
+<tr>
+<td align="left">no_wdelay</td>
+<td align="left">如果多个用户要写入nfs目录，则立即写入，当使用async时，无需此设置</td>
+</tr>
+<tr>
+<td align="left">hide</td>
+<td align="left">在nfs共享目录中不共享其子目录</td>
+</tr>
+<tr>
+<td align="left">no_hide</td>
+<td align="left">共享nfs目录的子目录</td>
+</tr>
+<tr>
+<td align="left">subtree_check</td>
+<td align="left">如果共享/usr/bin之类的子目录时，强制nfs检查父目录的权限（默认）</td>
+</tr>
+<tr>
+<td align="left">no_subtree_check</td>
+<td align="left">不检查父目录权限</td>
+</tr>
+<tr>
+<td align="left">all_squash</td>
+<td align="left">共享文件的UID和GID映射匿名用户anonymous，适合公用目录</td>
+</tr>
+<tr>
+<td align="left">no_all_squash</td>
+<td align="left">保留共享文件的UID和GID（默认）</td>
+</tr>
+<tr>
+<td align="left">root_squash</td>
+<td align="left">root用户的所有请求映射成如anonymous用户一样的权限（默认）</td>
+</tr>
+<tr>
+<td align="left">no_root_squash</td>
+<td align="left">root用户具有根目录的完全管理访问权限</td>
+</tr>
+<tr>
+<td align="left">anonuid=xxx</td>
+<td align="left">指定nfs服务器/etc/passwd文件中匿名用户的UID</td>
+</tr>
+<tr>
+<td align="left">anongid=xxx</td>
+<td align="left">指定nfs服务器/etc/passwd文件中匿名用户的GID</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>注1：尽量指定主机名或IP或IP段最小化授权可以访问NFS 挂载的资源的客户端</li>
+<li>注2：经测试参数insecure必须要加，否则客户端挂载出错mount.nfs: access denied by server while mounting</li>
+</ul>
+<h3 id="start">Start</h3>
+<div class="hlcode"><pre><span class="c"># Ubuntu </span>
+systemctl start nfs-kernel-server.service
+
+<span class="c"># CentOS</span>
+systemctl start nfs-server
+</pre></div>
+
+
+<h3 id="client-configuration">Client Configuration</h3>
+<div class="hlcode"><pre><span class="cp"># Ubuntu 16.04，首先需要安装 nfs-common 包</span>
+<span class="n">apt</span> <span class="n">install</span> <span class="n">nfs</span><span class="o">-</span><span class="n">common</span>
+
+<span class="cp"># CentOS 7, 需要安装 nfs-utils 包</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">nfs</span><span class="o">-</span><span class="n">utils</span>
+
+<span class="cp"># 使用mount命令来挂载其他机器共享的NFS目录。(/data/backup/nfs目录必须存在)</span>
+<span class="n">mount</span> <span class="n">example</span><span class="p">.</span><span class="n">hostname</span><span class="p">.</span><span class="n">com</span><span class="o">:/</span><span class="n">data</span><span class="o">/</span><span class="n">nfs</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">backup</span><span class="o">/</span><span class="n">nfs</span>
+
+<span class="cp"># 开机启动项/etc/fstab，须指明NFS服务器的主机名、服务器输出的目录名以及挂载 NFS 共享的本机目录。</span>
+<span class="cp"># ubuntu</span>
+<span class="n">example</span><span class="p">.</span><span class="n">hostname</span><span class="p">.</span><span class="n">com</span><span class="o">:/</span><span class="n">ubuntu</span> <span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">ubuntu</span> <span class="n">nfs</span> <span class="n">rsize</span><span class="o">=</span><span class="mi">8192</span><span class="p">,</span><span class="n">wsize</span><span class="o">=</span><span class="mi">8192</span><span class="p">,</span><span class="n">timeo</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span><span class="n">intr</span>
+
+<span class="cp"># centos</span>
+<span class="mf">192.168.1.49</span><span class="o">:/</span><span class="n">log</span><span class="o">/</span><span class="n">nfs</span><span class="o">/</span><span class="n">mysqlbackup</span><span class="o">/</span><span class="mi">78</span>  <span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">mysqlbackup</span> <span class="n">nfs</span> <span class="n">defaults</span> <span class="mi">0</span> <span class="mi">0</span>
+</pre></div>
+  
+</div>
+    </div>
+    <div id="footer">
+      <div class="footer-left">
+        <p>
+        Copyright © 2019 Uxun.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.
+        Theme by <a href="https://github.com/tankywoo/yasimple_x2" target="_blank">YASimple_X2</a>.
+        </p>
+      </div> <!-- end footer-left -->
+      <div class="footer-right">
+        <p>Page Updated 2019-09-30 14:39:58</p>
+      </div> <!-- end footer-right -->
+    </div>
+
+    
+    
+
+  </body>
+</html>
